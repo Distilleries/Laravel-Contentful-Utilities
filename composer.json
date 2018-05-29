@@ -1,0 +1,38 @@
+{
+    "name": "distilleries/contentful",
+    "description": "Package to use contentful in offline mode.",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Maxime Francois",
+            "email": "kezho@me.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.0",
+        "illuminate/support": "5.6.*",
+        "illuminate/database": "5.6.*"
+    },
+    "minimum-stability": "stable",
+    "require-dev": {
+        "orchestra/database": "3.6.*",
+        "orchestra/testbench": "3.6.*",
+        "phpunit/phpunit": "7.1.*",
+        "mockery/mockery": "0.9.*"
+    },
+    "autoload": {
+        "classmap": [
+            "tests"
+        ],
+        "psr-4": {
+            "Distilleries\\Contentful\\": "src/Distilleries/Contentful"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Distilleries\\Contentful\\ContentfulServiceProvider"
+            ]
+        }
+    }
+}
