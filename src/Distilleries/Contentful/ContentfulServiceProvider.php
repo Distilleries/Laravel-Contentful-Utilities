@@ -1,4 +1,8 @@
-<?php namespace Distilleries\Messenger;
+<?php
+
+namespace Distilleries\Contentful;
+
+use Distilleries\Contentful\Services\Contentful\ContentDeliveryApiCache;
 
 class ContentfulServiceProvider extends ServiceProvider {
 
@@ -36,6 +40,14 @@ class ContentfulServiceProvider extends ServiceProvider {
             __DIR__.'/../../config/config.php',
             $this->package
         );
+
+        $this->app->singleton(ContentDelivery::class,function($app)
+        {
+            return new ContentDeliveryApiCache(app('cache'),config($this->package.'.api'));
+        });
+
+
+
         $this->alias();
     }
 
@@ -45,6 +57,11 @@ class ContentfulServiceProvider extends ServiceProvider {
         AliasLoader::getInstance()->alias(
             'Log',
             'Illuminate\Support\Facades\Log'
+        );
+
+        AliasLoader::getInstance()->alias(
+            'DB',
+            'Illuminate\Support\Facades\DB'
         );
     }
 }

@@ -1,0 +1,30 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+/**
+{{PROPERTIES}}
+ */
+class {{MODEL}} extends Model
+{
+    /**
+     * {@inheritdoc}
+     */
+    protected $table = '{{TABLE}}';
+
+    /**
+     * {@inheritdoc}
+     */
+    protected $fillable = [
+{{FILLABLES}}
+    ];
+
+    /**
+     * {@inheritdoc}
+     */
+    protected $cast = [
+{{CASTS}}
+    ];{{RELATIONSHIPS}}
+}
