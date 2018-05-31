@@ -3,6 +3,7 @@
 namespace Distilleries\Contentful;
 
 use Distilleries\Contentful\Services\Contentful\ContentDeliveryApiCache;
+use Illuminate\Foundation\AliasLoader;
 use Illuminate\Support\ServiceProvider;
 
 class ContentfulServiceProvider extends ServiceProvider {
