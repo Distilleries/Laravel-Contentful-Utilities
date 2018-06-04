@@ -3,12 +3,13 @@
 return [
 
     'api' => [
+        'space' => env('CONTENTFUL_SPACE_ID'),
+        'default_locale' => null,
+
         'delivery' => [
-            'space' => env('CONTENTFUL_SPACE_ID'),
             'token' => env('CONTENTFUL_TOKEN_LIVE'),
             'preview' => env('CONTENTFUL_TOKEN_PREVIEW'),
             'use_preview' => env('CONTENTFUL_USE_PREVIEW'),
-            'default_locale' => null,
         ],
 
         'management' => [

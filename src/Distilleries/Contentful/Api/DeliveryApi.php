@@ -47,7 +47,7 @@ class DeliveryApi extends BaseApi
     {
         $response = $this->client->request('GET', $this->url($endpoint), [
             RequestOptions::QUERY => array_merge($parameters, [
-                'access_token' => $this->config['delivery_token'],
+                'access_token' => $this->config['api']['delivery']['token'],
             ]),
         ]);
 

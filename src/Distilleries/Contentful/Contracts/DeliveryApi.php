@@ -1,17 +1,19 @@
 <?php
 
-namespace Distilleries\Contentful\Services\Contentful;
+namespace Distilleries\Contentful\Contracts;
 
 use Illuminate\Cache\CacheManager;
 
-interface ContentDelivery
+interface DeliveryApi
 {
     /**
-     * ContentDelivery constructor.
+     * DeliveryApi constructor.
      *
      * @param  \Illuminate\Cache\CacheManager  $cache
+     * @param  array  $config
+     * @return void
      */
-    public function __construct(CacheManager $cache,$config);
+    public function __construct(CacheManager $cache, $config);
 
     /**
      * Return entries for given parameters.
@@ -30,6 +32,12 @@ interface ContentDelivery
      */
     public function entry($entryId, $locale = '');
 
-
+    /**
+     * Call for a single asset for given asset ID.
+     *
+     * @param  string  $assetId
+     * @param  string  $locale
+     * @return array
+     */
     public function asset($assetId, $locale = '');
 }

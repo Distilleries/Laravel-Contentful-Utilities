@@ -37,7 +37,7 @@ abstract class BaseApi
     {
         $this->client = $client;
 
-        $this->config = config('services.contentful');
+        $this->config = config('contentful');
     }
 
     /**
@@ -48,7 +48,7 @@ abstract class BaseApi
      */
     protected function url($endpoint)
     {
-        return rtrim($this->baseUrl, '/') . '/spaces/' . $this->config['space_id'] . '/' . trim($endpoint, '/');
+        return rtrim($this->baseUrl, '/') . '/spaces/' . $this->config['api']['space'] . '/' . trim($endpoint, '/');
     }
 
     /**

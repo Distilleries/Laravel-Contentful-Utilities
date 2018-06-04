@@ -109,7 +109,7 @@ class ManagementApi extends BaseApi
     {
         return array_merge([
             'Content-Type' => 'application/vnd.contentful.management.v1+json',
-            'Authorization' => 'Bearer ' . $this->config['management_token'],
+            'Authorization' => 'Bearer ' . $this->config['api']['management']['token'],
         ], $headers);
     }
 }

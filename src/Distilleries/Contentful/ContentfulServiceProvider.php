@@ -56,7 +56,7 @@ class ContentfulServiceProvider extends ServiceProvider
         });
 
         // @TODO... Use API\...
-        $this->app->singleton(Services\Contentful\ContentDelivery::class, function ($app) {
+        $this->app->singleton(Contracts\DeliveryApi::class, function ($app) {
             return new Services\Contentful\ContentDeliveryApiCache(app('cache'), config($this->package . '.api'));
         });
 
