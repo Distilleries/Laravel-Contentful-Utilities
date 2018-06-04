@@ -1,20 +1,15 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: mfrancois
- * Date: 11/08/2016
- * Time: 10:51
- */
 
-use \Mockery as m;
+use Mockery as m;
+use Orchestra\Testbench\TestCase;
 
-abstract class ContentfulTestCase extends \Orchestra\Testbench\TestCase
+abstract class ContentfulTestCase extends TestCase
 {
     protected $facade;
 
     protected function initService()
     {
-        $service       = $this->app->getProvider('Distilleries\Messenger\ContentfulServiceProvider');
+        $service = $this->app->getProvider('Distilleries\Messenger\ContentfulServiceProvider');
 
         $service->boot();
         $service->register();
@@ -25,22 +20,21 @@ abstract class ContentfulTestCase extends \Orchestra\Testbench\TestCase
     public function setUp()
     {
         parent::setUp();
+
         $this->app['Illuminate\Contracts\Console\Kernel']->call('vendor:publish');
+
         $this->artisan('migrate');
     }
-
-
 
     protected function getEnvironmentSetUp($app)
     {
         $app['config']->set('database.default', 'testbench');
         $app['config']->set('database.connections.testbench', [
-            'driver'   => 'sqlite',
+            'driver' => 'sqlite',
+            'prefix' => '',
             'database' => ':memory:',
-            'prefix'   => '',
         ]);
     }
-
 
     protected function getPackageProviders($app)
     {
@@ -51,14 +45,13 @@ abstract class ContentfulTestCase extends \Orchestra\Testbench\TestCase
 
     protected function getPackageAliases($app)
     {
-        return [
-        ];
+        return [];
     }
-
 
     public function tearDown()
     {
         parent::tearDown();
+
         m::close();
     }
 
