@@ -50,7 +50,7 @@ class Image
             'fl' => ($format !== 'webp') ? (! empty($isProgressive) ? 'progressive' : config('contentful.image.progressive', null)) : null,
             'fit' => ! empty($fit) ? (($fit === 'default') ? null : $fit) : 'fill',
         ])->filter(function ($value, $key) {
-            return !empty($value);
+            return ! empty($value);
         })->each(function ($value, $key) use (& $stringResult) {
             $stringResult .= $key . '=' . $value . '&';
         });
@@ -62,7 +62,6 @@ class Image
 
         $search = config('contentful.image.replace_host');
         $dest = config('contentful.image.dest_host');
-
         if (! empty($search) and ! empty($dest)) {
             $url = Str::replaceFirst($search, $dest, $url);
         }

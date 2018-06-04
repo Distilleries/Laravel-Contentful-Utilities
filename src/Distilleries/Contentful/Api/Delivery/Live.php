@@ -1,10 +1,11 @@
 <?php
 
-namespace Distilleries\Contentful\Api;
+namespace Distilleries\Contentful\Api\Delivery;
 
 use GuzzleHttp\RequestOptions;
+use Distilleries\Contentful\Api\BaseApi;
 
-class DeliveryApi extends BaseApi
+class Live extends BaseApi implements Api
 {
     /**
      * {@inheritdoc}
@@ -12,11 +13,7 @@ class DeliveryApi extends BaseApi
     protected $baseUrl = 'https://cdn.contentful.com';
 
     /**
-     * Return the "/entries" raw response corresponding to given parameters.
-     *
-     * @param  array  $parameters
-     * @return array
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * {@inheritdoc}
      */
     public function entries($parameters = [])
     {
@@ -24,15 +21,27 @@ class DeliveryApi extends BaseApi
     }
 
     /**
-     * Return the "/assets" raw response corresponding to given parameters.
-     *
-     * @param  array  $parameters
-     * @return array
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * {@inheritdoc}
      */
     public function assets($parameters = [])
     {
         return $this->items('assets', $parameters);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function entry($entryId, $locale = '')
+    {
+        // @TODO...
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function asset($assetId, $locale = '')
+    {
+        // @TODO...
     }
 
     /**
@@ -43,7 +52,7 @@ class DeliveryApi extends BaseApi
      * @return array
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    protected function items($endpoint, $parameters)
+    private function items($endpoint, $parameters)
     {
         $response = $this->client->request('GET', $this->url($endpoint), [
             RequestOptions::QUERY => array_merge($parameters, [

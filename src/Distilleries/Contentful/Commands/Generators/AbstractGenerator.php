@@ -5,23 +5,23 @@ namespace Distilleries\Contentful\Commands\Generators;
 use Exception;
 use Illuminate\Console\Command;
 use Distilleries\Contentful\Eloquent;
-use Distilleries\Contentful\Api\ManagementApi;
+use Distilleries\Contentful\Api\Management\Api;
 
 abstract class AbstractGenerator extends Command
 {
     /**
      * Contentful Management API implementation.
      *
-     * @var \Distilleries\Contentful\Api\ManagementApi
+     * @var \Distilleries\Contentful\Api\Management\Api
      */
     protected $api;
 
     /**
      * Create a new command instance.
      *
-     * @param  \Distilleries\Contentful\Api\ManagementApi  $api
+     * @param  \Distilleries\Contentful\Api\Management\Api  $api
      */
-    public function __construct(ManagementApi $api)
+    public function __construct(Api $api)
     {
         parent::__construct();
 

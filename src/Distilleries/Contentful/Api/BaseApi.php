@@ -2,7 +2,7 @@
 
 namespace Distilleries\Contentful\Api;
 
-use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Client;
 use Psr\Http\Message\ResponseInterface;
 
 abstract class BaseApi
@@ -10,7 +10,7 @@ abstract class BaseApi
     /**
      * HTTP client implementation.
      *
-     * @var \GuzzleHttp\ClientInterface
+     * @var \GuzzleHttp\Client
      */
     protected $client;
 
@@ -31,11 +31,13 @@ abstract class BaseApi
     /**
      * BaseApi constructor.
      *
-     * @param  \GuzzleHttp\ClientInterface  $client
+     * @return void
      */
-    public function __construct(ClientInterface $client)
+    public function __construct()
     {
-        $this->client = $client;
+        $this->client = new Client([
+            'verify' => false,
+        ]);
 
         $this->config = config('contentful');
     }

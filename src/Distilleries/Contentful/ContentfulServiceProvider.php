@@ -51,13 +51,10 @@ class ContentfulServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__ . '/../../config/config.php', $this->package);
 
-        $this->app->bind(\GuzzleHttp\ClientInterface::class, function () {
-            return new \GuzzleHttp\Client;
-        });
-
-        // @TODO... Use API\...
-        $this->app->singleton(Contracts\DeliveryApi::class, function ($app) {
-            return new Services\Contentful\ContentDeliveryApiCache(app('cache'), config($this->package . '.api'));
+        $this->app->singleton(Api\Delivery\Api::class, function ($app) {
+            // @TODO... Use cached API version
+            return new Api\Delivery\Live;
+            //return new Api\Delivery\Cache(app(\Illuminate\Contracts\Cache\Factory::class));
         });
 
         // @TODO... Required?
