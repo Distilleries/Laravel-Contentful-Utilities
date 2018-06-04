@@ -1,8 +1,8 @@
 <?php
 
-namespace Distilleries\Contentful\Contentful\Commands\Definitions;
+namespace Distilleries\Contentful\Commands\Generators\Definitions;
 
-class ObjectDefinition extends BaseDefinition
+class DateDefinition extends BaseDefinition
 {
     /**
      * {@inheritdoc}
@@ -10,7 +10,7 @@ class ObjectDefinition extends BaseDefinition
     protected function migrationType()
     {
         return [
-            "text('" . $this->id() . "')",
+            "date('" . $this->id() . "')",
         ];
     }
 
@@ -20,7 +20,7 @@ class ObjectDefinition extends BaseDefinition
     public function modelProperties()
     {
         return [
-            "array \$" . $this->id(),
+            "\\Illuminate\\Support\\Carbon \$" . $this->id(),
         ];
     }
 
@@ -30,7 +30,7 @@ class ObjectDefinition extends BaseDefinition
     public function modelCast()
     {
         return [
-            ['key' => $this->id(), 'type' => 'array'],
+            ['key' => $this->id(), 'type' => 'datetime'],
         ];
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Distilleries\Contentful\Contentful\Webhook;
+namespace Distilleries\Contentful\Webhook;
 
 class Manager
 {

@@ -1,11 +1,11 @@
 <?php
 
-namespace Distilleries\Contentful\Contentful\Commands\Definitions;
+namespace Distilleries\Contentful\Commands\Generators\Definitions;
 
 use Exception;
 use Illuminate\Support\Carbon;
 use Distilleries\Contentful\Eloquent;
-use App\Services\Contentful\Commands\Eloquent as EloquentCommand;
+use Distilleries\Contentful\Commands\Generators\Models as EloquentCommand;
 
 class ArrayDefinition extends BaseDefinition
 {

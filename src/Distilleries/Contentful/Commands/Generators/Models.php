@@ -1,13 +1,13 @@
 <?php
 
-namespace Distilleries\Contentful\Contentful\Commands;
+namespace Distilleries\Contentful\Commands\Generators;
 
-class Eloquent extends GeneratorCommand
+class Models extends AbstractGenerator
 {
     /**
      * {@inheritdoc}
      */
-    protected $signature = 'contentful:eloquent';
+    protected $signature = 'contentful:generate:models';
 
     /**
      * {@inheritdoc}

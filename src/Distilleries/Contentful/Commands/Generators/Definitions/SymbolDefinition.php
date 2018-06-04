@@ -1,6 +1,6 @@
 <?php
 
-namespace Distilleries\Contentful\Contentful\Commands\Definitions;
+namespace Distilleries\Contentful\Commands\Generators\Definitions;
 
 class SymbolDefinition extends BaseDefinition
 {

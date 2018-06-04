@@ -1,6 +1,6 @@
 <?php
 
-namespace Distilleries\Contentful\Contentful\Webhook;
+namespace Distilleries\Contentful\Webhook;
 
 use Exception;
 use Distilleries\Contentful\Eloquent;
@@ -27,6 +27,7 @@ class EntryHandler
      *
      * @param  array  $payload
      * @return void
+     * @throws \Exception
      */
     protected function create($payload)
     {
@@ -60,6 +61,7 @@ class EntryHandler
      *
      * @param  array  $payload
      * @return void
+     * @throws \Exception
      */
     protected function archive($payload)
     {
@@ -71,6 +73,7 @@ class EntryHandler
      *
      * @param  array  $payload
      * @return void
+     * @throws \Exception
      */
     protected function unarchive($payload)
     {
@@ -82,6 +85,7 @@ class EntryHandler
      *
      * @param  array  $payload
      * @return void
+     * @throws \Exception
      */
     protected function publish($payload)
     {
@@ -93,6 +97,7 @@ class EntryHandler
      *
      * @param  array  $payload
      * @return void
+     * @throws \Exception
      */
     protected function unpublish($payload)
     {
@@ -108,7 +113,7 @@ class EntryHandler
      */
     protected function delete($payload)
     {
-        $this->entryModel($payload)->where('contentful_id', '=', $payload['sys']['id'])->delete();
+        $this->entryModel($payload)->query()->where('contentful_id', '=', $payload['sys']['id'])->delete();
     }
 
     /**
@@ -123,7 +128,7 @@ class EntryHandler
         $map = $this->entryMapper($payload)->map($payload);
         
         // @TODO DEBUG QA... webhook
-        $entry = $this->entryModel($payload)->where('contentful_id', '=', $payload['sys']['id'])->first();
+        $entry = $this->entryModel($payload)->query()->where('contentful_id', '=', $payload['sys']['id'])->first();
         if (empty($entry)) {
             $entry = $this->entryModel($payload)->forceFill($map);
         } else {
@@ -171,10 +176,14 @@ class EntryHandler
      */
     private function entryModel($payload)
     {
-        $className = '\App\Models\\' . $this->modelName($payload);
+        $modelName = $this->modelName($payload);
 
+        $className = '\App\Models\\' . $modelName;
         if (! class_exists($className)) {
-            throw new Exception('Unknown model "' . $className . '"');
+            $className = '\Distilleries\Contentful\Models\\' . $modelName . 'Mapper';
+            if (! class_exists($className)) {
+                throw new Exception('Unknown model "' . $modelName . '"');
+            }
         }
 
         return new $className;
@@ -184,15 +193,19 @@ class EntryHandler
      * Return model mapper corresponding for given payload.
      *
      * @param  array  $payload
-     * @return \App\Models\Contentful\Mappers\MapperInterface
+     * @return \Distilleries\Contentful\Contracts\ModelMapper
      * @throws \Exception
      */
     private function entryMapper($payload)
     {
-        $className = '\App\Models\Contentful\Mappers\\' . $this->modelName($payload) . 'Mapper';
+        $modelName = $this->modelName($payload);
 
+        $className = '\App\Models\Mappers\\' . $modelName . 'Mapper';
         if (! class_exists($className)) {
-            throw new Exception('Unknown model mapper "' . $className . '"');
+            $className = '\Distilleries\Contentful\Models\Mappers\\' . $modelName . 'Mapper';
+            if (! class_exists($className)) {
+                throw new Exception('Unknown model mapper for model "' . $modelName . '"');
+            }
         }
 
         return new $className;

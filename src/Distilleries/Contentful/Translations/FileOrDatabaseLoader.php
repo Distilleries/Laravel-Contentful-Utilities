@@ -2,26 +2,39 @@
 
 namespace Distilleries\Contentful\Translations;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Translation\LoaderInterface;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Contracts\Translation\Loader as LoaderInterface;
 
 class FileOrDatabaseLoader implements LoaderInterface
 {
-
-    /**
-     * The eloquent model to load
-     *
-     * @var \Illuminate\Database\Eloquent\Model
-     */
-    protected $model;
-
     /**
      * All of the namespace hints.
      *
      * @var array
      */
     protected $hints = [];
+
+    /**
+     * The eloquent model to load.
+     *
+     * @var \Illuminate\Database\Eloquent\Model
+     */
+    protected $model;
+
+    /**
+     * Filesystem implementations.
+     *
+     * @var \Illuminate\Filesystem\Filesystem
+     */
+    protected $files;
+
+    /**
+     * File path.
+     *
+     * @var string
+     */
+    protected $path = '';
 
     /**
      * Create a new database loader instance.
@@ -33,30 +46,51 @@ class FileOrDatabaseLoader implements LoaderInterface
      */
     public function __construct(Model $model, Filesystem $files, $path)
     {
-        $this->path = $path;
-        $this->files = $files;
         $this->model = $model;
+
+        $this->files = $files;
+
+        $this->path = $path;
     }
 
     /**
-     * Load the messages for the given locale.
-     *
-     * @param  string  $locale
-     * @param  string  $group
-     * @param  string  $namespace
-     * @return array
+     * {@inheritdoc}
      */
     public function load($locale, $group, $namespace = null)
     {
-        if ($group == '*' && $namespace == '*') {
+        if (($group == '*') and ($namespace == '*')) {
             return $this->loadJsonPath($this->path, $locale);
         }
 
-        if (is_null($namespace) || $namespace == '*') {
+        if (is_null($namespace) or $namespace == '*') {
             return $this->loadPath($this->path, $locale, $group);
         }
 
         return $this->loadNamespaced($locale, $group, $namespace);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addNamespace($namespace, $hint)
+    {
+        $this->hints[$namespace] = $hint;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function namespaces()
+    {
+        return $this->hints;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addJsonPath($path)
+    {
+        // TODO: Implement addJsonPath() method.
     }
 
     /**
@@ -66,6 +100,7 @@ class FileOrDatabaseLoader implements LoaderInterface
      * @param  string  $group
      * @param  string  $namespace
      * @return array
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     protected function loadNamespaced($locale, $group, $namespace)
     {
@@ -86,6 +121,7 @@ class FileOrDatabaseLoader implements LoaderInterface
      * @param  string  $group
      * @param  string  $namespace
      * @return array
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     protected function loadNamespaceOverrides(array $lines, $locale, $group, $namespace)
     {
@@ -105,6 +141,7 @@ class FileOrDatabaseLoader implements LoaderInterface
      * @param  string  $locale
      * @param  string  $group
      * @return array
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     protected function loadPath($path, $locale, $group)
     {
@@ -112,10 +149,11 @@ class FileOrDatabaseLoader implements LoaderInterface
             return $this->files->getRequire($full);
         } else if ($group == 'db') {
             $model = $this->model
-                ->locale($locale,config('app.country'))
+                ->locale($locale, config('app.country'))
                 ->get()
                 ->last();
-            if(!empty($model)){
+
+            if (! empty($model)) {
                  return !empty($model->json['labels'])?$model->json['labels']:[];
             }
         }
@@ -129,6 +167,7 @@ class FileOrDatabaseLoader implements LoaderInterface
      * @param  string  $path
      * @param  string  $locale
      * @return array
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     protected function loadJsonPath($path, $locale)
     {
@@ -137,27 +176,5 @@ class FileOrDatabaseLoader implements LoaderInterface
         }
 
         return [];
-    }
-
-    /**
-     * Add a new namespace to the loader.
-     *
-     * @param  string  $namespace
-     * @param  string  $hint
-     * @return void
-     */
-    public function addNamespace($namespace, $hint)
-    {
-        $this->hints[$namespace] = $hint;
-    }
-
-    /**
-     * Get an array of all the registered namespaces.
-     *
-     * @return array
-     */
-    public function namespaces()
-    {
-        return $this->hints;
     }
 }

@@ -1,8 +1,8 @@
 <?php
 
-namespace Distilleries\Contentful\Contentful\Commands\Definitions;
+namespace Distilleries\Contentful\Commands\Generators\Definitions;
 
-class IntegerDefinition extends BaseDefinition
+class NumberDefinition extends BaseDefinition
 {
     /**
      * {@inheritdoc}
@@ -10,7 +10,7 @@ class IntegerDefinition extends BaseDefinition
     protected function migrationType()
     {
         return [
-            "integer('" . $this->id() . "')->unsigned()",
+            "float('" . $this->id() . "', 10 ,6)",
         ];
     }
 
@@ -20,7 +20,7 @@ class IntegerDefinition extends BaseDefinition
     public function modelProperties()
     {
         return [
-            "integer \$" . $this->id(),
+            "float \$" . $this->id(),
         ];
     }
 
@@ -30,7 +30,7 @@ class IntegerDefinition extends BaseDefinition
     public function modelCast()
     {
         return [
-            ['key' => $this->id(), 'type' => 'integer'],
+            ['key' => $this->id(), 'type' => 'float'],
         ];
     }
 }

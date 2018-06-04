@@ -1,6 +1,6 @@
 <?php
 
-namespace Distilleries\Contentful\Contentful;
+namespace Distilleries\Contentful;
 
 use Illuminate\Support\Facades\DB;
 

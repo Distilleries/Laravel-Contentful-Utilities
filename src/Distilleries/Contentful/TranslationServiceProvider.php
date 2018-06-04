@@ -2,10 +2,11 @@
 
 namespace Distilleries\Contentful;
 
-use Distilleries\Contentful\Models\LabelTransverses;
+use Distilleries\Contentful\Models\Label;
 use Distilleries\Contentful\Translations\FileOrDatabaseLoader;
+use Illuminate\Translation\TranslationServiceProvider as BaseServiceProvider;
 
-class TranslationServiceProvider extends \Illuminate\Translation\TranslationServiceProvider
+class TranslationServiceProvider extends BaseServiceProvider
 {
     /**
      * Register the translation line loader.
@@ -15,7 +16,7 @@ class TranslationServiceProvider extends \Illuminate\Translation\TranslationServ
     protected function registerLoader()
     {
         $this->app->singleton('translation.loader', function ($app) {
-            return new FileOrDatabaseLoader(new LabelTransverses(), $app['files'], $app['path.lang']);
+            return new FileOrDatabaseLoader(new Label, $app['files'], $app['path.lang']);
         });
     }
 }

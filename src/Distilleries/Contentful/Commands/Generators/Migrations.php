@@ -1,15 +1,15 @@
 <?php
 
-namespace Distilleries\Contentful\Contentful\Commands;
+namespace Distilleries\Contentful\Commands\Generators;
 
 use Illuminate\Support\Carbon;
 
-class Migrations extends GeneratorCommand
+class Migrations extends AbstractGenerator
 {
     /**
      * {@inheritdoc}
      */
-    protected $signature = 'contentful:migrations';
+    protected $signature = 'contentful:generate:migrations';
 
     /**
      * {@inheritdoc}

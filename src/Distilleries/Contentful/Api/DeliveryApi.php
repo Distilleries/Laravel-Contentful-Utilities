@@ -1,6 +1,6 @@
 <?php
 
-namespace Distilleries\Contentful\Contentful\Api;
+namespace Distilleries\Contentful\Api;
 
 use GuzzleHttp\RequestOptions;
 

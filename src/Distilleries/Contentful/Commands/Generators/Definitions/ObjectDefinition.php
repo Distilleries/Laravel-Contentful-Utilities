@@ -1,8 +1,8 @@
 <?php
 
-namespace Distilleries\Contentful\Contentful\Commands\Definitions;
+namespace Distilleries\Contentful\Commands\Generators\Definitions;
 
-class BooleanDefinition extends BaseDefinition
+class ObjectDefinition extends BaseDefinition
 {
     /**
      * {@inheritdoc}
@@ -10,7 +10,7 @@ class BooleanDefinition extends BaseDefinition
     protected function migrationType()
     {
         return [
-            "boolean('" . $this->id() . "')",
+            "text('" . $this->id() . "')",
         ];
     }
 
@@ -20,7 +20,7 @@ class BooleanDefinition extends BaseDefinition
     public function modelProperties()
     {
         return [
-            "boolean \$" . $this->id(),
+            "array \$" . $this->id(),
         ];
     }
 
@@ -30,7 +30,7 @@ class BooleanDefinition extends BaseDefinition
     public function modelCast()
     {
         return [
-            ['key' => $this->id(), 'type' => 'boolean'],
+            ['key' => $this->id(), 'type' => 'array'],
         ];
     }
 }

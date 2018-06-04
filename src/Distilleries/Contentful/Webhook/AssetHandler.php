@@ -1,9 +1,9 @@
 <?php
 
-namespace Distilleries\Contentful\Contentful\Webhook;
+namespace Distilleries\Contentful\Webhook;
 
-use App\Models\Asset;
-use App\Models\Contentful\Mappers\AssetMapper;
+use Distilleries\Contentful\Models\Asset;
+use Distilleries\Contentful\Models\Mappers\AssetMapper;
 
 class AssetHandler
 {
@@ -12,7 +12,7 @@ class AssetHandler
      * create, save, auto_save, archive, unarchive, publish, unpublish, delete
      *
      * @param  string  $action
-     * @param  array  æ$payload
+     * @param  array  $payload
      * @return void
      */
     public function handle($action, $payload)
@@ -114,7 +114,7 @@ class AssetHandler
      * Return asset for given payload.
      *
      * @param  array  $payload
-     * @return \App\Models\Asset
+     * @return \Distilleries\Contentful\Models\Asset
      */
     private function upsert($payload)
     {
