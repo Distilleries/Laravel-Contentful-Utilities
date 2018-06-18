@@ -9,7 +9,7 @@ abstract class ContentfulTestCase extends TestCase
 
     protected function initService()
     {
-        $service = $this->app->getProvider('Distilleries\Messenger\ContentfulServiceProvider');
+        $service = $this->app->getProvider('Distilleries\Contentful\ContentfulServiceProvider');
 
         $service->boot();
         $service->register();
@@ -20,10 +20,6 @@ abstract class ContentfulTestCase extends TestCase
     public function setUp()
     {
         parent::setUp();
-
-        $this->app['Illuminate\Contracts\Console\Kernel']->call('vendor:publish');
-
-        $this->artisan('migrate');
     }
 
     protected function getEnvironmentSetUp($app)
@@ -39,7 +35,7 @@ abstract class ContentfulTestCase extends TestCase
     protected function getPackageProviders($app)
     {
         return [
-            'Distilleries\Messenger\ContentfulServiceProvider',
+            'Distilleries\Contentful\ContentfulServiceProvider',
         ];
     }
 

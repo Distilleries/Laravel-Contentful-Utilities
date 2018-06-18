@@ -68,8 +68,9 @@ class ContentfulServiceProvider extends ServiceProvider
      */
     private function alias()
     {
-        AliasLoader::getInstance()->alias('Log', 'Illuminate\Support\Facades\Log');
 
+        AliasLoader::getInstance()->alias('Agent', 'Jenssegers\Agent\Facades\Agent');
+        AliasLoader::getInstance()->alias('Log', 'Illuminate\Support\Facades\Log');
         AliasLoader::getInstance()->alias('DB', 'Illuminate\Support\Facades\DB');
     }
 }

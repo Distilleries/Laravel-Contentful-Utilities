@@ -2,7 +2,6 @@
 
 namespace Distilleries\Contentful\Helpers;
 
-use Jenssegers\Agent\Agent;
 use Illuminate\Support\Str;
 
 class Image
@@ -15,9 +14,10 @@ class Image
      */
     protected static function autoDetectFormat($format = null)
     {
-        $agent = new Agent;
+        $agent = app('agent');
         $browser = mb_strtolower($agent->browser());
 
+        
         if (empty($format) and ($browser === 'chrome') and ! $agent->isMobile()) {
             $format = 'webp';
         }
