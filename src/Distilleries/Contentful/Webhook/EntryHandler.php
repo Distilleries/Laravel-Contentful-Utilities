@@ -2,24 +2,72 @@
 
 namespace Distilleries\Contentful\Webhook;
 
-use Exception;
-use Distilleries\Contentful\Eloquent;
+use Distilleries\Contentful\Repositories\EntriesRepository;
 
 class EntryHandler
 {
     /**
+     * Entries repository implementation.
+     *
+     * @var \Distilleries\Contentful\Repositories\EntriesRepository
+     */
+    protected $entries;
+
+    /**
+     * EntryHandler constructor.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->entries = new EntriesRepository;
+    }
+
+    /**
      * Handle an incoming ContentManagementEntry request.
-     * create, save, auto_save, archive, unarchive, publish, unpublish, delete
+     * (create, save, auto_save, archive, unarchive, publish, unpublish, delete)
      *
      * @param  string  $action
      * @param  array  $payload
+     * @param  boolean  $isPreview
      * @return void
      */
-    public function handle($action, $payload)
+    public function handle(string $action, array $payload, bool $isPreview)
     {
-        if (method_exists($this, $action)) {
+        $actionMethods = ['create', 'archive', 'unarchive', 'publish', 'unpublish', 'delete'];
+        $actionMethods = ! empty($isPreview) ? array_merge($actionMethods, ['save', 'auto_save']) : $actionMethods;
+
+        if (method_exists($this, $action) and in_array($action, $actionMethods)) {
             $this->$action($payload);
         }
+    }
+
+    // --------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------
+
+    /**
+     * Auto-save entry.
+     *
+     * @param  array  $payload
+     * @return void
+     * @throws \Exception
+     */
+    private function auto_save($payload)
+    {
+        $this->upsertEntry($payload);
+    }
+
+    /**
+     * Save entry.
+     *
+     * @param  array  $payload
+     * @return void
+     * @throws \Exception
+     */
+    private function save($payload)
+    {
+        $this->upsertEntry($payload);
     }
 
     /**
@@ -29,31 +77,9 @@ class EntryHandler
      * @return void
      * @throws \Exception
      */
-    protected function create($payload)
+    private function create($payload)
     {
-        $this->upsert($payload);
-    }
-
-    /**
-     * Save entry.
-     *
-     * @param  array  $payload
-     * @return void
-     */
-    protected function auto_save($payload)
-    {
-        //
-    }
-
-    /**
-     * Save entry.
-     *
-     * @param  array  $payload
-     * @return void
-     */
-    protected function save($payload)
-    {
-        //
+        $this->upsertEntry($payload);
     }
 
     /**
@@ -63,9 +89,9 @@ class EntryHandler
      * @return void
      * @throws \Exception
      */
-    protected function archive($payload)
+    private function archive($payload)
     {
-        $this->delete($payload);
+        $this->deleteEntry($payload);
     }
 
     /**
@@ -75,9 +101,9 @@ class EntryHandler
      * @return void
      * @throws \Exception
      */
-    protected function unarchive($payload)
+    private function unarchive($payload)
     {
-        $this->upsert($payload);
+        $this->upsertEntry($payload);
     }
 
     /**
@@ -87,9 +113,9 @@ class EntryHandler
      * @return void
      * @throws \Exception
      */
-    protected function publish($payload)
+    private function publish($payload)
     {
-        $this->upsert($payload);
+        $this->upsertEntry($payload);
     }
 
     /**
@@ -99,9 +125,9 @@ class EntryHandler
      * @return void
      * @throws \Exception
      */
-    protected function unpublish($payload)
+    private function unpublish($payload)
     {
-        $this->delete($payload);
+        $this->deleteEntry($payload);
     }
 
     /**
@@ -111,103 +137,37 @@ class EntryHandler
      * @return void
      * @throws \Exception
      */
-    protected function delete($payload)
+    private function delete($payload)
     {
-        $this->entryModel($payload)->query()->where('contentful_id', '=', $payload['sys']['id'])->delete();
+        $this->deleteEntry($payload);
     }
 
+    // --------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------
+
     /**
-     * Return entry for given payload.
+     * Upsert entry in DB.
      *
      * @param  array  $payload
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return void
      * @throws \Exception
      */
-    private function upsert($payload)
+
+    private function upsertEntry($payload)
     {
-        $map = $this->entryMapper($payload)->map($payload);
-        
-        // @TODO DEBUG QA... webhook
-        $entry = $this->entryModel($payload)->query()->where('contentful_id', '=', $payload['sys']['id'])->first();
-        if (empty($entry)) {
-            $entry = $this->entryModel($payload)->forceFill($map);
-        } else {
-            foreach ($map['fields'] as $field => $value) {
-                $entry->$field = $value;
-            }
-        }
-        $entry->save();
-
-        if (isset($map['relations']) and is_array($map['relations'])) {
-            Eloquent::handleRelations($this->tableName($payload), $map['fields']['contentful_id'], $map['relations']);
-        }
-
-        return $entry;
+        $this->entries->toContentfulModel($payload);
     }
 
     /**
-     * Return model name for given payload.
+     * Delete entry from DB.
      *
      * @param  array  $payload
-     * @return string
-     */
-    private function modelName($payload)
-    {
-        return studly_case(Eloquent::TABLE_PREFIX . str_singular($payload['sys']['contentType']['sys']['id']));
-    }
-
-    /**
-     * Return model name for given payload.
-     *
-     * @param  array  $payload
-     * @return string
-     */
-    private function tableName($payload)
-    {
-        return Eloquent::TABLE_PREFIX . str_plural($payload['sys']['contentType']['sys']['id']);
-    }
-
-    /**
-     * Return model corresponding for given payload.
-     *
-     * @param  array  $payload
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return void
      * @throws \Exception
      */
-    private function entryModel($payload)
+    private function deleteEntry($payload)
     {
-        $modelName = $this->modelName($payload);
-
-        $className = '\App\Models\\' . $modelName;
-        if (! class_exists($className)) {
-            $className = '\Distilleries\Contentful\Models\\' . $modelName . 'Mapper';
-            if (! class_exists($className)) {
-                throw new Exception('Unknown model "' . $modelName . '"');
-            }
-        }
-
-        return new $className;
-    }
-
-    /**
-     * Return model mapper corresponding for given payload.
-     *
-     * @param  array  $payload
-     * @return \Distilleries\Contentful\Contracts\ModelMapper
-     * @throws \Exception
-     */
-    private function entryMapper($payload)
-    {
-        $modelName = $this->modelName($payload);
-
-        $className = '\App\Models\Mappers\\' . $modelName . 'Mapper';
-        if (! class_exists($className)) {
-            $className = '\Distilleries\Contentful\Models\Mappers\\' . $modelName . 'Mapper';
-            if (! class_exists($className)) {
-                throw new Exception('Unknown model mapper for model "' . $modelName . '"');
-            }
-        }
-
-        return new $className;
+        $this->entries->delete($payload);
     }
 }

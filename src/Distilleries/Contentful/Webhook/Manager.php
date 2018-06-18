@@ -2,6 +2,8 @@
 
 namespace Distilleries\Contentful\Webhook;
 
+use Exception;
+
 class Manager
 {
     /**
@@ -9,9 +11,10 @@ class Manager
      *
      * @param  array  $headers
      * @param  array  $payload
+     * @param  boolean  $isPreview
      * @return array
      */
-    public function handle($headers, $payload)
+    public function handle(array $headers, array $payload, bool $isPreview = false) : array
     {
         if (! isset($headers['x-contentful-topic'])) {
             return $this->response('Page not found', 404);
@@ -35,7 +38,11 @@ class Manager
         }
 
         if (! empty($handler)) {
-            $handler->handle($topics[2], $payload);
+            try {
+                $handler->handle($topics[2], $payload, $isPreview);
+            } catch (Exception $e) {
+                return $this->response($e->getMessage(), 500);
+            }
         }
 
         return $this->response();
@@ -48,7 +55,7 @@ class Manager
      * @param  integer  $status
      * @return array
      */
-    private function response($message = '', $status = 200)
+    private function response(string $message = '', int $status = 200) : array
     {
         return [
             'status' => $status,

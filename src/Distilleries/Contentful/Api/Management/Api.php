@@ -2,11 +2,11 @@
 
 namespace Distilleries\Contentful\Api\Management;
 
-use Exception;
 use GuzzleHttp\RequestOptions;
 use Distilleries\Contentful\Api\BaseApi;
+use Distilleries\Contentful\Api\ManagementApi;
 
-class Api extends BaseApi
+class Api extends BaseApi implements ManagementApi
 {
     /**
      * {@inheritdoc}
@@ -14,30 +14,9 @@ class Api extends BaseApi
     protected $baseUrl = 'https://api.contentful.com';
 
     /**
-     * Return default headers + given headers.
-     *
-     * @param  array  $headers
-     * @return array
+     * {@inheritdoc}
      */
-    private function headers($headers = [])
-    {
-        return array_merge([
-            'Content-Type' => 'application/vnd.contentful.management.v1+json',
-            'Authorization' => 'Bearer ' . $this->config['api']['management']['token'],
-        ], $headers);
-    }
-
-    // --------------------------------------------------------------------------------
-    // --------------------------------------------------------------------------------
-    // --------------------------------------------------------------------------------
-
-    /**
-     * Return locales defined in Contentful.
-     *
-     * @return array
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     */
-    public function locales()
+    public function locales() : array
     {
         $response = $this->client->request('GET', $this->url('locales'), [
             RequestOptions::HEADERS => $this->headers(),
@@ -47,12 +26,9 @@ class Api extends BaseApi
     }
 
     /**
-     * Return data about content-types defined in Contentful.
-     *
-     * @return array
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * {@inheritdoc}
      */
-    public function contentTypes()
+    public function contentTypes() : array
     {
         $response = $this->client->request('GET', $this->url('content_types'), [
             RequestOptions::HEADERS => $this->headers(),
@@ -62,13 +38,9 @@ class Api extends BaseApi
     }
 
     /**
-     * Return data about editor interface of given content-type.
-     *
-     * @param  string  $contentTypeId
-     * @return array
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * {@inheritdoc}
      */
-    public function contentTypeEditorInterface($contentTypeId)
+    public function contentTypeEditorInterface(string $contentTypeId) : array
     {
         $response = $this->client->request('GET', $this->url('content_types/' . $contentTypeId . '/editor_interface'), [
             RequestOptions::HEADERS => $this->headers(),
@@ -82,13 +54,9 @@ class Api extends BaseApi
     // --------------------------------------------------------------------------------
 
     /**
-     * Return entries for given parameters.
-     *
-     * @param  array  $parameters
-     * @return array
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * {@inheritdoc}
      */
-    public function entries($parameters = [])
+    public function entries(array $parameters = []) : array
     {
         $response = $this->client->request('GET', $this->url('entries'), [
             RequestOptions::QUERY => $parameters,
@@ -99,17 +67,35 @@ class Api extends BaseApi
     }
 
     /**
-     * Create given entry of specified content-type.
-     *
-     * @param  string  $contentType
-     * @param  array  $entry
-     * @return array
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * {@inheritdoc}
      */
-    public function createEntry($contentType, $entry)
+    public function entry(string $contentType, array $fields) : ?array
+    {
+        $filters['content_type'] = $contentType;
+        foreach ($fields as $field => $value) {
+            $filters['fields.' . $field] = $value;
+        }
+
+        $response = $this->client->request('GET', $this->url('entries'), [
+            RequestOptions::QUERY => $filters,
+            RequestOptions::HEADERS => $this->headers(),
+        ]);
+
+        $results = $this->decodeResponse($response);
+
+        return (isset($results['items']) and isset($results['items'][0]) and ! empty($results['items'][0])) ? $results['items'][0] : null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createEntry(string $contentType, array $fields, array $sys = []) : array
     {
         $response = $this->client->request('POST', $this->url('entries'), [
-            RequestOptions::BODY => json_encode($entry),
+            RequestOptions::BODY => json_encode([
+                'sys' => $sys,
+                'fields' => $fields,
+            ]),
             RequestOptions::HEADERS => $this->headers([
                 'X-Contentful-Content-Type' => $contentType,
             ]),
@@ -119,14 +105,9 @@ class Api extends BaseApi
     }
 
     /**
-     * Publish given entry.
-     *
-     * @param  string  $entryId
-     * @param  integer  $version
-     * @return array
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * {@inheritdoc}
      */
-    public function publishEntry($entryId, $version = 1)
+    public function publishEntry(string $entryId, int $version = 1) : array
     {
         $response = $this->client->request('PUT', $this->url('entries/' . $entryId . '/published'), [
             RequestOptions::HEADERS => $this->headers([
@@ -137,16 +118,28 @@ class Api extends BaseApi
         return $this->decodeResponse($response);
     }
 
-    // @TODO...
-    public function unPublishEntry($entryId)
+    /**
+     * {@inheritdoc}
+     */
+    public function unpublishEntry(string $entryId) : array
     {
-        throw new Exception('Must implements unPublishEntry()');
+        $response = $this->client->request('DELETE', $this->url('entries/' . $entryId . '/published'), [
+            RequestOptions::HEADERS => $this->headers(),
+        ]);
+
+        return $this->decodeResponse($response);
     }
 
-    // @TODO...
-    public function deleteEntry($entryId)
+    /**
+     * {@inheritdoc}
+     */
+    public function deleteEntry(string $entryId) : bool
     {
-        throw new Exception('Must implements deleteEntry()');
+        $response = $this->client->request('DELETE', $this->url('entries/' . $entryId), [
+            RequestOptions::HEADERS => $this->headers(),
+        ]);
+
+        return $response->getStatusCode() === 204;
     }
 
     // --------------------------------------------------------------------------------
@@ -154,49 +147,97 @@ class Api extends BaseApi
     // --------------------------------------------------------------------------------
 
     /**
-     * Return assets for given parameters.
-     *
-     * @param  array  $parameters
-     * @return array
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * {@inheritdoc}
      */
-    public function assets($parameters = [])
+    public function assets(array $parameters = []) : array
     {
         $response = $this->client->request('GET', $this->url('assets'), [
             RequestOptions::QUERY => $parameters,
+            RequestOptions::HEADERS => $this->headers(),
+        ]);
+        
+        return $this->decodeResponse($response);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createAsset(array $fields, array $sys = []) : array
+    {
+        $response = $this->client->request('POST', $this->url('assets'), [
+            RequestOptions::BODY => json_encode([
+                'fields' => $fields,
+                'sys' => $sys,
+            ]),
             RequestOptions::HEADERS => $this->headers(),
         ]);
 
         return $this->decodeResponse($response);
     }
 
-    // @TODO...
-    public function createAsset($asset)
+    /**
+     * {@inheritdoc}
+     */
+    public function processAsset(string $assetId, string $locale)
     {
-        throw new Exception('Must implements createAsset()');
+        $this->client->request('PUT', $this->url('assets/' . $assetId . '/files/' . $locale . '/process'), [
+            RequestOptions::HEADERS => $this->headers(),
+        ]);
     }
 
-    // @TODO...
-    public function processAsset($assetId, $locale)
+    /**
+     * {@inheritdoc}
+     */
+    public function publishAsset(string $assetId, int $version = 1) : array
     {
-        throw new Exception('Must implements processAsset()');
+        $response = $this->client->request('PUT', $this->url('assets/' . $assetId . '/published'), [
+            RequestOptions::HEADERS => $this->headers([
+                'X-Contentful-Version' => $version,
+            ]),
+        ]);
+
+        return $this->decodeResponse($response);
     }
 
-    // @TODO...
-    public function publishAsset($assetId, $version = 1)
+    /**
+     * {@inheritdoc}
+     */
+    public function unpublishAsset(string $assetId) : array
     {
-        throw new Exception('Must implements publishAsset()');
+        $response = $this->client->request('DELETE', $this->url('assets/' . $assetId . '/published'), [
+            RequestOptions::HEADERS => $this->headers(),
+        ]);
+
+        return $this->decodeResponse($response);
     }
 
-    // @TODO...
-    public function unPublishAsset($assetId)
+    /**
+     * {@inheritdoc}
+     */
+    public function deleteAsset(string $assetId) : bool
     {
-        throw new Exception('Must implements unPublishAsset()');
+        $response = $this->client->request('DELETE', $this->url('assets/' . $assetId), [
+            RequestOptions::HEADERS => $this->headers(),
+        ]);
+
+        return $response->getStatusCode() === 204;
     }
 
-    // @TODO...
-    public function deleteAsset($assetId)
+    // --------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------
+
+    /**
+     * Return default headers + given headers.
+     *
+     * @param  array  $headers
+     * @return array
+     */
+    private function headers(array $headers = []) : array
     {
-        throw new Exception('Must implements deleteAsset()');
+        return array_merge([
+            'Content-Type' => 'application/vnd.contentful.management.v1+json',
+            'Authorization' => 'Bearer ' . $this->config['tokens']['management'],
+        ], $headers);
     }
 }
