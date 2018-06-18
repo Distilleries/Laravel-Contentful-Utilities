@@ -1,23 +1,16 @@
 <?php
 
 use Mockery as m;
+use Jenssegers\Agent\Agent;
+use Jenssegers\Agent\AgentServiceProvider;
 
- use \Jenssegers\Agent\AgentServiceProvider;
- use \Jenssegers\Agent\Agent;
-
-
-class AgentProviderTest extends AgentServiceProvider{
-	
-
-    /**
-     * Register the service provider.
-     */
+class AgentProviderTest extends AgentServiceProvider
+{
     public function register()
     {
-
         $this->app->singleton('agent', function ($app) {
-
         	$agent = m::mock();
+
 			$agent->shouldReceive('browser')
 				  ->andReturn('chrome');
 
@@ -29,5 +22,4 @@ class AgentProviderTest extends AgentServiceProvider{
 
         $this->app->alias('agent', Agent::class);
     }
-
-} 
+}

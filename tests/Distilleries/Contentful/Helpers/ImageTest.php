@@ -1,13 +1,14 @@
 <?php
 
-class ImageTest extends ContentfulTestCase {
-    
+use Distilleries\Contentful\Helpers\Image;
 
+class ImageTest extends ContentfulTestCase
+{
     protected function getPackageProviders($app)
     {
         return [
-            'Distilleries\Contentful\ContentfulServiceProvider',
-            'AgentProviderTest'
+            'Distilleries\Contentful\ServiceProvider',
+            'AgentProviderTest',
         ];
     }
 
@@ -15,22 +16,18 @@ class ImageTest extends ContentfulTestCase {
     {
         $url = "http://test.com/test.jpg";
 
-       
-           $this->assertEquals( \Distilleries\Contentful\Helpers\Image::getUrl($url), $url.'?q=80&fit=fill');
+        $this->assertEquals(Image::url($url), $url . '?q=80&fit=fill');
     }
 
     public function testGetWebpEnabled()
     {
-        // $app['config']->set('contentful.image.webp_enabled', true);
+        // $app['config']->set('contentful.image.use_webp', true);
 
-           $this->assertEquals(true, false);
+        $this->assertEquals(true, false);
     }
 
      public function testGetUrlWebpEnabledAndChrome()
     {
-           $this->assertEquals(true, false);
+        $this->assertEquals(true, false);
     }
-    
 }
-
-

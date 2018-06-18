@@ -39,7 +39,6 @@ class ServiceProvider extends BaseServiceProvider
             __DIR__ . '/../../config/config.php' => base_path('config/' . $this->package . '.php'),
         ], 'config');
 
-
         $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations/');
     }
 
@@ -50,12 +49,16 @@ class ServiceProvider extends BaseServiceProvider
      */
     public function register()
     {
+        $this->mergeConfigFrom(__DIR__ . '/../../config/config.php', $this->package);
+
         $this->app->bind(Api\DeliveryApi::class, Api\Delivery\Cached::class);
         $this->app->bind(Api\ManagementApi::class, Api\Management\Api::class);
         $this->app->bind(Api\SyncApi::class, Api\Sync\Api::class);
         $this->app->bind(Api\UploadApi::class, Api\Upload\Api::class);
 
-        $this->registerCommands();
+        if ($this->app->runningInConsole()) {
+            $this->registerCommands();
+        }
     }
 
     /**

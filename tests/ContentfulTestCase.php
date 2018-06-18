@@ -9,7 +9,7 @@ abstract class ContentfulTestCase extends TestCase
 
     protected function initService()
     {
-        $service = $this->app->getProvider('Distilleries\Contentful\ContentfulServiceProvider');
+        $service = $this->app->getProvider('Distilleries\Contentful\ServiceProvider');
 
         $service->boot();
         $service->register();
@@ -35,7 +35,7 @@ abstract class ContentfulTestCase extends TestCase
     protected function getPackageProviders($app)
     {
         return [
-            'Distilleries\Contentful\ContentfulServiceProvider',
+            'Distilleries\Contentful\ServiceProvider',
         ];
     }
 

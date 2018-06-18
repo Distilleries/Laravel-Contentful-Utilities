@@ -2,8 +2,6 @@
 
 namespace Distilleries\Contentful\Helpers;
 
-use Jenssegers\Agent\Agent;
-
 class Image
 {
     /**
@@ -76,7 +74,8 @@ class Image
      */
     protected static function detectFormat(string $format = '') : string
     {
-        $agent = new Agent;
+        /** @var \Jenssegers\Agent\Agent $agent */
+        $agent = app('agent');
 
         if (empty($format)) {
             $browser = mb_strtolower($agent->browser());
