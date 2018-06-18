@@ -2,7 +2,7 @@
 
 namespace Distilleries\Contentful\Api;
 
-use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
 
 abstract class BaseApi
@@ -10,12 +10,12 @@ abstract class BaseApi
     /**
      * HTTP client implementation.
      *
-     * @var \GuzzleHttp\Client
+     * @var \GuzzleHttp\ClientInterface
      */
     protected $client;
 
     /**
-     * API configuration.
+     * Contentful configuration.
      *
      * @var array
      */
@@ -31,13 +31,12 @@ abstract class BaseApi
     /**
      * BaseApi constructor.
      *
+     * @param  \GuzzleHttp\ClientInterface  $client
      * @return void
      */
-    public function __construct()
+    public function __construct(ClientInterface $client)
     {
-        $this->client = new Client([
-            'verify' => false,
-        ]);
+        $this->client = $client;
 
         $this->config = config('contentful');
     }
@@ -48,9 +47,15 @@ abstract class BaseApi
      * @param  string  $endpoint
      * @return string
      */
-    protected function url($endpoint)
+    protected function url($endpoint) : string
     {
-        return rtrim($this->baseUrl, '/') . '/spaces/' . $this->config['api']['space'] . '/' . trim($endpoint, '/');
+        $baseUrl = rtrim($this->baseUrl, '/');
+
+        if (config('contentful.use_preview') and isset($this->previewBaseUrl)) {
+            $baseUrl = rtrim($this->previewBaseUrl, '/');
+        }
+
+        return $baseUrl . '/spaces/' . $this->config['space_id'] . '/' . trim($endpoint, '/');
     }
 
     /**
@@ -59,7 +64,7 @@ abstract class BaseApi
      * @param  \Psr\Http\Message\ResponseInterface  $response
      * @return array
      */
-    protected function decodeResponse(ResponseInterface $response)
+    protected function decodeResponse(ResponseInterface $response) : array
     {
         return json_decode($response->getBody()->getContents(), true);
     }

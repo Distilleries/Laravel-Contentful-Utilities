@@ -2,27 +2,28 @@
 
 return [
 
-    'api' => [
-        'space' => env('CONTENTFUL_SPACE_ID'),
-        'default_locale' => null,
+    'space_id' => env('CONTENTFUL_SPACE_ID'),
 
+    'default_locale' => env('CONTENTFUL_DEFAULT_LOCALE', 'fr'),
+
+    // Must be changed programmatically (in Command via option OR via Middleware OR via WebhookController)
+    'use_preview' => 0,
+
+    'tokens' => [
         'delivery' => [
-            'token' => env('CONTENTFUL_TOKEN_LIVE'),
+            'live' => env('CONTENTFUL_TOKEN_LIVE'),
             'preview' => env('CONTENTFUL_TOKEN_PREVIEW'),
-            'use_preview' => env('CONTENTFUL_USE_PREVIEW'),
         ],
 
-        'management' => [
-            'token' => env('CONTENTFUL_TOKEN_MANAGEMENT'),
-        ],
+        'management' => env('CONTENTFUL_TOKEN_MANAGEMENT'),
     ],
 
-    'media' => [
-        'quality' => env('MEDIA_QUALITY', 90),
-        'progressive' => env('MEDIA_PROGRESSIVE', 'progressive'),
-        'replace_host' => env('IMAGE_SOURCE_REPLACE', 'images.contentful.com'),
-        'dest_host' => env('IMAGE_DEST_REPLACE', 'asset.contentful.com'),
-        'webp_enabled' => env('IMAGE_WEBP_ENABLED', false),
+    'image' => [
+        'use_webp' => env('CONTENTFUL_IMAGE_USE_WEBP', 1),
+        'use_progressive' => env('CONTENTFUL_IMAGE_USE_PROGRESSIVE', 1),
+        'default_quality' => env('CONTENTFUL_IMAGE_DEFAULT_QUALITY', 80),
+        'search_hosts' => 'images.contentful.com,images.ctfassets.net',
+        'replace_host' => 'images.ctfassets.net',
     ],
 
 ];

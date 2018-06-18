@@ -2,24 +2,70 @@
 
 namespace Distilleries\Contentful\Webhook;
 
-use Distilleries\Contentful\Models\Asset;
-use Distilleries\Contentful\Models\Mappers\AssetMapper;
+use Distilleries\Contentful\Repositories\AssetsRepository;
 
 class AssetHandler
 {
     /**
+     * Assets repository implementation.
+     *
+     * @var \Distilleries\Contentful\Repositories\AssetsRepository
+     */
+    protected $assets;
+
+    /**
+     * AssetHandler constructor.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->assets = new AssetsRepository;
+    }
+
+    /**
      * Handle an incoming ContentManagementAsset request.
-     * create, save, auto_save, archive, unarchive, publish, unpublish, delete
+     * (create, save, auto_save, archive, unarchive, publish, unpublish, delete)
      *
      * @param  string  $action
      * @param  array  $payload
+     * @param  boolean  $isPreview
      * @return void
      */
-    public function handle($action, $payload)
+    public function handle(string $action, array $payload, bool $isPreview)
     {
-        if (method_exists($this, $action)) {
+        $actionMethods = ['create', 'archive', 'unarchive', 'publish', 'unpublish', 'delete'];
+        $actionMethods = ! empty($isPreview) ? array_merge($actionMethods, ['save', 'auto_save']) : $actionMethods;
+
+        if (method_exists($this, $action) and in_array($action, $actionMethods)) {
             $this->$action($payload);
         }
+    }
+
+    // --------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------
+
+    /**
+     * Auto-save asset.
+     *
+     * @param  array  $payload
+     * @return void
+     */
+    private function auto_save($payload)
+    {
+        $this->upsertAsset($payload);
+    }
+
+    /**
+     * Save asset.
+     *
+     * @param  array  $payload
+     * @return void
+     */
+    private function save($payload)
+    {
+        $this->upsertAsset($payload);
     }
 
     /**
@@ -28,31 +74,9 @@ class AssetHandler
      * @param  array  $payload
      * @return void
      */
-    protected function create($payload)
+    private function create($payload)
     {
-        $this->upsert($payload);
-    }
-
-    /**
-     * Save entry.
-     *
-     * @param  array  $payload
-     * @return void
-     */
-    protected function auto_save($payload)
-    {
-        //
-    }
-
-    /**
-     * Save entry.
-     *
-     * @param  array  $payload
-     * @return void
-     */
-    protected function save($payload)
-    {
-        //
+        $this->upsertAsset($payload);
     }
 
     /**
@@ -61,9 +85,9 @@ class AssetHandler
      * @param  array  $payload
      * @return void
      */
-    protected function archive($payload)
+    private function archive($payload)
     {
-        $this->delete($payload);
+        $this->deleteAsset($payload);
     }
 
     /**
@@ -72,9 +96,9 @@ class AssetHandler
      * @param  array  $payload
      * @return void
      */
-    protected function unarchive($payload)
+    private function unarchive($payload)
     {
-        $this->upsert($payload);
+        $this->upsertAsset($payload);
     }
 
     /**
@@ -83,9 +107,9 @@ class AssetHandler
      * @param  array  $payload
      * @return void
      */
-    protected function publish($payload)
+    private function publish($payload)
     {
-        $this->upsert($payload);
+        $this->upsertAsset($payload);
     }
 
     /**
@@ -94,9 +118,9 @@ class AssetHandler
      * @param  array  $payload
      * @return void
      */
-    protected function unpublish($payload)
+    private function unpublish($payload)
     {
-        $this->delete($payload);
+        $this->deleteAsset($payload);
     }
 
     /**
@@ -105,31 +129,35 @@ class AssetHandler
      * @param  array  $payload
      * @return void
      */
-    protected function delete($payload)
+    private function delete($payload)
     {
-        Asset::query()->where('contentful_id', '=', $payload['sys']['id'])->delete();
+        $this->deleteAsset($payload);
+    }
+
+    // --------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------
+
+    /**
+     * Upsert asset in DB.
+     *
+     * @param  array  $payload
+     * @return void
+     */
+
+    private function upsertAsset($payload)
+    {
+        $this->assets->toContentfulModel($payload);
     }
 
     /**
-     * Return asset for given payload.
+     * Delete asset from DB.
      *
      * @param  array  $payload
-     * @return \Distilleries\Contentful\Models\Asset
+     * @return void
      */
-    private function upsert($payload)
+    private function deleteAsset($payload)
     {
-        $map = (new AssetMapper)->map($payload);
-
-        $asset = Asset::query()->where('contentful_id', '=', $payload['sys']['id'])->first();
-        if (empty($asset)) {
-            $asset = (new Asset)->forceFill($map);
-        } else {
-            foreach ($map['fields'] as $field => $value) {
-                $asset->$field = $value;
-            }
-        }
-        $asset->save();
-
-        return $asset;
+        $this->assets->delete($payload['sys']['id']);
     }
 }

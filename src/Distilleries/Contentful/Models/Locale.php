@@ -2,11 +2,12 @@
 
 namespace Distilleries\Contentful\Models;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property integer $id
- * @property string $name
+ * @property string $label
  * @property string $code
  * @property string $fallback_code
  * @property boolean $is_editable
@@ -25,9 +26,10 @@ class Locale extends Model
      * {@inheritdoc}
      */
     protected $fillable = [
-        'name',
+        'label',
         'code',
         'fallback_code',
+        'is_default',
         'is_editable',
         'is_publishable',
     ];
@@ -36,7 +38,48 @@ class Locale extends Model
      * {@inheritdoc}
      */
     protected $casts = [
+        'is_default' => 'boolean',
         'is_editable' => 'boolean',
         'is_publishable' => 'boolean',
     ];
+
+    /**
+     * Return default locale code.
+     *
+     * @return string
+     */
+    public static function default() : string
+    {
+        $default = Cache::get('locale_default');
+
+        if ($default === null) {
+            $default = static::query()->select('code')->where('is_default', '=', true)->first();
+            $default = ! empty($default) ? $default->code : config('contentful.default_locale');
+
+            // Cache is cleaned in Console\Commands\SyncLocales (run at least daily)
+            Cache::forever('locale_default', $default);
+        }
+
+        return $default;
+    }
+
+    /**
+     * Return fallback code for given locale code.
+     *
+     * @param  string  $code
+     * @return string
+     */
+    public static function fallback(string $code) : string
+    {
+        $fallback = Cache::get('locale_fallback_' . $code);
+
+        if ($fallback === null) {
+            $locale = static::query()->select('fallback_code')->where('code', '=', $code)->first();
+            $fallback = (! empty($locale) and ! empty($locale->fallback_code)) ? $locale->fallback_code : '';
+
+            Cache::put('locale_fallback_' . $code, $fallback, 5);
+        }
+
+        return $fallback;
+    }
 }

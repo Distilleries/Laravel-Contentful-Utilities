@@ -3,9 +3,11 @@
 namespace Distilleries\Contentful\Api\Delivery;
 
 use GuzzleHttp\RequestOptions;
+use Psr\Http\Message\ResponseInterface;
 use Distilleries\Contentful\Api\BaseApi;
+use Distilleries\Contentful\Api\DeliveryApi;
 
-class Live extends BaseApi implements Api
+class Live extends BaseApi implements DeliveryApi
 {
     /**
      * {@inheritdoc}
@@ -13,53 +15,48 @@ class Live extends BaseApi implements Api
     protected $baseUrl = 'https://cdn.contentful.com';
 
     /**
+     * Preview base URL API.
+     *
+     * @var string
+     */
+    protected $previewBaseUrl = 'https://preview.contentful.com';
+
+    /**
      * {@inheritdoc}
      */
-    public function entries($parameters = [])
+    public function entries(array $parameters = []) : array
     {
-        return $this->items('entries', $parameters);
+        $response = $this->query('entries', $parameters);
+
+        return $this->decodeResponse($response);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function assets($parameters = [])
+    public function assets(array $parameters = []) : array
     {
-        return $this->items('assets', $parameters);
+        $response = $this->query('assets', $parameters);
+
+        return $this->decodeResponse($response);
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function entry($entryId, $locale = '')
-    {
-        // @TODO...
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function asset($assetId, $locale = '')
-    {
-        // @TODO...
-    }
-
-    /**
-     * Return a raw items response for given endpoint and parameters.
+     * Return a raw items response matching given endpoint and parameters.
      *
      * @param  string  $endpoint
      * @param  array  $parameters
-     * @return array
+     * @return \Psr\Http\Message\ResponseInterface
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    private function items($endpoint, $parameters)
+    protected function query(string $endpoint, array $parameters) : ResponseInterface
     {
-        $response = $this->client->request('GET', $this->url($endpoint), [
+        $token = ! empty($this->config['use_preview']) ? 'preview' : 'live';
+
+        return $this->client->request('GET', $this->url($endpoint), [
             RequestOptions::QUERY => array_merge($parameters, [
-                'access_token' => $this->config['api']['delivery']['token'],
+                'access_token' => $this->config['tokens']['delivery'][$token],
             ]),
         ]);
-
-        return $this->decodeResponse($response);
     }
 }
