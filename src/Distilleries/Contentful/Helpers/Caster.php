@@ -53,4 +53,15 @@ class Caster
     {
         return is_numeric($int) ? (int) $int : null;
     }
+
+    /**
+     * Return entry ID in given "Link" array.
+     *
+     * @param  array  $entry
+     * @return string|null
+     */
+    public static function entryId(array $entry) : ?string
+    {
+        return (isset($entry['sys']) and isset($entry['sys']['id'])) ? $entry['sys']['id'] : null;
+    }
 }
