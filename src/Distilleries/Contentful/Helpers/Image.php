@@ -17,7 +17,7 @@ class Image
         $agent = app('agent');
         $browser = mb_strtolower($agent->browser());
 
-        
+
         if (empty($format) and ($browser === 'chrome') and ! $agent->isMobile()) {
             $format = 'webp';
         }
@@ -47,7 +47,7 @@ class Image
             'h' => $height,
             'q' => ! empty($quality) ? $quality : config('contentful.image.quality', 80),
             'fm' => config('contentful.image.webp_enabled')?$format:false,
-            'fl' => ($format !== 'webp') ? (! empty($isProgressive) ? 'progressive' : config('contentful.image.progressive', null)) : null,
+            'fl' => ($format !== 'webp' || !config('contentful.image.webp_enabled')) ? (! empty($isProgressive) ? 'progressive' : config('contentful.image.progressive', null)) : null,
             'fit' => ! empty($fit) ? (($fit === 'default') ? null : $fit) : 'fill',
         ])->filter(function ($value, $key) {
             return ! empty($value);
