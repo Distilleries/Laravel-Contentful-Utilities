@@ -11,11 +11,20 @@ class ImageTest extends ContentfulTestCase {
         ];
     }
 
+
+    public function testNoUrl()
+    {
+        $url = "";
+
+        $this->assertEquals( \Distilleries\Contentful\Helpers\Image::url($url), $url);
+    }
+
     public function testGetUrl()
     {
         $url = "http://test.com/test.jpg";
 
-       $this->app->make('config')->set('contentful.image.use_progressive',null);
+        $this->app->make('config')->set('contentful.image.use_progressive',null);
+
         $this->assertEquals( \Distilleries\Contentful\Helpers\Image::url($url), $url.'?q=80&fit=fill');
     }
 
@@ -32,10 +41,12 @@ class ImageTest extends ContentfulTestCase {
 
         $url = "http://test.com/test.jpg";
 
-         $this->app->make('config')->set('contentful.image.use_webp',true);
-         $this->assertEquals( \Distilleries\Contentful\Helpers\Image::url($url), $url.'?q=80&fm=webp&fit=fill');
+        $this->app->make('config')->set('contentful.image.use_webp',true);
+
+        $this->assertEquals( \Distilleries\Contentful\Helpers\Image::url($url), $url.'?q=80&fm=webp&fit=fill');
 
     }
+
 
     
     public function testGetWebpDisabled()
@@ -44,8 +55,9 @@ class ImageTest extends ContentfulTestCase {
         $url = "http://test.com/test.jpg";
 
         $this->app->make('config')->set('contentful.image.use_progressive',null);
-         $this->app->make('config')->set('contentful.image.use_webp',false);
-         $this->assertEquals( \Distilleries\Contentful\Helpers\Image::url($url), $url.'?q=80&fit=fill');
+        $this->app->make('config')->set('contentful.image.use_webp',false);
+
+        $this->assertEquals( \Distilleries\Contentful\Helpers\Image::url($url), $url.'?q=80&fit=fill');
 
     }
 
@@ -54,9 +66,10 @@ class ImageTest extends ContentfulTestCase {
 
         $url = "http://test.com/test.jpg";
 
-         $this->app->make('config')->set('contentful.image.use_webp',false);
-         $this->app->make('config')->set('contentful.image.use_progressive','progressive');
-         $this->assertEquals( \Distilleries\Contentful\Helpers\Image::url($url), $url.'?q=80&fl=progressive&fit=fill');
+        $this->app->make('config')->set('contentful.image.use_webp',false);
+        $this->app->make('config')->set('contentful.image.use_progressive','progressive');
+
+        $this->assertEquals( \Distilleries\Contentful\Helpers\Image::url($url), $url.'?q=80&fl=progressive&fit=fill');
 
     }
 
@@ -65,11 +78,12 @@ class ImageTest extends ContentfulTestCase {
     {
         $url = "http://test.com/test.jpg";
 
-        $this->app->make('config')->set('contentful.image.replace_host','test.com');
-        $this->app->make('config')->set('contentful.image.dest_host','test-destination.com');
+        $this->app->make('config')->set('contentful.image.search_hosts','test.com');
+        $this->app->make('config')->set('contentful.image.replace_host','test-destination.com');
+
         $this->app->make('config')->set('contentful.image.use_progressive',null);
 
-         $this->assertEquals( \Distilleries\Contentful\Helpers\Image::url($url),'http://test-destination.com/test.jpg?q=80&fit=fill');
+        $this->assertEquals( \Distilleries\Contentful\Helpers\Image::url($url),'http://test-destination.com/test.jpg?q=80&fit=fill');
 
     }
 
@@ -89,7 +103,7 @@ class ImageTest extends ContentfulTestCase {
         $this->app->make('config')->set('contentful.image.use_webp',false);
         $this->app->make('config')->set('contentful.image.use_progressive','progressive');
 
-        $this->assertEquals( \Distilleries\Contentful\Helpers\Image::url($url), $url.'q=80&fl=progressive&fit=fill');
+        $this->assertEquals( \Distilleries\Contentful\Helpers\Image::url($url, 100, 100, '', 80, 'progressive', 'fill'), $url.'w=100&h=100&q=80&fl=progressive&fit=fill');
 
     }
 
