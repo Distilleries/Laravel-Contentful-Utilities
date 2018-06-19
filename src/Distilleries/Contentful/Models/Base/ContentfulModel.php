@@ -97,13 +97,15 @@ abstract class ContentfulModel extends Model
     // --------------------------------------------------------------------------------
 
     /**
-     * Return Contentful Asset for given ID.
+     * Return Contentful Asset for given link (sys or ID).
      *
-     * @param  string|null  $assetId
+     * @param  array|string|null  $link
      * @return \Distilleries\Contentful\Models\Asset|null
      */
-    protected function contentfulAsset($assetId) : ?Asset
+    protected function contentfulAsset($link) : ?Asset
     {
+        $assetId = $this->contentfulLinkId($link);
+
         if (empty($assetId)) {
             return null;
         }
@@ -117,13 +119,15 @@ abstract class ContentfulModel extends Model
     }
 
     /**
-     * Return Contentful Entry for given ID.
+     * Return Contentful Entry for given link (sys or ID).
      *
-     * @param  string|null  $entryId
+     * @param  array|string|null  $link
      * @return \Distilleries\Contentful\Models\Base\ContentfulModel|null
      */
-    protected function contentfulEntry($entryId) : ?ContentfulModel
+    protected function contentfulEntry($link) : ?ContentfulModel
     {
+        $entryId = $this->contentfulLinkId($link);
+
         if (empty($entryId)) {
             return null;
         }
@@ -136,36 +140,46 @@ abstract class ContentfulModel extends Model
     /**
      * Return Contentful Entries for given ID.
      *
-     * @param  array  $entryIds
+     * @param  array  $links
      * @return \Illuminate\Support\Collection
      */
-    protected function contentfulEntries(array $entryIds) : Collection
+    protected function contentfulEntries(array $links) : Collection
     {
         $entries = [];
 
-        $relationships = DB::table('entry_relationships')
-            ->select('related_contentful_id', 'related_contentful_type')
-            ->where('locale', '=', $this->locale)
-            ->where('source_contentful_id', '=', $this->contentful_id)
-            ->whereIn('related_contentful_id', $entryIds)
-            ->orderBy('order', 'asc')
-            ->get();
-
-        foreach ($relationships as $relationship) {
-            if ($relationship->related_contentful_type === 'asset') {
-                $model = new Asset;
-            } else {
-                $modelClass = '\App\Models\\' . studly_case($relationship->related_contentful_type);
-                $model = new $modelClass;
+        $entryIds = [];
+        foreach ($links as $link) {
+            $entryId = $this->contentfulLinkId($link);
+            if (! empty($entryId)) {
+                $entryIds[] = $entryId;
             }
+        }
 
-            $instance = $model->query()
+        if (! empty($entryIds)) {
+            $relationships = DB::table('entry_relationships')
+                ->select('related_contentful_id', 'related_contentful_type')
                 ->where('locale', '=', $this->locale)
-                ->where('contentful_id', '=', $relationship->related_contentful_id)
-                ->first();
+                ->where('source_contentful_id', '=', $this->contentful_id)
+                ->whereIn('related_contentful_id', $entryIds)
+                ->orderBy('order', 'asc')
+                ->get();
 
-            if (! empty($instance)) {
-                $entries[] = $instance;
+            foreach ($relationships as $relationship) {
+                if ($relationship->related_contentful_type === 'asset') {
+                    $model = new Asset;
+                } else {
+                    $modelClass = '\App\Models\\' . studly_case($relationship->related_contentful_type);
+                    $model = new $modelClass;
+                }
+
+                $instance = $model->query()
+                    ->where('locale', '=', $this->locale)
+                    ->where('contentful_id', '=', $relationship->related_contentful_id)
+                    ->first();
+
+                if (! empty($instance)) {
+                    $entries[] = $instance;
+                }
             }
         }
 
@@ -215,13 +229,25 @@ abstract class ContentfulModel extends Model
     }
 
     /**
-     * Decode Contentful JSON data.
+     * Return Contentful link ID.
      *
-     * @param  string  $str
-     * @return array
+     * @param  mixed  $link
+     * @return string|null
      */
-    protected function contentfulJson(string $str) : array
+    protected function contentfulLinkId($link) : ?string
     {
-        return json_decode($str, true);
+        if (empty($link)) {
+            return null;
+        }
+
+        if (is_string($link)) {
+            return $link;
+        }
+
+        if (is_array($link) and isset($link['sys']) and isset($link['sys']['id'])) {
+            return $link['sys']['id'];
+        }
+
+        return null;
     }
 }

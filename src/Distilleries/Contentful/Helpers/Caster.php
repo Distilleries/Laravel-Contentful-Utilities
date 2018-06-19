@@ -23,9 +23,30 @@ class Caster
      * @param  mixed  $data
      * @return string
      */
-    public static function json($data) : string
+    public static function toJson($data) : string
     {
         return ! empty($data) ? json_encode($data) : '';
+    }
+
+    /**
+     * Transform a JSON string to its associative array representation.
+     *
+     * @param  mixed  $json
+     * @return array|null
+     */
+    public static function fromJson($json) : ?array
+    {
+        if (empty($json)) {
+            return null;
+        }
+
+        $data = json_decode($json, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return null;
+        }
+
+        return $data;
     }
 
     /**
