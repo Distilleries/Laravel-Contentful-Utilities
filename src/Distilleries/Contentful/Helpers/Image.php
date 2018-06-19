@@ -69,9 +69,9 @@ class Image
      * Auto-detect image format to serve (based on browser capability).
      *
      * @param  string  $format
-     * @return string
+     * @return string|null
      */
-    protected static function detectFormat(string $format = '') : string
+    protected static function detectFormat(string $format = '') : ?string
     {
         /** @var \Jenssegers\Agent\Agent $agent */
         $agent = app('agent');
