@@ -25,9 +25,7 @@ class Image
         $imageUrl = '';
 
         $format = static::detectFormat($format);
-
-
-        if ($format === 'webp' || !config('contentful.image.webp_enabled')) {
+        if ($format === 'webp') {
             $useProgressive = false;
         }
         if ($useProgressive === null) {
@@ -81,7 +79,7 @@ class Image
         if (empty($format)) {
             $browser = mb_strtolower($agent->browser());
             if (($browser === 'chrome') and ! $agent->isMobile()) {
-                $format = 'webp';
+                $format = config('contentful.image.use_webp') ? 'webp' : null;
             }
         }
 
