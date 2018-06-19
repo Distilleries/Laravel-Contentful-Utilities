@@ -3,7 +3,6 @@
 namespace Distilleries\Contentful\Models\Base;
 
 use Exception;
-use Parsedown;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Distilleries\Contentful\Models\Locale;
@@ -39,8 +38,18 @@ abstract class ContentfulMapper
 
         $locales = $this->entryLocales($entry);
         foreach ($locales as $locale) {
+            // Add specific fields
             $data = array_merge($common, $this->map($entry, $locale));
+
             $data['locale'] = $locale;
+
+            if (! isset($data['payload'])) {
+                $data['payload'] = $this->mapPayload($entry, $locale);
+            }
+
+            if (! isset($data['relationships'])) {
+                $data['relationships'] = $this->mapRelationships($data['payload']);
+            }
 
             $entries[] = $data;
         }
@@ -53,43 +62,61 @@ abstract class ContentfulMapper
     // --------------------------------------------------------------------------------
 
     /**
-     * Return relationship opinionated array to handle entry single relationship.
+     * Return raw entry fields payload for given locale.
      *
      * @param  array  $entry
      * @param  string  $locale
-     * @param  string  $field
      * @return array
-     * @throws \Exception
      */
-    protected function fieldRelationship(array $entry, string $locale, string $field) : array
+    protected function mapPayload(array $entry, string $locale) : array
     {
-        $localeField = $this->localeField($entry, $locale, $field);
+        $payload = [];
 
-        $relationship = $this->relationshipSignature($localeField);
+        $fallbackLocale = Locale::fallback($locale);
+        foreach ($entry['fields'] as $field => $localesData) {
+            if (isset($localesData[$locale])) {
+                $payload[$field] = $localesData[$locale];
+            } else {
+                // Fallback field...
+                if (isset($localesData[$fallbackLocale])) {
+                    $payload[$field] = $localesData[$fallbackLocale];
+                } else {
+                    $payload[$field] = null;
+                }
+            }
+        }
 
-        return ! empty($relationship) ? [$relationship] : [];
+        return $payload;
     }
 
+    // --------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------
+
     /**
-     * Return relationship opinionated array to handle entry multiple relationships.
+     * Map relationships in given payload.
      *
-     * @param  array  $entry
-     * @param  string  $locale
-     * @param  string  $field
+     * @param  array  $payload
      * @return array
      * @throws \Exception
      */
-    protected function fieldRelationships(array $entry, string $locale, string $field) : array
+    protected function mapRelationships($payload) : array
     {
         $relationships = [];
 
-        $localeFields = $this->localeField($entry, $locale, $field);
-        if (! empty($localeFields)) {
-            foreach ($localeFields as $localeField) {
-                $relationship = $this->relationshipSignature($localeField);
-                if (! empty($relationship)) {
-                    $relationships[] = $relationship;
+        foreach ($payload as $field => $value) {
+            if (is_array($value)) {
+                if ($this->isLink($value)) {
+                    $relationships[] = $this->relationshipSignature($value);
+                } else {
+                    foreach ($value as $entry) {
+                        if ($this->isLink($entry)) {
+                            $relationships[] = $this->relationshipSignature($entry);
+                        }
+                    }
                 }
+            } else {
+                // No relationship
             }
         }
 
@@ -105,187 +132,31 @@ abstract class ContentfulMapper
      */
     private function relationshipSignature($localeField) : ?array
     {
-        if (isset($localeField['sys']) and isset($localeField['sys']['type']) and ($localeField['sys']['type'] === 'Link')) {
-            if ($localeField['sys']['linkType'] === 'Asset') {
-                return ['id' => $localeField['sys']['id'], 'type' => 'asset'];
-            } elseif ($localeField['sys']['linkType'] === 'Entry') {
-                if (app()->runningInConsole()) {
-                    // From SYNC
-                    return ['id' => $localeField['sys']['id'], 'type' => $this->contentTypeFromSyncEntries($localeField['sys']['id'])];
-                } else {
-                    // From Webhook
-                    return ['id' => $localeField['sys']['id'], 'type' => $this->contentTypeFromEntryTypes($localeField['sys']['id'])];
-                }
+        if ($localeField['sys']['linkType'] === 'Asset') {
+            return ['id' => $localeField['sys']['id'], 'type' => 'asset'];
+        } elseif ($localeField['sys']['linkType'] === 'Entry') {
+            if (app()->runningInConsole()) {
+                // From SYNC
+                return ['id' => $localeField['sys']['id'], 'type' => $this->contentTypeFromSyncEntries($localeField['sys']['id'])];
+            } else {
+                // From Webhook
+                return ['id' => $localeField['sys']['id'], 'type' => $this->contentTypeFromEntryTypes($localeField['sys']['id'])];
             }
         }
 
-        return null;
-    }
-
-    // --------------------------------------------------------------------------------
-    // --------------------------------------------------------------------------------
-    // --------------------------------------------------------------------------------
-
-    /**
-     * Return a localised entry field casted as an integer.
-     *
-     * @param  array  $entry
-     * @param  string  $locale
-     * @param  string  $field
-     * @return int
-     */
-    protected function fieldInteger(array $entry, string $locale, string $field) : int
-    {
-        $localeField = $this->localeField($entry, $locale, $field);
-
-        return ! empty($localeField) ? (integer) $localeField : 0;
+        throw new Exception('Invalid field signature... ' . PHP_EOL . print_r($localeField, true));
     }
 
     /**
-     * Return a localised entry field casted as string.
+     * Return if field is a Link one.
      *
-     * @param  array  $entry
-     * @param  string  $locale
-     * @param  string  $field
-     * @return string
+     * @param  mixed  $localeField
+     * @return bool
      */
-    protected function fieldString(array $entry, string $locale, string $field) : string
+    private function isLink($localeField) : bool
     {
-        $localeField = $this->localeField($entry, $locale, $field);
-
-        return ! empty($localeField) ? (string) $localeField : '';
+        return isset($localeField['sys']) and isset($localeField['sys']['type']) and ($localeField['sys']['type'] === 'Link');
     }
-
-    /**
-     * Return a localised entry field string JSON encoded.
-     *
-     * @param  array  $entry
-     * @param  string  $locale
-     * @param  string  $field
-     * @return string
-     */
-    protected function fieldJson(array $entry, string $locale, string $field) : string
-    {
-        $localeField = $this->localeField($entry, $locale, $field);
-
-        return ! empty($localeField) ? json_encode($localeField) : '';
-    }
-
-    /**
-     * Return a localised entry field transformed from Markdown HTML string.
-     *
-     * @param  array  $entry
-     * @param  string  $locale
-     * @param  string  $field
-     * @return string
-     */
-    protected function fieldMarkdown(array $entry, string $locale, string $field) : string
-    {
-        $localeField = $this->localeField($entry, $locale, $field);
-
-        if (empty($localeField)) {
-            return '';
-        }
-
-        $html = (new Parsedown)->setBreaksEnabled(true)->text($localeField);
-
-        return $html;
-    }
-
-    /**
-     * Return a localised entry or asset ID field.
-     *
-     * @param  array  $entry
-     * @param  string  $locale
-     * @param  string  $field
-     * @return string|null
-     */
-    protected function fieldLink(array $entry, string $locale, string $field) : ?string
-    {
-        $localeField = $this->localeField($entry, $locale, $field);
-
-        if (! isset($localeField['sys']) or ! isset($localeField['sys']['type']) or ($localeField['sys']['type'] !== 'Link')) {
-            return null;
-        }
-
-        return $localeField['sys']['id'];
-    }
-
-    /**
-     * Return a localised entry or asset IDs array.
-     *
-     * @param  array  $entry
-     * @param  string  $locale
-     * @param  string  $field
-     * @return array
-     */
-    protected function fieldArray(array $entry, string $locale, string $field) : array
-    {
-        $linkIds = [];
-
-        $localeField = $this->localeField($entry, $locale, $field);
-        if (! empty($localeField)) {
-            foreach ($localeField as $link) {
-                if (isset($link['sys']) and isset($link['sys']['type']) and ($link['sys']['type'] === 'Link')) {
-                    $linkIds[] = $link['sys']['id'];
-                }
-            }
-        }
-
-        return $linkIds;
-    }
-
-    // --------------------------------------------------------------------------------
-    // --------------------------------------------------------------------------------
-    // --------------------------------------------------------------------------------
-
-    /**
-     * Return all locales in entry payload.
-     *
-     * @param  array  $entry
-     * @return array
-     */
-    private function entryLocales(array $entry) : array
-    {
-        $locales = [];
-
-        if (isset($entry['fields']) and ! empty($entry['fields'])) {
-            $firstField = array_first($entry['fields']);
-            $locales = array_keys($firstField);
-        }
-
-        return $locales;
-    }
-
-    /**
-     * Return raw locale field content.
-     *
-     * @param  array  $entry
-     * @param  string  $locale
-     * @param  string  $field
-     * @return mixed|null
-     */
-    private function localeField(array $entry, string $locale, string $field)
-    {
-        if (! isset($entry['fields']) or ! isset($entry['fields'][$field])) {
-            return null;
-        }
-
-        if (isset($entry['fields'][$field][$locale]) and ! empty($entry['fields'][$field][$locale])) {
-            return $entry['fields'][$field][$locale];
-        }
-
-        $fallbackLocale = Locale::fallback($locale);
-        if (! empty($fallbackLocale) and isset($entry['fields'][$field][$fallbackLocale]) and ! empty($entry['fields'][$field][$fallbackLocale])) {
-            return $entry['fields'][$field][$fallbackLocale];
-        }
-
-        return null;
-    }
-
-    // --------------------------------------------------------------------------------
-    // --------------------------------------------------------------------------------
-    // --------------------------------------------------------------------------------
 
     /**
      * Return contentful-type for given Contentful ID from `sync_entries` table.
@@ -327,5 +198,27 @@ abstract class ContentfulMapper
         }
 
         return $pivot->contentful_type;
+    }
+
+    // --------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------
+
+    /**
+     * Return all locales in entry payload.
+     *
+     * @param  array  $entry
+     * @return array
+     */
+    private function entryLocales(array $entry) : array
+    {
+        $locales = [];
+
+        if (isset($entry['fields']) and ! empty($entry['fields'])) {
+            $firstField = array_first($entry['fields']);
+            $locales = array_keys($firstField);
+        }
+
+        return $locales;
     }
 }

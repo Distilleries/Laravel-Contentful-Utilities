@@ -2,70 +2,89 @@
 
 namespace Distilleries\Contentful\Helpers;
 
-use Illuminate\Support\Str;
-
 class Image
 {
     /**
-     * Auto-detect image format to serve.
+     * Return image URL to serve based on given parameters.
      *
-     * @param  string|null  $format
-     * @return string|null
-     */
-    protected static function autoDetectFormat($format = null)
-    {
-        $agent = app('agent');
-        $browser = mb_strtolower($agent->browser());
-
-
-        if (empty($format) and ($browser === 'chrome') and ! $agent->isMobile()) {
-            $format = 'webp';
-        }
-
-        return $format;
-    }
-
-    /**
-     * Return Contentful image URL with transformations parameters.
-     *
-     * @param  string $url
-     * @param  integer|null  $width
-     * @param  integer|null  $height
-     * @param  string|null  $format
-     * @param  integer|null  $quality
-     * @param  boolean|null  $isProgressive
-     * @param  boolean|null  $fit
+     * @param  string  $url
+     * @param  integer  $width
+     * @param  integer  $height
+     * @param  string  $format
+     * @param  integer  $quality
+     * @param  boolean|null  $useProgressive
+     * @param  string  $fit
      * @return string
      */
-    public static function getUrl($url, $width = null, $height = null, $format = null, $quality = null, $isProgressive = null, $fit = null)
+    public static function url(string $url, int $width = 0, int $height = 0, $format = '', int $quality = 0, ?bool $useProgressive = null, $fit = '') : string
     {
-        $stringResult = '';
-        $format = static::autoDetectFormat($format);
+        if (empty($url)) {
+            return '';
+        }
+
+        $imageUrl = '';
+
+        $format = static::detectFormat($format);
+
+
+        if ($format === 'webp' || !config('contentful.image.webp_enabled')) {
+            $useProgressive = false;
+        }
+        if ($useProgressive === null) {
+            $useProgressive = ! empty(config('contentful.image.use_progressive'));
+        }
+
+        if (empty($fit)) {
+            $fit = 'fill';
+        } else {
+            $fit = ($fit !== 'default') ? $fit : null;
+        }
 
         collect([
             'w' => $width,
             'h' => $height,
-            'q' => ! empty($quality) ? $quality : config('contentful.image.quality', 80),
-            'fm' => config('contentful.image.webp_enabled')?$format:false,
-            'fl' => ($format !== 'webp' || !config('contentful.image.webp_enabled')) ? (! empty($isProgressive) ? 'progressive' : config('contentful.image.progressive', null)) : null,
-            'fit' => ! empty($fit) ? (($fit === 'default') ? null : $fit) : 'fill',
-        ])->filter(function ($value, $key) {
+            'q' => ! empty($quality) ? $quality : config('contentful.image.default_quality'),
+            'fm' => config('contentful.image.use_webp') ? $format : null,
+            'fl' => $useProgressive ? 'progressive' : null,
+            'fit' => $fit,
+        ])->filter(function ($value) {
             return ! empty($value);
-        })->each(function ($value, $key) use (& $stringResult) {
-            $stringResult .= $key . '=' . $value . '&';
+        })->each(function ($value, $key) use (& $imageUrl) {
+            $imageUrl .= $key . '=' . $value . '&';
         });
 
-        if (Str::contains($url, '?')) {
+        if (str_contains($url, '?')) {
             $url = explode('?', $url);
             $url = $url[0];
         }
 
-        $search = config('contentful.image.replace_host');
-        $dest = config('contentful.image.dest_host');
-        if (! empty($search) and ! empty($dest)) {
-            $url = Str::replaceFirst($search, $dest, $url);
+        $searchHosts = config('contentful.image.search_hosts');
+        $replaceHost = config('contentful.image.replace_host');
+        if (! empty($searchHosts) and ! empty($replaceHost)) {
+            $url = str_replace(explode(',', $searchHosts), $replaceHost, $url);
         }
 
-        return ! empty($url) ? $url . '?' . trim($stringResult, '&') : '';
+        return ! empty($url) ? $url . '?' . trim($imageUrl, '&') : '';
+    }
+
+    /**
+     * Auto-detect image format to serve (based on browser capability).
+     *
+     * @param  string  $format
+     * @return string
+     */
+    protected static function detectFormat(string $format = '') : string
+    {
+        /** @var \Jenssegers\Agent\Agent $agent */
+        $agent = app('agent');
+
+        if (empty($format)) {
+            $browser = mb_strtolower($agent->browser());
+            if (($browser === 'chrome') and ! $agent->isMobile()) {
+                $format = 'webp';
+            }
+        }
+
+        return $format;
     }
 }

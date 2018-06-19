@@ -19,7 +19,7 @@ return [
     ],
 
     'image' => [
-        'use_webp' => env('CONTENTFUL_IMAGE_USE_WEBP', 1),
+        'use_webp' => env('CONTENTFUL_IMAGE_USE_WEBP', 0),
         'use_progressive' => env('CONTENTFUL_IMAGE_USE_PROGRESSIVE', 1),
         'default_quality' => env('CONTENTFUL_IMAGE_DEFAULT_QUALITY', 80),
         'search_hosts' => 'images.contentful.com,images.ctfassets.net',
