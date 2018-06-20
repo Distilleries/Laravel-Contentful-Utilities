@@ -2,7 +2,6 @@
 
 class ImageTest extends ContentfulTestCase {
     
-
     protected function getPackageProviders($app)
     {
         return [
