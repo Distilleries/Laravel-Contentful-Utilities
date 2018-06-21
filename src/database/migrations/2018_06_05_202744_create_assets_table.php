@@ -18,7 +18,7 @@ class CreateAssetsTable extends Migration
             $table->string('locale', 16)->index();
             $table->string('title');
             $table->text('description');
-            $table->string('url');
+            $table->text('url');
             $table->string('file_name');
             $table->string('content_type');
             $table->integer('size')->unsigned()->default(0);
