@@ -111,10 +111,11 @@ interface ManagementApi
      *
      * @param  string  $assetId
      * @param  string  $locale
+     * @param  integer  $version
      * @return void
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function processAsset(string $assetId, string $locale);
+    public function processAsset(string $assetId, string $locale, int $version = 1);
 
     /**
      * Publish given asset.
