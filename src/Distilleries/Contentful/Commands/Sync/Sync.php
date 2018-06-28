@@ -28,9 +28,6 @@ class Sync extends Command
             $arguments['--preview'] = true;
         }
 
-        $this->line('Syncing locales...');
-        $this->call('contentful:sync-locales', $arguments);
-
         $this->call('contentful:sync-data', $arguments);
 
         $this->call('contentful:sync-flatten', $arguments);
