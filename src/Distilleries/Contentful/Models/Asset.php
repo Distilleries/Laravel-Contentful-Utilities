@@ -3,6 +3,7 @@
 namespace Distilleries\Contentful\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 /**
  * @property string $contentful_id
