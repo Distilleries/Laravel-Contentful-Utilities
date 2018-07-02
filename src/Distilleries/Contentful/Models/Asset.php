@@ -49,4 +49,18 @@ class Asset extends Model
         'width' => 'integer',
         'height' => 'integer',
     ];
+
+    /**
+     * Scope a query to a given locale.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  string  $locale
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeLocale($query, string $locale = '') : Builder
+    {
+        $locale = ! empty($locale) ? $locale : Locale::default();
+
+        return $query->where($this->getTable() . '.locale', '=', $locale);
+    }
 }
