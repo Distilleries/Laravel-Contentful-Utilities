@@ -80,7 +80,8 @@ class AssetsRepository
 
         $instance = Asset::query()
             ->where('contentful_id', '=', $asset['sys']['id'])
-            ->where('locale', '=', $locale)
+            ->where('locale', '=', Locale::getLocale($locale))
+            ->where('country', '=', Locale::getCountry($locale))
             ->first();
 
         if (empty($instance)) {
@@ -88,12 +89,14 @@ class AssetsRepository
         } else {
             Asset::query()
                 ->where('contentful_id', '=', $asset['sys']['id'])
-                ->where('locale', '=', $locale)
+                ->where('locale', '=', Locale::getLocale($locale))
+                ->where('country', '=', Locale::getCountry($locale))
                 ->update($data);
 
             $instance = Asset::query()
                 ->where('contentful_id', '=', $asset['sys']['id'])
-                ->where('locale', '=', $locale)
+                ->where('locale', '=', Locale::getLocale($locale))
+                ->where('country', '=', Locale::getCountry($locale))
                 ->first();
         }
 
@@ -111,7 +114,8 @@ class AssetsRepository
     {
         return [
             'contentful_id' => $asset['sys']['id'],
-            'locale' => $locale,
+            'locale' => Locale::getLocale($locale),
+            'country' => Locale::getCountry($locale),
         ] + $this->fieldsWithFallback($asset['fields'], $locale);
     }
 

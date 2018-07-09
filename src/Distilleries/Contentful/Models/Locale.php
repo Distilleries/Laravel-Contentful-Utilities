@@ -84,24 +84,33 @@ class Locale extends Model
         return $fallback;
     }
 
-    public function getLocaleAttribute(): string
+    public static function getLocale(string $locale) :string
     {
-        if (Str::contains($this->code, '_')) {
-            $tab = explode('_', $this->code);
+        if (Str::contains($locale, '_')) {
+            $tab = explode('_', $locale);
             return $tab[1];
         }
 
-        return $this->code;
+        return $locale;
     }
 
-    public function getCountryAttribute(): string
+    public static function getCountry(string $locale) :string
     {
-
-        if (Str::contains($this->code, '_')) {
-            $tab = explode('_', $this->code);
+        if (Str::contains($locale, '_')) {
+            $tab = explode('_', $locale);
             return $tab[0];
         }
 
         return config('contentful.default_country');
+    }
+
+    public function getLocaleAttribute(): string
+    {
+        return self::getLocale($this->code);
+    }
+
+    public function getCountryAttribute(): string
+    {
+        return self::getCountry($this->code);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Distilleries\Contentful\Repositories;
 
+use Distilleries\Contentful\Models\Locale;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Builder;
@@ -23,10 +24,10 @@ class EntriesRepository
 
         foreach (glob($modelPath . 'Models/*.php') as $file) {
             $modelClass = '\App\\' . str_replace(
-                [$modelPath, '.php', '/'],
-                ['', '', '\\'],
-                $file
-            );
+                    [$modelPath, '.php', '/'],
+                    ['', '', '\\'],
+                    $file
+                );
 
             $modelInstance = new $modelClass;
             if ($modelInstance instanceof ContentfulModel) {
@@ -41,7 +42,7 @@ class EntriesRepository
     /**
      * Map Contentful entry payload to an Eloquent one.
      *
-     * @param  array  $entry
+     * @param  array $entry
      * @return void
      * @throws \Exception
      */
@@ -65,7 +66,7 @@ class EntriesRepository
     /**
      * Delete entry and relationships.
      *
-     * @param  array  $entry
+     * @param  array $entry
      * @return void
      * @throws \Exception
      */
@@ -84,10 +85,10 @@ class EntriesRepository
     /**
      * Return entry content-type.
      *
-     * @param  array  $entry
+     * @param  array $entry
      * @return string
      */
-    private function entryContentType(array $entry) : string
+    private function entryContentType(array $entry): string
     {
         return $entry['sys']['contentType']['sys']['id'];
     }
@@ -95,15 +96,15 @@ class EntriesRepository
     /**
      * Return entry content-type mapper class instance.
      *
-     * @param  array  $entry
+     * @param  array $entry
      * @return \Distilleries\Contentful\Models\Base\ContentfulMapper
      * @throws \Exception
      */
-    private function entryMapper(array $entry) : ContentfulMapper
+    private function entryMapper(array $entry): ContentfulMapper
     {
         $mapperClass = '\App\Models\Mappers\\' . studly_case($this->entryContentType($entry)) . 'Mapper';
 
-        if (! class_exists($mapperClass)) {
+        if (!class_exists($mapperClass)) {
             throw new Exception('Unknown mapper: ' . $mapperClass);
         }
 
@@ -113,15 +114,15 @@ class EntriesRepository
     /**
      * Return entry content-type model class instance.
      *
-     * @param  array  $entry
+     * @param  array $entry
      * @return \Distilleries\Contentful\Models\Base\ContentfulModel
      * @throws \Exception
      */
-    private function entryModel(array $entry) : ContentfulModel
+    private function entryModel(array $entry): ContentfulModel
     {
         $modelClass = '\App\Models\\' . studly_case($this->entryContentType($entry));
 
-        if (! class_exists($modelClass)) {
+        if (!class_exists($modelClass)) {
             throw new Exception('Unknown model: ' . $modelClass);
         }
 
@@ -135,28 +136,33 @@ class EntriesRepository
     /**
      * Handle mapped relationships to fill `entry_relationships` pivot table.
      *
-     * @param  string  $locale
-     * @param  string  $sourceId
-     * @param  string  $sourceType
-     * @param  array  $relationships
+     * @param  string $locale
+     * @param  string $sourceId
+     * @param  string $sourceType
+     * @param  array $relationships
      * @return void
      * @throws \Exception
      */
     private function handleRelationships(string $locale, string $sourceId, string $sourceType, array $relationships = [])
     {
+        $country = Locale::getCountry($locale);
+        $iso = Locale::getLocale($locale);
+
         DB::table('entry_relationships')
-            ->where('locale', '=', $locale)
+            ->where('locale', '=', $iso)
+            ->where('country', '=', $country)
             ->where('source_contentful_id', '=', $sourceId)
             ->delete();
 
         $order = 1;
         foreach ($relationships as $relationship) {
-            if (! isset($relationship['id']) or ! isset($relationship['type'])) {
+            if (!isset($relationship['id']) or !isset($relationship['type'])) {
                 throw new Exception('Relationships malformed! (' . print_r($relationship, true) . ')');
             }
 
             DB::table('entry_relationships')->insert([
-                'locale' => $locale,
+                'locale' => $iso,
+                'country' => $country,
                 'source_contentful_id' => $sourceId,
                 'source_contentful_type' => $sourceType,
                 'related_contentful_id' => $relationship['id'],
@@ -171,7 +177,7 @@ class EntriesRepository
     /**
      * Delete entry relationships for given Contentful entry.
      *
-     * @param  array  $entry
+     * @param  array $entry
      * @return void
      */
     private function deleteRelationships(array $entry)
@@ -189,15 +195,15 @@ class EntriesRepository
     /**
      * Return inserted / updated model instance for given parameters.
      *
-     * @param  array  $entry
-     * @param  array  $data
+     * @param  array $entry
+     * @param  array $data
      * @return \Distilleries\Contentful\Models\Base\ContentfulModel
      * @throws \Exception
      */
-    private function upsertLocale(array $entry, array $data) : ContentfulModel
+    private function upsertLocale(array $entry, array $data): ContentfulModel
     {
         $model = $this->entryModel($entry);
-        if (! isset($data['payload'])) {
+        if (!isset($data['payload'])) {
             throw new Exception('Mapper for model ' . class_basename($model) . ' must set a "payload" key');
         }
 
@@ -215,8 +221,8 @@ class EntriesRepository
     /**
      * Override Eloquent entry with all fillable data.
      *
-     * @param  \Distilleries\Contentful\Models\Base\ContentfulModel  $model
-     * @param  array  $data
+     * @param  \Distilleries\Contentful\Models\Base\ContentfulModel $model
+     * @param  array $data
      * @return void
      */
     private function overridePayloadAndExtraFillables(ContentfulModel $model, array $data)
@@ -239,11 +245,11 @@ class EntriesRepository
     /**
      * Return Eloquent QueryBuilder to target given entry.
      *
-     * @param  \Distilleries\Contentful\Models\Base\ContentfulModel  $model
-     * @param  array  $data
+     * @param  \Distilleries\Contentful\Models\Base\ContentfulModel $model
+     * @param  array $data
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    private function instanceQueryBuilder(ContentfulModel $model, array $data) : Builder
+    private function instanceQueryBuilder(ContentfulModel $model, array $data): Builder
     {
         return $model->query()
             ->where('contentful_id', '=', $data['contentful_id'])

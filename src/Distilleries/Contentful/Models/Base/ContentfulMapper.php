@@ -12,21 +12,21 @@ abstract class ContentfulMapper
     /**
      * Map entry specific payload.
      *
-     * @param  array  $entry
-     * @param  string  $locale
+     * @param  array $entry
+     * @param  string $locale
      * @return array
      * @throws \Exception
      */
-    abstract protected function map(array $entry, string $locale) : array;
+    abstract protected function map(array $entry, string $locale): array;
 
     /**
      * Map entry with common data + specific payload for each locales.
      *
-     * @param  array  $entry
+     * @param  array $entry
      * @return array
      * @throws \Exception
      */
-    public function toLocaleEntries(array $entry) : array
+    public function toLocaleEntries(array $entry): array
     {
         $entries = [];
 
@@ -41,13 +41,14 @@ abstract class ContentfulMapper
             // Add specific fields
             $data = array_merge($common, $this->map($entry, $locale));
 
-            $data['locale'] = $locale;
+            $data['country'] = Locale::getCountry($locale);
+            $data['locale'] = Locale::getLocale($locale);
 
-            if (! isset($data['payload'])) {
+            if (!isset($data['payload'])) {
                 $data['payload'] = $this->mapPayload($entry, $locale);
             }
 
-            if (! isset($data['relationships'])) {
+            if (!isset($data['relationships'])) {
                 $data['relationships'] = $this->mapRelationships($data['payload']);
             }
 
@@ -64,11 +65,11 @@ abstract class ContentfulMapper
     /**
      * Return raw entry fields payload for given locale.
      *
-     * @param  array  $entry
-     * @param  string  $locale
+     * @param  array $entry
+     * @param  string $locale
      * @return array
      */
-    protected function mapPayload(array $entry, string $locale) : array
+    protected function mapPayload(array $entry, string $locale): array
     {
         $payload = [];
 
@@ -96,11 +97,11 @@ abstract class ContentfulMapper
     /**
      * Map relationships in given payload.
      *
-     * @param  array  $payload
+     * @param  array $payload
      * @return array
      * @throws \Exception
      */
-    protected function mapRelationships($payload) : array
+    protected function mapRelationships($payload): array
     {
         $relationships = [];
 
@@ -126,11 +127,11 @@ abstract class ContentfulMapper
     /**
      * Return relationship signature for given "localized" field.
      *
-     * @param  array  $localeField
+     * @param  array $localeField
      * @return array|null
      * @throws \Exception
      */
-    private function relationshipSignature($localeField) : ?array
+    private function relationshipSignature($localeField): ?array
     {
         if ($localeField['sys']['linkType'] === 'Asset') {
             return ['id' => $localeField['sys']['id'], 'type' => 'asset'];
@@ -150,10 +151,10 @@ abstract class ContentfulMapper
     /**
      * Return if field is a Link one.
      *
-     * @param  mixed  $localeField
+     * @param  mixed $localeField
      * @return bool
      */
-    private function isLink($localeField) : bool
+    private function isLink($localeField): bool
     {
         return isset($localeField['sys']) and isset($localeField['sys']['type']) and ($localeField['sys']['type'] === 'Link');
     }
@@ -161,11 +162,11 @@ abstract class ContentfulMapper
     /**
      * Return contentful-type for given Contentful ID from `sync_entries` table.
      *
-     * @param  string  $contentfulId
+     * @param  string $contentfulId
      * @return string
      * @throws \Exception
      */
-    private function contentTypeFromSyncEntries(string $contentfulId) : string
+    private function contentTypeFromSyncEntries(string $contentfulId): string
     {
         $pivot = DB::table('sync_entries')
             ->select('contentful_type')
@@ -182,11 +183,11 @@ abstract class ContentfulMapper
     /**
      * Return content-type for given Contentful ID from `entry_types` table.
      *
-     * @param  string  $contentfulId
+     * @param  string $contentfulId
      * @return string
      * @throws \Exception
      */
-    private function contentTypeFromEntryTypes(string $contentfulId) : string
+    private function contentTypeFromEntryTypes(string $contentfulId): string
     {
         $pivot = DB::table('entry_types')
             ->select('contentful_type')
@@ -207,14 +208,14 @@ abstract class ContentfulMapper
     /**
      * Return all locales in entry payload.
      *
-     * @param  array  $entry
+     * @param  array $entry
      * @return array
      */
-    private function entryLocales(array $entry) : array
+    private function entryLocales(array $entry): array
     {
         $locales = [];
 
-        if (isset($entry['fields']) and ! empty($entry['fields'])) {
+        if (isset($entry['fields']) and !empty($entry['fields'])) {
             $firstField = array_first($entry['fields']);
             $locales = array_keys($firstField);
         }
