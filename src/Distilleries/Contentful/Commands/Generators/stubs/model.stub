@@ -1,0 +1,28 @@
+<?php
+
+namespace App\Models;
+
+
+use Distilleries\Contentful\Helpers\Caster;
+use Distilleries\Contentful\Models\Base\ContentfulModel;
+
+
+class {{MODEL}} extends ContentfulModel
+{
+    /**
+     * {@inheritdoc}
+     */
+    protected $table = '{{TABLE}}';
+
+    /**
+     * {@inheritdoc}
+     */
+    protected $fillable = [];
+
+    /**
+     * {@inheritdoc}
+     */
+    protected $cast = [];
+
+    {{GETTERS}}
+}

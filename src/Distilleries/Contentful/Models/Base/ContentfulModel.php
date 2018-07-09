@@ -55,6 +55,7 @@ abstract class ContentfulModel extends Model
     {
         return [
             'contentful_id',
+            'country',
             'locale',
             'payload',
             'created_at',
@@ -83,13 +84,17 @@ abstract class ContentfulModel extends Model
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @param  string  $locale
+     * @param  string  $country
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeLocale($query, string $locale = '') : Builder
+    public function scopeLocale($query, string $locale = '',string $country='') : Builder
     {
         $locale = ! empty($locale) ? $locale : Locale::default();
 
-        return $query->where($this->getTable() . '.locale', '=', $locale);
+        return $query
+            ->where($this->getTable() . '.locale', '=', $locale)
+            ->where($this->getTable() . '.country', '=', $country)
+            ;
     }
 
     // --------------------------------------------------------------------------------
@@ -113,6 +118,7 @@ abstract class ContentfulModel extends Model
         $asset = (new Asset)->query()
             ->where('contentful_id', '=', $assetId)
             ->where('locale', '=', $this->locale)
+            ->where('country', '=', $this->country)
             ->first();
 
         return ! empty($asset) ? $asset : null;
@@ -159,6 +165,7 @@ abstract class ContentfulModel extends Model
             $relationships = DB::table('entry_relationships')
                 ->select('related_contentful_id', 'related_contentful_type')
                 ->distinct()
+                ->where('country', '=', $this->country)
                 ->where('locale', '=', $this->locale)
                 ->where('source_contentful_id', '=', $this->contentful_id)
                 ->whereIn('related_contentful_id', $entryIds)
@@ -174,6 +181,7 @@ abstract class ContentfulModel extends Model
                 }
 
                 $instance = $model->query()
+                    ->where('country', '=', $this->country)
                     ->where('locale', '=', $this->locale)
                     ->where('contentful_id', '=', $relationship->related_contentful_id)
                     ->first();
@@ -200,6 +208,7 @@ abstract class ContentfulModel extends Model
 
         $query = DB::table('entry_relationships')
             ->select('source_contentful_id', 'source_contentful_type')
+            ->where('country', '=', $this->country)
             ->where('locale', '=', $this->locale)
             ->where('related_contentful_id', '=', $contentfulId);
 
@@ -217,6 +226,7 @@ abstract class ContentfulModel extends Model
             }
 
             $instance = $model->query()
+                ->where('country', '=', $this->country)
                 ->where('locale', '=', $this->locale)
                 ->where('contentful_id', '=', $relationship->source_contentful_id)
                 ->first();

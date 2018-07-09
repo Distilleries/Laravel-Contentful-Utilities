@@ -1,0 +1,9 @@
+    /**
+     * {{FIELD_CAMEL}} attribute accessor.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function get{{FIELD_CAMEL}}Attribute() : bool
+    {
+        return isset($this->payload['{{FIELD}}']) ? Caster::datetime($this->payload['{{FIELD}}'],false) : false;
+    }

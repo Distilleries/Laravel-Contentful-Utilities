@@ -1,0 +1,9 @@
+    /**
+     * {{FIELD_CAMEL}} attribute accessor.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function get{{FIELD_CAMEL}}Attribute() : int
+    {
+        return isset($this->payload['{{FIELD}}']) ? Caster::integer($this->payload['{{FIELD}}'],0) : 0;
+    }

@@ -1,0 +1,16 @@
+<?php
+
+namespace App\Models\Mappers;
+
+use Distilleries\Contentful\Models\Base\ContentfulMapper;
+
+class {{MODEL}}Mapper extends ContentfulMapper
+{
+    /**
+     * {@inheritdoc}
+     */
+    protected function map(array $entry, string $locale) : array
+    {
+        return [];
+    }
+}
