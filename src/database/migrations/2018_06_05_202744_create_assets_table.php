@@ -16,6 +16,7 @@ class CreateAssetsTable extends Migration
         Schema::create('assets', function (Blueprint $table) {
             $table->string('contentful_id')->index();
             $table->string('locale', 16)->index();
+            $table->string('country', 16)->index();
             $table->string('title');
             $table->text('description');
             $table->text('url');
@@ -26,7 +27,7 @@ class CreateAssetsTable extends Migration
             $table->integer('height')->unsigned()->default(0);
             $table->timestamps();
 
-            $table->primary(['contentful_id', 'locale']);
+            $table->primary(['contentful_id', 'locale','country']);
         });
     }
 

@@ -15,6 +15,7 @@ class CreateEntryRelationshipsTable extends Migration
     {
         Schema::create('entry_relationships', function (Blueprint $table) {
             $table->string('locale', 16);
+            $table->string('country', 16);
             $table->string('source_contentful_id')->index();
             $table->string('source_contentful_type')->index();
             $table->string('related_contentful_id')->index();

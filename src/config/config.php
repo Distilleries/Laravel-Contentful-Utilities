@@ -5,6 +5,7 @@ return [
     'space_id' => env('CONTENTFUL_SPACE_ID'),
 
     'default_locale' => env('CONTENTFUL_DEFAULT_LOCALE', 'fr'),
+    'default_country' => env('CONTENTFUL_DEFAULT_COUNTRY', 'www'),
 
     // Must be changed programmatically (in Command via option OR via Middleware OR via WebhookController)
     'use_preview' => 0,
