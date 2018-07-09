@@ -68,6 +68,12 @@ class ServiceProvider extends BaseServiceProvider
      */
     private function registerCommands()
     {
+        $this->app->singleton('command.contentful.model', function () {
+            return new Commands\Generators\Models;
+        });
+        $this->app->singleton('command.contentful.migration', function () {
+            return new Commands\Generators\Migrations;
+        });
         $this->app->singleton('command.contentful.sync', function () {
             return new Commands\Sync\Sync;
         });
@@ -87,6 +93,8 @@ class ServiceProvider extends BaseServiceProvider
             return new Commands\Import\ImportPublish(app(Api\ManagementApi::class));
         });
 
+        $this->commands('command.contentful.model');
+        $this->commands('command.contentful.migration');
         $this->commands('command.contentful.sync');
         $this->commands('command.contentful.sync-data');
         $this->commands('command.contentful.sync-flatten');

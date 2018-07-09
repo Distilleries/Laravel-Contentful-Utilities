@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Commands\Generators;
+namespace Distilleries\Contentful\Commands\Generators;
 
 use Illuminate\Support\Carbon;
 

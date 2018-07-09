@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Commands\Generators;
+namespace Distilleries\Contentful\Commands\Generators;
 
 use Exception;
 use Illuminate\Console\Command;
@@ -114,12 +114,12 @@ abstract class AbstractGenerator extends Command
      *
      * @param  string  $table
      * @param  array  $field
-     * @return \App\Commands\Generators\Definitions\DefinitionInterface
+     * @return \Distilleries\Contentful\Commands\Generators\Definitions\DefinitionInterface
      * @throws \Exception
      */
     protected function fieldDefinition($table, $field)
     {
-        $className = '\App\Commands\Generators\Definitions\\' . $field['type'] . 'Definition';
+        $className = '\Distilleries\Contentful\Commands\Generators\Definitions\\' . $field['type'] . 'Definition';
 
         if (class_exists($className)) {
             return new $className($table, $field);
