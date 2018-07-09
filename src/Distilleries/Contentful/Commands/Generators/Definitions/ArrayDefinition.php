@@ -27,7 +27,7 @@ class ArrayDefinition extends BaseDefinition
         }
 
         return self::getStub($stubPath, [
-            'field_camel' => camel_case($this->id()),
+            'field_camel' => studly_case($this->id()),
             'field' => $this->id(),
         ]);
     }

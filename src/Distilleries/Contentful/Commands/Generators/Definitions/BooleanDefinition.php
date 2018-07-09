@@ -12,7 +12,7 @@ class BooleanDefinition extends BaseDefinition
     {
         $stubPath = __DIR__ . '/stubs/boolean.stub';
         return self::getStub($stubPath, [
-            'field_camel' => camel_case($this->id()),
+            'field_camel' => studly_case($this->id()),
             'field' => $this->id(),
         ]);
     }
