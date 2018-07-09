@@ -18,10 +18,8 @@ class Api extends BaseApi implements UploadApi
      */
     public function uploadFile(string $file) : array
     {
-        $body = starts_with($file, '/') ? file_get_contents($file) : $file;
-
         $response = $this->client->request('POST', $this->url('uploads'), [
-            RequestOptions::BODY => $body,
+            RequestOptions::BODY => file_get_contents($file),
             RequestOptions::HEADERS => [
                 'Content-Type' => 'application/octet-stream',
                 'Authorization' => 'Bearer ' . $this->config['tokens']['management'],

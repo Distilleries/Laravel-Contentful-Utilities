@@ -75,12 +75,12 @@ class ImportClean extends Command
     private function cleanEntry(stdClass $entry)
     {
         if ($entry->contentful_type === 'asset') {
-            if (empty($entry->published_at)) {
+            if (! empty($entry->published_at)) {
                 $this->api->unpublishAsset($entry->contentful_id);
             }
             $this->api->deleteAsset($entry->contentful_id);
         } else {
-            if (empty($entry->published_at)) {
+            if (! empty($entry->published_at)) {
                 $this->api->unpublishEntry($entry->contentful_id);
             }
             $this->api->deleteEntry($entry->contentful_id);

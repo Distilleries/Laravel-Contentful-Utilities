@@ -12,6 +12,8 @@ use Distilleries\Contentful\Repositories\EntriesRepository;
 
 class SyncFlatten extends Command
 {
+    use Traits\SyncTrait;
+
     /**
      * Number of entries to fetch per pagination.
      *
@@ -64,9 +66,12 @@ class SyncFlatten extends Command
      */
     public function handle()
     {
-        if ($this->option('preview')) {
+        $isPreview = $this->option('preview');
+        if ($isPreview) {
             use_contentful_preview();
         }
+
+        $this->switchToSyncDb();
 
         $this->line('Truncate Contentful related tables');
         $this->assets->truncateRelatedTables();
@@ -80,6 +85,9 @@ class SyncFlatten extends Command
             $this->error($e->getMessage());
             return;
         }
+
+        $dumpPath = $this->dumpSync($isPreview);
+        $this->putSync($dumpPath, $isPreview);
     }
 
     /**

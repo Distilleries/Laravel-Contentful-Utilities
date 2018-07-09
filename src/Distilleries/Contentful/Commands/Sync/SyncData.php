@@ -9,6 +9,8 @@ use GuzzleHttp\Exception\GuzzleException;
 
 class SyncData extends Command
 {
+    use Traits\SyncTrait;
+
     /**
      * {@inheritdoc}
      */
@@ -49,6 +51,8 @@ class SyncData extends Command
         if ($this->option('preview')) {
             use_contentful_preview();
         }
+
+        $this->switchToSyncDb();
 
         $this->line('Clean previous synced data');
         DB::table('sync_entries')->truncate();
