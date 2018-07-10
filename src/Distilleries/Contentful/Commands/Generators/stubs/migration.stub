@@ -18,6 +18,7 @@ class Create{{CLASS}}Table extends Migration
             $table->string('country', 16)->index();
             $table->string('locale', 16)->index();
             $table->longText('payload');
+            $table->timestamps();
 
             $table->primary(['contentful_id', 'locale','country']);
         });
