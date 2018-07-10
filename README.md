@@ -8,7 +8,7 @@
 # Distilleries / Laravel-Contentful-Utilities
 
 Laravel-Contentful-Utilities is a Laravel 5.6 / Lumen package 5.6 package to use [contentful](https://www.contentful.com/) in offline mode with and without preview.
-Contentful is a no head cms in cloud you can have more information on their website https://www.contentful.com
+Contentful is a headless CMS in cloud you can have more information on their website https://www.contentful.com
 
 
 ### Features
