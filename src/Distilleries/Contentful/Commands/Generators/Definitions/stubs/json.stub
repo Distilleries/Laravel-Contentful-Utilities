@@ -1,0 +1,9 @@
+    /**
+     * {{FIELD_CAMEL}} attribute accessor.
+     *
+     * @return object
+     */
+    public function get{{FIELD_CAMEL}}Attribute() : object
+    {
+        return isset($this->payload['{{FIELD}}']) ? Caster::fromJson($this->payload['{{FIELD}}'],'{}') : '';
+    }

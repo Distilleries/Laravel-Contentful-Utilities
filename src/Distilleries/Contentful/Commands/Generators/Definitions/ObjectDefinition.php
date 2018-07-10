@@ -7,30 +7,12 @@ class ObjectDefinition extends BaseDefinition
     /**
      * {@inheritdoc}
      */
-    protected function migrationType()
+    public function modelGetter()
     {
-        return [
-            "text('" . $this->id() . "')",
-        ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function modelProperties()
-    {
-        return [
-            "array \$" . $this->id(),
-        ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function modelCast()
-    {
-        return [
-            ['key' => $this->id(), 'type' => 'array'],
-        ];
+        $stubPath = __DIR__ . '/stubs/json.stub';
+        return self::getStub($stubPath, [
+            'field_camel' => studly_case($this->id()),
+            'field' => $this->id(),
+        ]);
     }
 }
