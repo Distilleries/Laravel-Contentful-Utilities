@@ -23,9 +23,12 @@ class CreateEntryRelationshipsTable extends Migration
             $table->integer('order')->unsigned()->default(0);
 
             $table->index(['locale', 'source_contentful_id'], 'locale_source_contentful_id_index');
+            $table->index(['country','locale', 'source_contentful_id'], 'cl_source_contentful_id_index');
             $table->index(['locale', 'source_contentful_id', 'related_contentful_id', 'related_contentful_type'], 'locale_source_related_index');
+            $table->index(['country','locale', 'source_contentful_id', 'related_contentful_id', 'related_contentful_type'], 'cl_source_related_index');
             $table->index(['locale', 'related_contentful_id'], 'locale_related_contentful_id_index');
-            $table->index(['locale', 'related_contentful_id', 'source_contentful_id', 'source_contentful_type'], 'locale_related_source_index');
+            $table->index(['country','locale', 'related_contentful_id'], 'cl_related_contentful_id_index');
+            $table->index(['country','locale', 'related_contentful_id', 'source_contentful_id', 'source_contentful_type'], 'cl_related_source_index');
         });
     }
 

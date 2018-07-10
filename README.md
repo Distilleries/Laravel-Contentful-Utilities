@@ -41,7 +41,7 @@ For example you want to externilize the title and the slug on the database you h
     
             return [
                 'slug' => isset($payload['slug']) ? Caster::string($payload['slug']) : '',
-                'slug' => isset($payload['title']) ? Caster::string($payload['title']) : '',
+                'title' => isset($payload['title']) ? Caster::string($payload['title']) : '',
             ];
         }
     }
