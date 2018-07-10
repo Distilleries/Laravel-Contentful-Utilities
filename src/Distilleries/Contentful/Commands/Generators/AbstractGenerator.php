@@ -36,7 +36,7 @@ abstract class AbstractGenerator extends Command
      */
     protected function tableName($id)
     {
-        return DB::getTablePrefix() . str_plural($id);
+        return DB::getTablePrefix() . str_plural(snake_case($id));
     }
 
     /**
