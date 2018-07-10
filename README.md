@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/Distilleries/Laravel-Contentful-Utilities.svg?branch=master)](https://travis-ci.org/Distilleries/Laravel-Contentful-Utilities) 
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Distilleries/Laravel-Contentful-Utilities/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Distilleries/Laravel-Contentful-Utilities/?branch=master)
 [![Code Coverage](https://scrutinizer-ci.com/g/Distilleries/Laravel-Contentful-Utilities/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/Distilleries/Laravel-Contentful-Utilities/?branch=master)
-[![Total Downloads](https://poser.pugx.org/Distilleries/distilleries/contentful)](https://packagist.org/packages/distilleries/contentful)
+[![Total Downloads](https://poser.pugx.org/distilleries/contentful/downloads)](https://packagist.org/packages/distilleries/contentful)
 [![Latest Stable Version](https://poser.pugx.org/distilleries/contentful/version)](https://packagist.org/packages/distilleries/contentful)
 [![License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](LICENSE) 
 
