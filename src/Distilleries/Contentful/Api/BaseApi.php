@@ -31,7 +31,7 @@ abstract class BaseApi
     /**
      * BaseApi constructor.
      *
-     * @param  \GuzzleHttp\ClientInterface  $client
+     * @param  \GuzzleHttp\ClientInterface $client
      * @return void
      */
     public function __construct(ClientInterface $client)
@@ -44,10 +44,10 @@ abstract class BaseApi
     /**
      * Return endpoint URL.
      *
-     * @param  string  $endpoint
+     * @param  string $endpoint
      * @return string
      */
-    protected function url($endpoint) : string
+    protected function url($endpoint): string
     {
         $baseUrl = rtrim($this->baseUrl, '/');
 
@@ -55,16 +55,17 @@ abstract class BaseApi
             $baseUrl = rtrim($this->previewBaseUrl, '/');
         }
 
-        return $baseUrl . '/spaces/' . $this->config['space_id'] . '/' . trim($endpoint, '/');
+        $environment = config('contentful.use_environment', false) ? '/environments/' . config('contentful.environment') . '/' : '/';
+        return $baseUrl . '/spaces/' . $this->config['space_id'] . $environment . trim($endpoint, '/');
     }
 
     /**
      * Decode given response.
      *
-     * @param  \Psr\Http\Message\ResponseInterface  $response
+     * @param  \Psr\Http\Message\ResponseInterface $response
      * @return array
      */
-    protected function decodeResponse(ResponseInterface $response) : array
+    protected function decodeResponse(ResponseInterface $response): array
     {
         return json_decode($response->getBody()->getContents(), true);
     }

@@ -3,7 +3,8 @@
 return [
 
     'space_id' => env('CONTENTFUL_SPACE_ID'),
-
+    'use_environment' => env('CONTENTFUL_USE_ENVIRONMENT', false),
+    'environment' => env('CONTENTFUL_ENVIRONMENT', 'master'),
     'default_locale' => env('CONTENTFUL_DEFAULT_LOCALE', 'fr'),
     'default_country' => env('CONTENTFUL_DEFAULT_COUNTRY', 'www'),
 
