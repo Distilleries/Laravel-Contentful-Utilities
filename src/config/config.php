@@ -7,19 +7,16 @@ return [
     'environment' => env('CONTENTFUL_ENVIRONMENT', 'master'),
     'default_locale' => env('CONTENTFUL_DEFAULT_LOCALE', 'fr'),
     'default_country' => env('CONTENTFUL_DEFAULT_COUNTRY', 'www'),
-    'namespace'=>[
-        'model'=>env('MODEL_BASE_NAMESPACE','App\Models'),
-        'transformer'=>env('TRANSFORMER_BASE_NAMESPACE','App\Models\Transformers'),
+    'namespace' => [
+        'model' => env('MODEL_BASE_NAMESPACE', 'App\Models'),
+        'transformer' => env('TRANSFORMER_BASE_NAMESPACE', 'App\Models\Transformers'),
     ],
-    'generator'=>[
-        'model'=>app_path('Models'),
-        'mapper'=>app_path('Models/Mappers'),
+    'generator' => [
+        'model' => app_path('Models'),
+        'mapper' => app_path('Models/Mappers'),
     ],
-
-
     // Must be changed programmatically (in Command via option OR via Middleware OR via WebhookController)
     'use_preview' => 0,
-
     'tokens' => [
         'delivery' => [
             'live' => env('CONTENTFUL_TOKEN_LIVE'),
@@ -28,7 +25,6 @@ return [
 
         'management' => env('CONTENTFUL_TOKEN_MANAGEMENT'),
     ],
-
     'image' => [
         'use_webp' => env('CONTENTFUL_IMAGE_USE_WEBP', 0),
         'use_progressive' => env('CONTENTFUL_IMAGE_USE_PROGRESSIVE', 1),
@@ -36,5 +32,4 @@ return [
         'search_hosts' => 'images.contentful.com,images.ctfassets.net',
         'replace_host' => 'images.ctfassets.net',
     ],
-
 ];

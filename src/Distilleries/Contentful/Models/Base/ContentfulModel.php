@@ -2,19 +2,26 @@
 
 namespace Distilleries\Contentful\Models\Base;
 
+use Distilleries\Contentful\Models\EntryRelationship;
+use Distilleries\Contentful\Models\Traits\Localable;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder;
 use Distilleries\Contentful\Models\Asset;
-use Distilleries\Contentful\Models\Locale;
 
 abstract class ContentfulModel extends Model
 {
+    use Localable;
+
     /**
      * {@inheritdoc}
      */
     protected $primaryKey = 'contentful_id';
+
+
+    /**
+     * {@inheritdoc}
+     */
+    protected $keyType = 'string';
 
     /**
      * {@inheritdoc}
@@ -75,27 +82,6 @@ abstract class ContentfulModel extends Model
         ];
     }
 
-    // --------------------------------------------------------------------------------
-    // --------------------------------------------------------------------------------
-    // --------------------------------------------------------------------------------
-
-    /**
-     * Scope a query to a given locale.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  string  $locale
-     * @param  string  $country
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public function scopeLocale($query, string $locale = '',string $country='') : Builder
-    {
-        $locale = ! empty($locale) ? $locale : Locale::getAppOrDefaultLocale();
-        $country = ! empty($country) ? $country : Locale::getAppOrDefaultCountry();
-
-        return $query
-            ->whereRaw('LOWER(country) LIKE LOWER("' . $country . '")')
-            ->whereRaw('LOWER(locale) LIKE LOWER("' . $locale . '")');
-    }
 
     // --------------------------------------------------------------------------------
     // --------------------------------------------------------------------------------
@@ -162,11 +148,10 @@ abstract class ContentfulModel extends Model
         }
 
         if (! empty($entryIds)) {
-            $relationships = DB::table('entry_relationships')
+            $relationships = EntryRelationship::query()
                 ->select('related_contentful_id', 'related_contentful_type')
                 ->distinct()
-                ->where('country', '=', $this->country)
-                ->where('locale', '=', $this->locale)
+                ->locale($this->locale,$this->country)
                 ->where('source_contentful_id', '=', $this->contentful_id)
                 ->whereIn('related_contentful_id', $entryIds)
                 ->orderBy('order', 'asc')
@@ -206,10 +191,9 @@ abstract class ContentfulModel extends Model
     {
         $entries = [];
 
-        $query = DB::table('entry_relationships')
+        $query = EntryRelationship::query()
             ->select('source_contentful_id', 'source_contentful_type')
-            ->where('country', '=', $this->country)
-            ->where('locale', '=', $this->locale)
+            ->locale($this->locale,$this->country)
             ->where('related_contentful_id', '=', $contentfulId);
 
         if (! empty($contentfulType)) {
@@ -221,13 +205,12 @@ abstract class ContentfulModel extends Model
             if ($relationship->source_contentful_type === 'asset') {
                 $model = new Asset;
             } else {
-                $modelClass = '\App\Models\\' . studly_case($relationship->source_contentful_type);
+                $modelClass = rtrim(config('contentful.namespace.model'),'\\') .'\\' . studly_case($relationship->source_contentful_type);
                 $model = new $modelClass;
             }
 
             $instance = $model->query()
-                ->where('country', '=', $this->country)
-                ->where('locale', '=', $this->locale)
+                ->locale($this->locale,$this->country)
                 ->where('contentful_id', '=', $relationship->source_contentful_id)
                 ->first();
 

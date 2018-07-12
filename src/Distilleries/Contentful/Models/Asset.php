@@ -2,6 +2,7 @@
 
 namespace Distilleries\Contentful\Models;
 
+use Distilleries\Contentful\Models\Traits\Localable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -21,6 +22,7 @@ use Illuminate\Database\Eloquent\Builder;
  */
 class Asset extends Model
 {
+    use Localable;
     /**
      * {@inheritdoc}
      */
@@ -51,19 +53,4 @@ class Asset extends Model
         'height' => 'integer',
     ];
 
-    /**
-     * Scope a query to a given locale.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder $query
-     * @param  string $locale
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public function scopeLocale($query, string $locale = '', string $country = ''): Builder
-    {
-        $locale = !empty($locale) ? $locale : Locale::default();
-
-        return $query
-            ->where($this->getTable() . '.locale', '=', $locale)
-            ->where($this->getTable() . '.country', '=', $country);
-    }
 }

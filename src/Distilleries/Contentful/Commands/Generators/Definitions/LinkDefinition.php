@@ -14,8 +14,10 @@ class LinkDefinition extends BaseDefinition
     {
         switch ($this->field['linkType']) {
             case 'Entry':
+                $stubPath = __DIR__ . '/stubs/entry.stub';
+                break;
             case 'Asset':
-                $stubPath = __DIR__ . '/stubs/entries.stub';
+                $stubPath = __DIR__ . '/stubs/asset.stub';
                 break;
             default:
                 throw new Exception('Unknown Array items type "' . $this->field['linkType'] . '"');

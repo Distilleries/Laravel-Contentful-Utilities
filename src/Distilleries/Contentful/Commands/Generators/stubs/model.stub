@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Support\Collection;
 use Distilleries\Contentful\Helpers\Caster;
 use Distilleries\Contentful\Models\Base\ContentfulModel;
+use Distilleries\Contentful\Models\Asset;
 
 
 class {{MODEL}} extends ContentfulModel

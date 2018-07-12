@@ -16,14 +16,14 @@ use Distilleries\Contentful\Models\Base\ContentfulModel;
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  */
-class EntriesRelationship extends ContentfulModel
+class EntryRelationship extends ContentfulModel
 {
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'entries_relationship';
+    protected $table = 'entry_relationships';
 
     /**
      * The primary key for the model.
