@@ -56,9 +56,43 @@ class Locale extends Model
         if ($default === null) {
             $default = static::query()->select('code')->where('is_default', '=', true)->first();
             $default = !empty($default) ? $default->code : config('contentful.default_locale');
-
+            $default = self::getLocale($default);
             // Cache is cleaned in Console\Commands\SyncLocales (run at least daily)
             Cache::forever('locale_default', $default);
+        }
+
+        return $default;
+    }
+
+
+    public static function getAppOrDefaultLocale(): string
+    {
+        return app()->getLocale() ?? self::default();
+    }
+
+    public static function getAppOrDefaultCountry($key = 'app.country'): string
+    {
+        return config($key, self::defaultCountry());
+    }
+
+    /**
+     * Return default country code.
+     *
+     * @return string
+     */
+    public static function defaultCountry(): string
+    {
+        $default = Cache::get('country_default');
+
+        if ($default === null) {
+            $default = static::query()
+                ->select('code')
+                ->where('is_default', '=', true)
+                ->first();
+            $default = !empty($default) ? $default->code : config('contentful.default_country');
+            $default = self::getCountry($default);
+            // Cache is cleaned in Console\Commands\SyncLocales (run at least daily)
+            Cache::forever('country_default', $default);
         }
 
         return $default;
@@ -84,7 +118,7 @@ class Locale extends Model
         return $fallback;
     }
 
-    public static function getLocale(string $locale) :string
+    public static function getLocale(string $locale): string
     {
         if (Str::contains($locale, '_')) {
             $tab = explode('_', $locale);
@@ -94,7 +128,7 @@ class Locale extends Model
         return $locale;
     }
 
-    public static function getCountry(string $locale) :string
+    public static function getCountry(string $locale): string
     {
         if (Str::contains($locale, '_')) {
             $tab = explode('_', $locale);

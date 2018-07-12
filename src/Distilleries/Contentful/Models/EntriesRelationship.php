@@ -1,0 +1,86 @@
+<?php
+
+namespace Distilleries\Contentful\Models;
+
+use Distilleries\Contentful\Models\Base\ContentfulModel;
+
+/**
+ * @property string $src_contentful_id
+ * @property string $src_content_type
+ * @property string $related_contentful_id
+ * @property string $related_content_type
+ * @property string $locale
+ * @property string $country
+ * @property integer $order
+ * @property boolean $is_forbidden
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ */
+class EntriesRelationship extends ContentfulModel
+{
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'entries_relationship';
+
+    /**
+     * The primary key for the model.
+     *
+     * @var string
+     */
+    protected $primaryKey = null;
+
+    /**
+     * Indicates if the IDs are auto-incrementing.
+     *
+     * @var boolean
+     */
+    public $incrementing = false;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'src_contentful_id',
+        'src_content_type',
+        'related_contentful_id',
+        'related_content_type',
+        'locale',
+        'country',
+        'order'
+    ];
+
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'order' => 'integer'
+    ];
+
+    /**
+     * Get Contentful related entry.
+     *
+     * @return mixed
+     */
+    public function getRelatedEntry()
+    {
+        $localModel = rtrim(config('contentful.namespaces.model'), '\\') . '\\' . ucfirst($this->src_content_type);
+        if (!class_exists($localModel)) {
+            return null;
+        }
+
+        $model = (new $localModel);
+        return $model
+            ->locale()
+            ->where($model->getKeyName(), '=', $this->src_contentful_id)
+            ->first();
+
+
+    }
+}

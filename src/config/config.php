@@ -7,6 +7,15 @@ return [
     'environment' => env('CONTENTFUL_ENVIRONMENT', 'master'),
     'default_locale' => env('CONTENTFUL_DEFAULT_LOCALE', 'fr'),
     'default_country' => env('CONTENTFUL_DEFAULT_COUNTRY', 'www'),
+    'namespace'=>[
+        'model'=>env('MODEL_BASE_NAMESPACE','App\Models'),
+        'transformer'=>env('TRANSFORMER_BASE_NAMESPACE','App\Models\Transformers'),
+    ],
+    'generator'=>[
+        'model'=>app_path('Models'),
+        'mapper'=>app_path('Models/Mappers'),
+    ],
+
 
     // Must be changed programmatically (in Command via option OR via Middleware OR via WebhookController)
     'use_preview' => 0,

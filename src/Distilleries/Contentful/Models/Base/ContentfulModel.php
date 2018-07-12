@@ -14,7 +14,7 @@ abstract class ContentfulModel extends Model
     /**
      * {@inheritdoc}
      */
-    public $primaryKey = null;
+    protected $primaryKey = 'contentful_id';
 
     /**
      * {@inheritdoc}
@@ -89,12 +89,12 @@ abstract class ContentfulModel extends Model
      */
     public function scopeLocale($query, string $locale = '',string $country='') : Builder
     {
-        $locale = ! empty($locale) ? $locale : Locale::default();
+        $locale = ! empty($locale) ? $locale : Locale::getAppOrDefaultLocale();
+        $country = ! empty($country) ? $country : Locale::getAppOrDefaultCountry();
 
         return $query
-            ->where($this->getTable() . '.locale', '=', $locale)
-            ->where($this->getTable() . '.country', '=', $country)
-            ;
+            ->whereRaw('LOWER(country) LIKE LOWER("' . $country . '")')
+            ->whereRaw('LOWER(locale) LIKE LOWER("' . $locale . '")');
     }
 
     // --------------------------------------------------------------------------------

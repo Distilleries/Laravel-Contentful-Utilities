@@ -51,7 +51,7 @@ class Models extends AbstractGenerator
         $model = studly_case(str_singular($table));
 
         $stubPath = __DIR__ . '/stubs/model.stub';
-        $destPath = app_path('Models/' . $model . '.php');
+        $destPath = rtrim(config('contentful.generator.model'), '/') . '/' . $model . '.php';
 
         return static::writeStub($stubPath, $destPath, [
             'model' => $model,
@@ -66,7 +66,7 @@ class Models extends AbstractGenerator
         $model = studly_case(str_singular($table));
 
         $stubPath = __DIR__ . '/stubs/mapper.stub';
-        $destPath = app_path('Models/Mappers/' . $model . 'Mapper.php');
+        $destPath = rtrim(config('contentful.generator.mapper'), '/') . '/' . $model . 'Mapper.php';
 
         return static::writeStub($stubPath, $destPath, [
             'model' => $model
@@ -88,7 +88,7 @@ class Models extends AbstractGenerator
             return "\t\t//";
         }
 
-        return implode("\n", array_map(function ($getter) {
+        return implode("\n\n", array_map(function ($getter) {
             return $getter;
         }, $getters));
     }
