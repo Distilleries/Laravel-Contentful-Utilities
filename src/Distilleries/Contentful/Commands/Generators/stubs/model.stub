@@ -30,6 +30,12 @@ class {{MODEL}} extends ContentfulModel
      */
     protected $fillable = [];
 
+
+    /**
+     * {@inheritdoc}
+     */
+    protected $dates = [];
+
     /**
      * {@inheritdoc}
      */
