@@ -9,6 +9,7 @@
 namespace Distilleries\Contentful\Models\Traits;
 
 
+use Distilleries\Contentful\Models\Locale;
 use Illuminate\Database\Eloquent\Builder;
 
 trait Localable
