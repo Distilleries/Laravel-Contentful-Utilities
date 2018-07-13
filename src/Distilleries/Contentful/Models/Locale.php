@@ -118,6 +118,12 @@ class Locale extends Model
         return $fallback;
     }
 
+    public static function canBeSave(string $country,string $locale): bool
+    {
+        $locales = config('contentful.locales_not_flatten','');
+        $locales = explode(',',$locales);
+        return !in_array($country.'_'.$locale,$locales);
+    }
     public static function getLocale(string $locale): string
     {
         if (Str::contains($locale, '_')) {

@@ -2,6 +2,8 @@
 
 namespace Distilleries\Contentful\Commands\Sync;
 
+use Distilleries\Contentful\Models\Locale;
+use Illuminate\Support\Collection;
 use stdClass;
 use Exception;
 use Illuminate\Console\Command;
@@ -71,13 +73,15 @@ class SyncFlatten extends Command
             use_contentful_preview();
         }
 
-        $this->switchToSyncDb();
+        $dumpPath = $this->dumpSync($isPreview);
+        $this->putSync($dumpPath, $isPreview,'mysql_sync');
 
+        $this->switchToSyncDb();
         $this->line('Truncate Contentful related tables');
         $this->assets->truncateRelatedTables();
         $this->entries->truncateRelatedTables();
-
         $this->line('Map and persist synced data');
+
         try {
             $this->flattenSyncedData();
         } catch (Exception $e) {
@@ -86,7 +90,7 @@ class SyncFlatten extends Command
             return;
         }
 
-        $dumpPath = $this->dumpSync($isPreview);
+        $dumpPath = $this->dumpSync($isPreview,'mysql_sync');
         $this->putSync($dumpPath, $isPreview);
     }
 
@@ -100,12 +104,13 @@ class SyncFlatten extends Command
     {
         $page = 1;
         $paginator = DB::table('sync_entries')->paginate(static::PER_BATCH, ['*'], 'page', $page);
+        $locales = Locale::all();
 
         $bar = $this->createProgressBar($paginator->total());
         while ($paginator->isNotEmpty()) {
             foreach ($paginator->items() as $item) {
                 $bar->setMessage('Map entry ID: ' . $item->contentful_id);
-                $this->mapItemToContentfulModel($item);
+                $this->mapItemToContentfulModel($item,$locales);
                 $bar->advance();
             }
 
@@ -139,14 +144,14 @@ class SyncFlatten extends Command
      * @return void
      * @throws \Exception
      */
-    private function mapItemToContentfulModel(stdClass $item)
+    private function mapItemToContentfulModel(stdClass $item, Collection $locales)
     {
         $entry = json_decode($item->payload, true);
 
         if ($item->contentful_type === 'asset') {
             $this->assets->toContentfulModel($entry);
         } else {
-            $this->entries->toContentfulModel($entry);
+            $this->entries->toContentfulModel($entry,$locales);
         }
     }
 }

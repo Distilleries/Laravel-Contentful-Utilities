@@ -3,7 +3,9 @@
 namespace Distilleries\Contentful\Repositories;
 
 use Distilleries\Contentful\Models\Locale;
+use Distilleries\Contentful\Models\Scopes\NotNullSlugScope;
 use Exception;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Builder;
 use Distilleries\Contentful\Models\Base\ContentfulModel;
@@ -20,10 +22,11 @@ class EntriesRepository
      */
     public function truncateRelatedTables()
     {
-        $modelPath = base_path() . '/app/';
+        $modelPath = config('contentful.generator.model');
+        $namespace = config('contentful.namespace.model');
 
-        foreach (glob($modelPath . 'Models/*.php') as $file) {
-            $modelClass = '\App\\' . str_replace(
+        foreach (glob($modelPath . '/*.php') as $file) {
+            $modelClass = $namespace . str_replace(
                     [$modelPath, '.php', '/'],
                     ['', '', '\\'],
                     $file
@@ -46,20 +49,24 @@ class EntriesRepository
      * @return void
      * @throws \Exception
      */
-    public function toContentfulModel(array $entry)
+    public function toContentfulModel(array $entry, Collection $locales)
     {
         $this->upsertEntryType($entry, $this->entryContentType($entry));
         $this->deleteRelationships($entry);
 
-        $localeEntries = $this->entryMapper($entry)->toLocaleEntries($entry);
-
+        $localeEntries = $this->entryMapper($entry)->toLocaleEntries($entry, $locales);
         foreach ($localeEntries as $localeEntry) {
-            if (isset($localeEntry['relationships'])) {
-                $this->handleRelationships($localeEntry['locale'], $localeEntry['contentful_id'], $this->entryContentType($entry), $localeEntry['relationships']);
+
+            $model = $this->upsertLocale($entry, $localeEntry);
+
+            if (!empty($model)) {
+                if (isset($localeEntry['relationships'])) {
+                    $this->handleRelationships($localeEntry['locale'], $localeEntry['contentful_id'], $this->entryContentType($entry), $localeEntry['relationships']);
+                    unset($localeEntry['relationships']);
+                }
+            } else if (isset($localeEntry['relationships'])) {
                 unset($localeEntry['relationships']);
             }
-
-            $this->upsertLocale($entry, $localeEntry);
         }
     }
 
@@ -102,7 +109,8 @@ class EntriesRepository
      */
     private function entryMapper(array $entry): ContentfulMapper
     {
-        $mapperClass = '\App\Models\Mappers\\' . studly_case($this->entryContentType($entry)) . 'Mapper';
+        $mapperNamespace = config('contentful.namespace.mapper');
+        $mapperClass = $mapperNamespace . '\\' . studly_case($this->entryContentType($entry)) . 'Mapper';
 
         if (!class_exists($mapperClass)) {
             throw new Exception('Unknown mapper: ' . $mapperClass);
@@ -120,7 +128,8 @@ class EntriesRepository
      */
     private function entryModel(array $entry): ContentfulModel
     {
-        $modelClass = '\App\Models\\' . studly_case($this->entryContentType($entry));
+        $namespace = config('contentful.namespace.model');
+        $modelClass = $namespace . '\\' . studly_case($this->entryContentType($entry));
 
         if (!class_exists($modelClass)) {
             throw new Exception('Unknown model: ' . $modelClass);
@@ -197,12 +206,16 @@ class EntriesRepository
      *
      * @param  array $entry
      * @param  array $data
-     * @return \Distilleries\Contentful\Models\Base\ContentfulModel
+     * @return \Distilleries\Contentful\Models\Base\ContentfulModel|null
      * @throws \Exception
      */
-    private function upsertLocale(array $entry, array $data): ContentfulModel
+    private function upsertLocale(array $entry, array $data): ?ContentfulModel
     {
         $model = $this->entryModel($entry);
+        if (($model instanceof NotNullSlugScope && empty($data['slug'])) || !Locale::canBeSave($data['country'],$data['locale'])) {
+            return null;
+        }
+
         if (!isset($data['payload'])) {
             throw new Exception('Mapper for model ' . class_basename($model) . ' must set a "payload" key');
         }

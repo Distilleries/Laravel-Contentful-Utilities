@@ -24,7 +24,7 @@ trait SyncTrait
      * @param  boolean  $isPreview
      * @return string
      */
-    protected function dumpSync(bool $isPreview) : string
+    protected function dumpSync(bool $isPreview, string $connector='mysql') : string
     {
         $path = storage_path('dumps/' . date('YmdHis') . '_sync' . ($isPreview ? '_preview' : '') . '.sql');
         $this->warn('Dump "' . basename($path) . '"...');
@@ -34,7 +34,7 @@ trait SyncTrait
             mkdir($dirName, 0777, true);
         }
 
-        $this->dumpSql($path, config('database.default'));
+        $this->dumpSql($path, $connector);
 
         return realpath($path);
     }
@@ -59,7 +59,6 @@ trait SyncTrait
             config('database.connections.' . $connector . '.port'),
             $path
         );
-
         exec($command);
     }
 
@@ -70,15 +69,13 @@ trait SyncTrait
      * @param  boolean $isPreview
      * @return void
      */
-    protected function putSync(string $path, bool $isPreview)
+    protected function putSync(string $path, bool $isPreview, string $connector='mysql')
     {
         config([
             'database.default' => 'mysql' . ($isPreview ? '_preview' : ''),
         ]);
 
-        $connector = config('database.default');
         $this->warn('Put into "' . $connector . '" database...');
-
         $this->putSql($path, $connector);
     }
 

@@ -52,8 +52,6 @@ class SyncData extends Command
             use_contentful_preview();
         }
 
-        $this->switchToSyncDb();
-
         $this->line('Clean previous synced data');
         DB::table('sync_entries')->truncate();
 

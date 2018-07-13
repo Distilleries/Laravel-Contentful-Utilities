@@ -10,6 +10,7 @@ return [
     'namespace' => [
         'model' => env('MODEL_BASE_NAMESPACE', 'App\Models'),
         'transformer' => env('TRANSFORMER_BASE_NAMESPACE', 'App\Models\Transformers'),
+        'mapper' => env('MAPPER_BASE_NAMESPACE', 'App\Models\Mappers'),
     ],
     'generator' => [
         'model' => app_path('Models'),
@@ -32,4 +33,5 @@ return [
         'search_hosts' => 'images.contentful.com,images.ctfassets.net',
         'replace_host' => 'images.ctfassets.net',
     ],
+    'locales_not_flatten'=>env('CONTENTFUL_LOCALES_NOT_FLATTEN', 'www_default'),
 ];

@@ -4,8 +4,10 @@ namespace Distilleries\Contentful\Models\Base;
 
 use Exception;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Distilleries\Contentful\Models\Locale;
+use Illuminate\Support\Str;
 
 abstract class ContentfulMapper
 {
@@ -26,31 +28,34 @@ abstract class ContentfulMapper
      * @return array
      * @throws \Exception
      */
-    public function toLocaleEntries(array $entry): array
+    public function toLocaleEntries(array $entry, Collection $locales): array
     {
         $entries = [];
-
         $common = [
             'contentful_id' => $entry['sys']['id'],
             'created_at' => new Carbon($entry['sys']['createdAt']),
             'updated_at' => new Carbon($entry['sys']['updatedAt']),
         ];
 
-        $locales = $this->entryLocales($entry);
         foreach ($locales as $locale) {
             // Add specific fields
-            $data = array_merge($common, $this->map($entry, $locale));
+            $data = array_merge($common, $this->map($entry, $locale->code));
 
-            $data['country'] = Locale::getCountry($locale);
-            $data['locale'] = Locale::getLocale($locale);
+            $data['country'] = Locale::getCountry($locale->code);
+            $data['locale'] = Locale::getLocale($locale->code);
 
             if (!isset($data['payload'])) {
-                $data['payload'] = $this->mapPayload($entry, $locale);
+                $data['payload'] = $this->mapPayload($entry, $locale->code);
             }
 
             if (!isset($data['relationships'])) {
                 $data['relationships'] = $this->mapRelationships($data['payload']);
             }
+
+            if (isset($data['slug']) && Str::contains($data['slug'], 'untitled-')) {
+                $data['slug'] = null;
+            }
+
 
             $entries[] = $data;
         }
@@ -79,7 +84,7 @@ abstract class ContentfulMapper
                 $payload[$field] = $localesData[$locale];
             } else {
                 // Fallback field...
-                if (isset($localesData[$fallbackLocale])) {
+                if (isset($localesData[$fallbackLocale]) && $this->levelFallBack($field) == 'all') {
                     $payload[$field] = $localesData[$fallbackLocale];
                 } else {
                     $payload[$field] = null;
@@ -88,6 +93,14 @@ abstract class ContentfulMapper
         }
 
         return $payload;
+    }
+
+
+    protected function levelFallBack($field)
+    {
+        $levelMaster = ['slug'];
+        return in_array($field, $levelMaster) ? 'master' : 'all';
+
     }
 
     // --------------------------------------------------------------------------------
@@ -135,7 +148,7 @@ abstract class ContentfulMapper
     {
         if ($localeField['sys']['linkType'] === 'Asset') {
             return ['id' => $localeField['sys']['id'], 'type' => 'asset'];
-        } elseif ($localeField['sys']['linkType'] === 'Entry') {
+        } else if ($localeField['sys']['linkType'] === 'Entry') {
             if (app()->runningInConsole()) {
                 // From SYNC
                 return ['id' => $localeField['sys']['id'], 'type' => $this->contentTypeFromSyncEntries($localeField['sys']['id'])];
