@@ -286,4 +286,9 @@ abstract class ContentfulModel extends Model
     {
         return $this->contentType;
     }
+
+    public function getIdAttribute()
+    {
+        return $this->getKey();
+    }
 }
