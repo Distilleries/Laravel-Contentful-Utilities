@@ -161,7 +161,7 @@ abstract class ContentfulModel extends Model
                 if ($relationship->related_contentful_type === 'asset') {
                     $model = new Asset;
                 } else {
-                    $modelClass = config('contentful.namespace.model') '\\' . studly_case($relationship->related_contentful_type);
+                    $modelClass = config('contentful.namespace.model').'\\' . studly_case($relationship->related_contentful_type);
                     $model = new $modelClass;
                 }
 
