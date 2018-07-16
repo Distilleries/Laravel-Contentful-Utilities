@@ -149,7 +149,7 @@ abstract class ContentfulModel extends Model
 
         if (! empty($entryIds)) {
             $relationships = EntryRelationship::query()
-                ->select('related_contentful_id', 'related_contentful_type')
+                ->select('related_contentful_id', 'related_contentful_type','order')
                 ->distinct()
                 ->locale($this->locale,$this->country)
                 ->where('source_contentful_id', '=', $this->contentful_id)
@@ -161,7 +161,7 @@ abstract class ContentfulModel extends Model
                 if ($relationship->related_contentful_type === 'asset') {
                     $model = new Asset;
                 } else {
-                    $modelClass = '\App\Models\\' . studly_case($relationship->related_contentful_type);
+                    $modelClass = config('contentful.namespace.model') '\\' . studly_case($relationship->related_contentful_type);
                     $model = new $modelClass;
                 }
 
@@ -192,7 +192,7 @@ abstract class ContentfulModel extends Model
         $entries = [];
 
         $query = EntryRelationship::query()
-            ->select('source_contentful_id', 'source_contentful_type')
+            ->select('source_contentful_id', 'source_contentful_type','')
             ->locale($this->locale,$this->country)
             ->where('related_contentful_id', '=', $contentfulId);
 
