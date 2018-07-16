@@ -22,7 +22,7 @@ class AssetsRepository
     /**
      * Map Contentful asset payload to an Eloquent one.
      *
-     * @param  array  $asset
+     * @param  array $asset
      * @return void
      */
     public function toContentfulModel(array $asset)
@@ -31,7 +31,8 @@ class AssetsRepository
 
         $locales = $this->assetLocales($asset);
 
-        foreach ($locales as $locale) {
+        foreach ($locales as $locale)
+        {
             $this->upsertAsset($asset, $locale);
         }
     }
@@ -39,7 +40,7 @@ class AssetsRepository
     /**
      * Delete asset with given Contentful ID.
      *
-     * @param  string  $assetId
+     * @param  string $assetId
      * @return void
      */
     public function delete(string $assetId)
@@ -52,14 +53,15 @@ class AssetsRepository
     /**
      * Return all locales in asset payload.
      *
-     * @param  array  $asset
+     * @param  array $asset
      * @return array
      */
-    private function assetLocales(array $asset) : array
+    private function assetLocales(array $asset): array
     {
         $locales = [];
 
-        if (isset($asset['fields']) and ! empty($asset['fields'])) {
+        if (isset($asset['fields']) and !empty($asset['fields']))
+        {
             $firstField = array_first($asset['fields']);
             $locales = array_keys($firstField);
         }
@@ -70,23 +72,29 @@ class AssetsRepository
     /**
      * Insert OR update given asset.
      *
-     * @param  array  $asset
-     * @param  string  $locale
+     * @param  array $asset
+     * @param  string $locale
      * @return \Distilleries\Contentful\Models\Asset
      */
-    private function upsertAsset(array $asset, string $locale) : Asset
+    private function upsertAsset(array $asset, string $locale): ?Asset
     {
-        $data = $this->mapAsset($asset, $locale);
+        if (!Locale::canBeSave(Locale::getCountry($locale), Locale::getLocale($locale)))
+        {
+            return null;
+        }
 
+        $data = $this->mapAsset($asset, $locale);
         $instance = Asset::query()
             ->where('contentful_id', '=', $asset['sys']['id'])
             ->where('locale', '=', Locale::getLocale($locale))
             ->where('country', '=', Locale::getCountry($locale))
             ->first();
 
-        if (empty($instance)) {
+        if (empty($instance))
+        {
             $instance = Asset::query()->create($data);
-        } else {
+        } else
+        {
             Asset::query()
                 ->where('contentful_id', '=', $asset['sys']['id'])
                 ->where('locale', '=', Locale::getLocale($locale))
@@ -106,34 +114,34 @@ class AssetsRepository
     /**
      * Map a Contentful asset to it's Eloquent model signature.
      *
-     * @param  array  $asset
-     * @param  string  $locale
+     * @param  array $asset
+     * @param  string $locale
      * @return array
      */
-    private function mapAsset(array $asset, string $locale) : array
+    private function mapAsset(array $asset, string $locale): array
     {
         return [
-            'contentful_id' => $asset['sys']['id'],
-            'locale' => Locale::getLocale($locale),
-            'country' => Locale::getCountry($locale),
-        ] + $this->fieldsWithFallback($asset['fields'], $locale);
+                'contentful_id' => $asset['sys']['id'],
+                'locale' => Locale::getLocale($locale),
+                'country' => Locale::getCountry($locale),
+            ] + $this->fieldsWithFallback($asset['fields'], $locale);
     }
 
     /**
      * Return asset fields with locale OR locale fallback data.
      *
-     * @param  array  $fields
-     * @param  string  $locale
+     * @param  array $fields
+     * @param  string $locale
      * @return array
      */
-    private function fieldsWithFallback(array $fields, string $locale) : array
+    private function fieldsWithFallback(array $fields, string $locale): array
     {
         $fallbackLocale = Locale::fallback($locale);
-        $file = ! empty($fields['file'][$locale]) ? $fields['file'][$locale] : (! empty($fields['file'][$fallbackLocale]) ? $fields['file'][$fallbackLocale] : []);
+        $file = !empty($fields['file'][$locale]) ? $fields['file'][$locale] : (!empty($fields['file'][$fallbackLocale]) ? $fields['file'][$fallbackLocale] : []);
 
         return [
-            'title' => ! empty($fields['title'][$locale]) ? $fields['title'][$locale] : (! empty($fields['title'][$fallbackLocale]) ? $fields['title'][$fallbackLocale] : ''),
-            'description' => ! empty($fields['description'][$locale]) ? $fields['description'][$locale] : (! empty($fields['description'][$fallbackLocale]) ? $fields['description'][$fallbackLocale] : ''),
+            'title' => !empty($fields['title'][$locale]) ? $fields['title'][$locale] : (!empty($fields['title'][$fallbackLocale]) ? $fields['title'][$fallbackLocale] : ''),
+            'description' => !empty($fields['description'][$locale]) ? $fields['description'][$locale] : (!empty($fields['description'][$fallbackLocale]) ? $fields['description'][$fallbackLocale] : ''),
             'url' => isset($file['url']) ? $file['url'] : '',
             'file_name' => isset($file['fileName']) ? $file['fileName'] : '',
             'content_type' => isset($file['contentType']) ? $file['contentType'] : '',

@@ -33,6 +33,7 @@ class Asset extends Model
      */
     protected $fillable = [
         'contentful_id',
+        'country',
         'locale',
         'title',
         'description',
