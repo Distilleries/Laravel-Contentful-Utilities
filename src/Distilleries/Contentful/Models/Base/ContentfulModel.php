@@ -69,7 +69,7 @@ abstract class ContentfulModel extends Model
     {
         if (empty($this->contentType))
         {
-            $this->contentType = lcfirst(class_basename(__CLASS__));
+            $this->contentType = lcfirst(class_basename(get_class($this)));
         }
     }
 
