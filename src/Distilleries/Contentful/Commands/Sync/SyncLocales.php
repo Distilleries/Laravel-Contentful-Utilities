@@ -30,7 +30,7 @@ class SyncLocales extends Command
     /**
      * SyncLocales constructor.
      *
-     * @param  \Distilleries\Contentful\Api\ManagementApi  $api
+     * @param  \Distilleries\Contentful\Api\ManagementApi $api
      * @return void
      */
     public function __construct(ManagementApi $api)
@@ -47,14 +47,17 @@ class SyncLocales extends Command
      */
     public function handle()
     {
-        if ($this->option('preview')) {
+        if ($this->option('preview'))
+        {
             use_contentful_preview();
         }
 
-        try {
+        try
+        {
             $data = $this->api->locales();
             $this->resetLocales($data['items']);
-        } catch (GuzzleException $e) {
+        } catch (GuzzleException $e)
+        {
             $this->error($e->getMessage());
         }
     }
@@ -62,16 +65,18 @@ class SyncLocales extends Command
     /**
      * Reset Contentful locales in application DB.
      *
-     * @param  array  $locales
+     * @param  array $locales
      * @return void
      */
     private function resetLocales(array $locales)
     {
-        if (! empty($locales)) {
+        if (!empty($locales))
+        {
             Cache::forget('locale_default');
             Locale::query()->truncate();
 
-            foreach ($locales as $locale) {
+            foreach ($locales as $locale)
+            {
                 $this->createLocale($locale);
             }
         }
@@ -80,7 +85,7 @@ class SyncLocales extends Command
     /**
      * Create locale in DB.
      *
-     * @param  array  $locale
+     * @param  array $locale
      * @return void
      */
     private function createLocale(array $locale)
@@ -88,10 +93,12 @@ class SyncLocales extends Command
         Locale::query()->create([
             'label' => $locale['name'],
             'code' => $locale['code'],
+            'country' => Locale::getCountry($locale['code']),
+            'locale' => Locale::getLocale($locale['code']),
             'fallback_code' => $locale['fallbackCode'],
-            'is_default' => ! empty($locale['default']),
-            'is_editable' => ! empty($locale['contentManagementApi']),
-            'is_publishable' => ! empty($locale['contentDeliveryApi']),
+            'is_default' => !empty($locale['default']),
+            'is_editable' => !empty($locale['contentManagementApi']),
+            'is_publishable' => !empty($locale['contentDeliveryApi']),
         ]);
     }
 }

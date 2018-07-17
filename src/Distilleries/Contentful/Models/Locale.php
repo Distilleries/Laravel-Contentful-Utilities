@@ -29,6 +29,8 @@ class Locale extends Model
     protected $fillable = [
         'label',
         'code',
+        'locale',
+        'country',
         'fallback_code',
         'is_default',
         'is_editable',
@@ -54,9 +56,12 @@ class Locale extends Model
         $default = Cache::get('locale_default');
 
         if ($default === null) {
-            $default = static::query()->select('code')->where('is_default', '=', true)->first();
-            $default = !empty($default) ? $default->code : config('contentful.default_locale');
-            $default = self::getLocale($default);
+            $default = static::query()
+                ->select('locale')
+                ->where('is_default', '=', true)
+                ->first();
+
+            $default = !empty($default) ? $default->locale : config('contentful.default_locale');
             // Cache is cleaned in Console\Commands\SyncLocales (run at least daily)
             Cache::forever('locale_default', $default);
         }
@@ -86,11 +91,10 @@ class Locale extends Model
 
         if ($default === null) {
             $default = static::query()
-                ->select('code')
+                ->select('country')
                 ->where('is_default', '=', true)
                 ->first();
-            $default = !empty($default) ? $default->code : config('contentful.default_country');
-            $default = self::getCountry($default);
+            $default = !empty($default) ? $default->country : config('contentful.default_country');
             // Cache is cleaned in Console\Commands\SyncLocales (run at least daily)
             Cache::forever('country_default', $default);
         }
@@ -109,7 +113,11 @@ class Locale extends Model
         $fallback = Cache::get('locale_fallback_' . $code);
 
         if ($fallback === null) {
-            $locale = static::query()->select('fallback_code')->where('code', '=', $code)->first();
+            $locale = static::query()
+                ->select('fallback_code')
+                ->where('code', '=', $code)
+                ->first();
+
             $fallback = (!empty($locale) and !empty($locale->fallback_code)) ? $locale->fallback_code : '';
 
             Cache::put('locale_fallback_' . $code, $fallback, 5);
@@ -124,6 +132,7 @@ class Locale extends Model
         $locales = explode(',',$locales);
         return !in_array($country.'_'.$locale,$locales);
     }
+
     public static function getLocale(string $locale): string
     {
         if (Str::contains($locale, '_')) {
@@ -144,13 +153,5 @@ class Locale extends Model
         return config('contentful.default_country');
     }
 
-    public function getLocaleAttribute(): string
-    {
-        return self::getLocale($this->code);
-    }
 
-    public function getCountryAttribute(): string
-    {
-        return self::getCountry($this->code);
-    }
 }
