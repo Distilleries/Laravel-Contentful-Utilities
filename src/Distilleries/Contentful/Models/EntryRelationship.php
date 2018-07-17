@@ -5,10 +5,10 @@ namespace Distilleries\Contentful\Models;
 use Distilleries\Contentful\Models\Base\ContentfulModel;
 
 /**
- * @property string $src_contentful_id
- * @property string $src_content_type
+ * @property string $source_contentful_id
+ * @property string $source_contentful_type
  * @property string $related_contentful_id
- * @property string $related_content_type
+ * @property string $related_contentful_type
  * @property string $locale
  * @property string $country
  * @property integer $order
@@ -45,10 +45,10 @@ class EntryRelationship extends ContentfulModel
      * @var array
      */
     protected $fillable = [
-        'src_contentful_id',
-        'src_content_type',
+        'source_contentful_id',
+        'source_contentful_type',
         'related_contentful_id',
-        'related_content_type',
+        'related_contentful_type',
         'locale',
         'country',
         'order'
