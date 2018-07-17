@@ -54,4 +54,15 @@ class Asset extends Model
         'height' => 'integer',
     ];
 
+
+    /**
+     * Return asset URL.
+     *
+     * @return string
+     */
+    public function getUrl()
+    {
+        return $this->url;
+    }
+
 }
