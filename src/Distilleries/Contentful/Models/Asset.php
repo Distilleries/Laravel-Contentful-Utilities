@@ -58,9 +58,9 @@ class Asset extends Model
     /**
      * Return asset URL.
      *
-     * @return string
+     * @return string|null
      */
-    public function getUrl()
+    public function getUrl() : ?string
     {
         return $this->url;
     }
