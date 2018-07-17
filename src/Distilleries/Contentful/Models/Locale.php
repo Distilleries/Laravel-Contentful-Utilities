@@ -55,7 +55,8 @@ class Locale extends Model
     {
         $default = Cache::get('locale_default');
 
-        if ($default === null) {
+        if ($default === null)
+        {
             $default = static::query()
                 ->select('locale')
                 ->where('is_default', '=', true)
@@ -89,7 +90,8 @@ class Locale extends Model
     {
         $default = Cache::get('country_default');
 
-        if ($default === null) {
+        if ($default === null)
+        {
             $default = static::query()
                 ->select('country')
                 ->where('is_default', '=', true)
@@ -112,7 +114,8 @@ class Locale extends Model
     {
         $fallback = Cache::get('locale_fallback_' . $code);
 
-        if ($fallback === null) {
+        if ($fallback === null)
+        {
             $locale = static::query()
                 ->select('fallback_code')
                 ->where('code', '=', $code)
@@ -126,17 +129,23 @@ class Locale extends Model
         return $fallback;
     }
 
-    public static function canBeSave(string $country,string $locale): bool
+    public static function canBeSave(string $country, string $locale): bool
     {
-        $locales = config('contentful.locales_not_flatten','');
-        $locales = explode(',',$locales);
-        return !in_array($country.'_'.$locale,$locales);
+        $locales = config('contentful.locales_not_flatten', '');
+        $locales = explode(',', $locales);
+        return !in_array($country . '_' . $locale, $locales);
     }
 
     public static function getLocale(string $locale): string
     {
-        if (Str::contains($locale, '_')) {
+        if (Str::contains($locale, '_'))
+        {
             $tab = explode('_', $locale);
+            return $tab[1];
+        }
+        else if (Str::contains($locale, '-'))
+        {
+            $tab = explode('-', $locale);
             return $tab[1];
         }
 
@@ -145,8 +154,13 @@ class Locale extends Model
 
     public static function getCountry(string $locale): string
     {
-        if (Str::contains($locale, '_')) {
+        if (Str::contains($locale, '_'))
+        {
             $tab = explode('_', $locale);
+            return $tab[0];
+        } else if (Str::contains($locale, '-'))
+        {
+            $tab = explode('-', $locale);
             return $tab[0];
         }
 
