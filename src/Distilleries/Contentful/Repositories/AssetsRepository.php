@@ -4,6 +4,7 @@ namespace Distilleries\Contentful\Repositories;
 
 use Distilleries\Contentful\Models\Asset;
 use Distilleries\Contentful\Models\Locale;
+use Illuminate\Support\Collection;
 
 class AssetsRepository
 {
@@ -25,11 +26,9 @@ class AssetsRepository
      * @param  array $asset
      * @return void
      */
-    public function toContentfulModel(array $asset)
+    public function toContentfulModel(array $asset,Collection $locales)
     {
         $this->upsertEntryType($asset, 'asset');
-
-        $locales = $this->assetLocales($asset);
 
         foreach ($locales as $locale)
         {

@@ -149,7 +149,7 @@ class SyncFlatten extends Command
         $entry = json_decode($item->payload, true);
 
         if ($item->contentful_type === 'asset') {
-            $this->assets->toContentfulModel($entry);
+            $this->assets->toContentfulModel($entry,$locales);
         } else {
             $this->entries->toContentfulModel($entry,$locales);
         }

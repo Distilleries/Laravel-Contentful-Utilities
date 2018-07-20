@@ -2,6 +2,7 @@
 
 namespace Distilleries\Contentful\Webhook;
 
+use Distilleries\Contentful\Models\Locale;
 use Distilleries\Contentful\Repositories\EntriesRepository;
 
 class EntryHandler
@@ -156,7 +157,7 @@ class EntryHandler
 
     private function upsertEntry($payload)
     {
-        $this->entries->toContentfulModel($payload);
+        $this->entries->toContentfulModel($payload,Locale::all());
     }
 
     /**
