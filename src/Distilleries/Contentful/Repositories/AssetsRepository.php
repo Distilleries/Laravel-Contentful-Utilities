@@ -32,7 +32,7 @@ class AssetsRepository
 
         foreach ($locales as $locale)
         {
-            $this->upsertAsset($asset, $locale);
+            $this->upsertAsset($asset, $locale->code);
         }
     }
 

@@ -2,6 +2,7 @@
 
 namespace Distilleries\Contentful\Webhook;
 
+use Distilleries\Contentful\Models\Locale;
 use Distilleries\Contentful\Repositories\AssetsRepository;
 
 class AssetHandler
@@ -147,7 +148,7 @@ class AssetHandler
 
     private function upsertAsset($payload)
     {
-        $this->assets->toContentfulModel($payload);
+        $this->assets->toContentfulModel($payload,Locale::all());
     }
 
     /**
