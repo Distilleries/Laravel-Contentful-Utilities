@@ -53,7 +53,10 @@ class Live extends BaseApi implements DeliveryApi
     {
         $token = ! empty($this->config['use_preview']) ? 'preview' : 'live';
 
-        return $this->client->request('GET', $this->url($endpoint), [
+        $url = isset($parameters['id']) ? $this->url($endpoint) . '/' . $parameters['id'] : $this->url($endpoint);
+        unset($parameters['id']);
+
+        return $this->client->request('GET', $url, [
             RequestOptions::QUERY => array_merge($parameters, [
                 'access_token' => $this->config['tokens']['delivery'][$token],
             ]),
