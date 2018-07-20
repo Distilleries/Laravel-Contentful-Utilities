@@ -25,7 +25,8 @@ class EntriesRepository
         $modelPath = config('contentful.generator.model');
         $namespace = config('contentful.namespace.model');
 
-        foreach (glob($modelPath . '/*.php') as $file) {
+        foreach (glob($modelPath . '/*.php') as $file)
+        {
             $modelClass = $namespace . str_replace(
                     [$modelPath, '.php', '/'],
                     ['', '', '\\'],
@@ -33,7 +34,8 @@ class EntriesRepository
                 );
 
             $modelInstance = new $modelClass;
-            if ($modelInstance instanceof ContentfulModel) {
+            if ($modelInstance instanceof ContentfulModel)
+            {
                 $modelInstance->query()->truncate();
             }
         }
@@ -55,16 +57,20 @@ class EntriesRepository
         $this->deleteRelationships($entry);
 
         $localeEntries = $this->entryMapper($entry)->toLocaleEntries($entry, $locales);
-        foreach ($localeEntries as $localeEntry) {
+        foreach ($localeEntries as $localeEntry)
+        {
 
             $model = $this->upsertLocale($entry, $localeEntry);
 
-            if (!empty($model)) {
-                if (isset($localeEntry['relationships'])) {
+            if (!empty($model))
+            {
+                if (isset($localeEntry['relationships']))
+                {
                     $this->handleRelationships($localeEntry['locale'], $localeEntry['contentful_id'], $this->entryContentType($entry), $localeEntry['relationships']);
                     unset($localeEntry['relationships']);
                 }
-            } else if (isset($localeEntry['relationships'])) {
+            } else if (isset($localeEntry['relationships']))
+            {
                 unset($localeEntry['relationships']);
             }
         }
@@ -112,7 +118,8 @@ class EntriesRepository
         $mapperNamespace = config('contentful.namespace.mapper');
         $mapperClass = $mapperNamespace . '\\' . studly_case($this->entryContentType($entry)) . 'Mapper';
 
-        if (!class_exists($mapperClass)) {
+        if (!class_exists($mapperClass))
+        {
             throw new Exception('Unknown mapper: ' . $mapperClass);
         }
 
@@ -131,7 +138,8 @@ class EntriesRepository
         $namespace = config('contentful.namespace.model');
         $modelClass = $namespace . '\\' . studly_case($this->entryContentType($entry));
 
-        if (!class_exists($modelClass)) {
+        if (!class_exists($modelClass))
+        {
             throw new Exception('Unknown model: ' . $modelClass);
         }
 
@@ -164,8 +172,10 @@ class EntriesRepository
             ->delete();
 
         $order = 1;
-        foreach ($relationships as $relationship) {
-            if (!isset($relationship['id']) or !isset($relationship['type'])) {
+        foreach ($relationships as $relationship)
+        {
+            if (!isset($relationship['id']) or !isset($relationship['type']))
+            {
                 throw new Exception('Relationships malformed! (' . print_r($relationship, true) . ')');
             }
 
@@ -212,19 +222,23 @@ class EntriesRepository
     private function upsertLocale(array $entry, array $data): ?ContentfulModel
     {
         $model = $this->entryModel($entry);
-        if (($model instanceof NotNullSlugScope && empty($data['slug'])) || !Locale::canBeSave($data['country'],$data['locale'])) {
+        if ((method_exists($model, 'bootNotNullSlug') && empty($data['slug'])) || !Locale::canBeSave($data['country'], $data['locale']))
+        {
             return null;
         }
 
-        if (!isset($data['payload'])) {
+        if (!isset($data['payload']))
+        {
             throw new Exception('Mapper for model ' . class_basename($model) . ' must set a "payload" key');
         }
 
         $instance = $this->instanceQueryBuilder($model, $data)->first();
 
-        if (empty($instance)) {
+        if (empty($instance))
+        {
             $model->fill($data)->save();
-        } else {
+        } else
+        {
             $this->overridePayloadAndExtraFillables($model, $data);
         }
 
@@ -245,8 +259,10 @@ class EntriesRepository
         // In this way we can delegate extra field update to
         // the Model itself (eg. adding slug or publishing date).
         $update = [];
-        foreach ($data as $key => $value) {
-            if (in_array($key, $fillables)) {
+        foreach ($data as $key => $value)
+        {
+            if (in_array($key, $fillables))
+            {
                 $update[$key] = $value;
             }
         }
