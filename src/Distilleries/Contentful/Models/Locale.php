@@ -2,6 +2,7 @@
 
 namespace Distilleries\Contentful\Models;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -173,6 +174,53 @@ class Locale extends Model
         }
 
         return config('contentful.default_country');
+    }
+
+
+    /**
+     * Return request accepted languages.
+     *
+     * @param  \Illuminate\Http\Request|null $request
+     * @return string|array
+     */
+    public static function getAcceptedLanguages(Request $request = null)
+    {
+        $request = !empty($request) ? $request : request();
+
+        $langs = $request->server('HTTP_ACCEPT_LANGUAGE');
+        if (!empty($langs))
+        {
+            preg_match_all('/(\W|^)([a-z]{2})([^a-z]|$)/six', $langs, $locales, PREG_PATTERN_ORDER);
+
+            if (!empty($locales) and !empty($locales[2]))
+            {
+                return $locales[2];
+            }
+        }
+
+        return [];
+    }
+
+    /**
+     * Return user default language.
+     *
+     * @param  \Illuminate\Http\Request|null $request
+     * @return string
+     */
+    public static function getDefaultLanguageUser(Request $request = null): string
+    {
+        $country = self::defaultCountry();
+        $locales = static::getAcceptedLanguages($request);
+        $locale = !empty($locales) ? $locales[0] : config('app.fallback_locale');
+
+        $localeModel = (new static)
+            ->where('country', $country)
+            ->where('locale', $locale)
+            ->take(1)
+            ->get()
+            ->firs();
+
+        return empty($localeModel) ? static::default() : $localeModel->locale;
     }
 
 
