@@ -218,7 +218,7 @@ class Locale extends Model
             ->where('locale', $locale)
             ->take(1)
             ->get()
-            ->firs();
+            ->first();
 
         return empty($localeModel) ? static::default() : $localeModel->locale;
     }
