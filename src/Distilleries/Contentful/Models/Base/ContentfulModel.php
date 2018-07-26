@@ -131,6 +131,36 @@ abstract class ContentfulModel extends Model
         return !empty($asset) ? $asset : null;
     }
 
+    protected function getAndSetPayloadContentfulEntries(string $payload, array $links, $query = null): Collection
+    {
+        if (empty($this->payload[$payload]))
+        {
+            return collect();
+        }
+
+        if (!is_object($this->payload[$payload]))
+        {
+            $this->payload[$payload] = $this->contentfulEntries($links, $query);
+        }
+
+        return $this->payload[$payload];
+    }
+
+    protected function getAndSetPayloadContentfulEntry(string $payload, array $links, $query = null): ?ContentfulModel
+    {
+        if (empty($this->payload[$payload]))
+        {
+            return null;
+        }
+
+        if (!is_object($this->payload[$payload]))
+        {
+            $this->payload[$payload] = $this->contentfulEntry($links, $query);
+        }
+
+        return $this->payload[$payload];
+    }
+
     /**
      * Return Contentful Entry for given link (sys or ID).
      *
@@ -217,6 +247,7 @@ abstract class ContentfulModel extends Model
 
         return collect($entries);
     }
+
 
     /**
      * Return a collection of related models for base Contentful ID.
