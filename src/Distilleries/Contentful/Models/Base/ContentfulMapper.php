@@ -2,6 +2,8 @@
 
 namespace Distilleries\Contentful\Models\Base;
 
+use Distilleries\Contentful\Api\DeliveryApi;
+use Distilleries\Contentful\Repositories\Traits\EntryType;
 use Exception;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -11,6 +13,9 @@ use Illuminate\Support\Str;
 
 abstract class ContentfulMapper
 {
+
+    use EntryType;
+
     /**
      * Map entry specific payload.
      *
@@ -179,15 +184,8 @@ abstract class ContentfulMapper
             return ['id' => $localeField['sys']['id'], 'type' => 'asset'];
         } else if ($localeField['sys']['linkType'] === 'Entry')
         {
-            if (app()->runningInConsole())
-            {
-                // From SYNC
-                return ['id' => $localeField['sys']['id'], 'type' => $this->contentTypeFromSyncEntries($localeField['sys']['id'])];
-            } else
-            {
-                // From Webhook
-                return ['id' => $localeField['sys']['id'], 'type' => $this->contentTypeFromEntryTypes($localeField['sys']['id'])];
-            }
+            return ['id' => $localeField['sys']['id'], 'type' => $this->contentTypeFromEntryTypes($localeField['sys']['id'])];
+
         }
 
         throw new Exception('Invalid field signature... ' . PHP_EOL . print_r($localeField, true));
@@ -211,7 +209,7 @@ abstract class ContentfulMapper
      * @return string
      * @throws \Exception
      */
-    private function contentTypeFromSyncEntries(string $contentfulId): string
+    public function contentTypeFromEntryTypes(string $contentfulId): string
     {
         $pivot = DB::table('sync_entries')
             ->select('contentful_type')
@@ -220,29 +218,20 @@ abstract class ContentfulMapper
 
         if (empty($pivot))
         {
-            throw new Exception('Unknown content-type from synced entry: ' . $contentfulId);
-        }
+            try{
+                $entry = app(DeliveryApi::class)->entries([
+                    'id' => $contentfulId,
+                    'locale' => '*',
+                    'content_type' => 'single_entry',
+                ]);
 
-        return $pivot->contentful_type;
-    }
-
-    /**
-     * Return content-type for given Contentful ID from `entry_types` table.
-     *
-     * @param  string $contentfulId
-     * @return string
-     * @throws \Exception
-     */
-    private function contentTypeFromEntryTypes(string $contentfulId): string
-    {
-        $pivot = DB::table('entry_types')
-            ->select('contentful_type')
-            ->where('contentful_id', '=', $contentfulId)
-            ->first();
-
-        if (empty($pivot))
-        {
-            throw new Exception('Unknown content-type from webhook entry: ' . $contentfulId);
+                if (!empty($entry) and !empty($entry['sys']['contentType']) and !empty($entry['sys']['contentType']['sys'])) {
+                    $this->upsertEntryType($entry, $entry['sys']['contentType']['sys']['id']);
+                    return $entry['sys']['contentType']['sys']['id'];
+                }
+            }catch (Exception $e){
+                throw new Exception('Unknown content-type from synced entry: ' . $contentfulId);
+            }
         }
 
         return $pivot->contentful_type;
