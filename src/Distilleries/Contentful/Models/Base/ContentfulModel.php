@@ -138,7 +138,7 @@ abstract class ContentfulModel extends Model
      * @param  callback|null $query
      * @return \Distilleries\Contentful\Models\Base\ContentfulModel|null
      */
-    protected function contentfulEntry($link, $query=null): ?ContentfulModel
+    protected function contentfulEntry($link, $query = null): ?ContentfulModel
     {
         $entryId = $this->contentfulLinkId($link);
 
@@ -147,7 +147,7 @@ abstract class ContentfulModel extends Model
             return null;
         }
 
-        $entries = $this->contentfulEntries([$entryId],$query);
+        $entries = $this->contentfulEntries([$entryId], $query);
 
         return $entries->isNotEmpty() ? $entries->first() : null;
     }
@@ -159,7 +159,7 @@ abstract class ContentfulModel extends Model
      * @param  callback|null $query
      * @return \Illuminate\Support\Collection
      */
-    protected function contentfulEntries(array $links,$query=null): Collection
+    protected function contentfulEntries(array $links, $query = null): Collection
     {
         $entries = [];
 
@@ -201,8 +201,9 @@ abstract class ContentfulModel extends Model
                     ->where('contentful_id', '=', $relationship->related_contentful_id);
 
 
-                if(!empty($query)){
-                    $instance = call_user_func($query,$instance);
+                if (!empty($query))
+                {
+                    $instance = call_user_func($query, $instance);
                 }
 
                 $instance = $instance->first();
@@ -299,4 +300,18 @@ abstract class ContentfulModel extends Model
     {
         return $this->getKey();
     }
+
+    public function toArray()
+    {
+        $array = parent::toArray();
+        foreach ($this->getMutatedAttributes() as $key)
+        {
+            if (!array_key_exists($key, $array))
+            {
+                $array[$key] = $this->{$key};
+            }
+        }
+        return $array;
+    }
+
 }
