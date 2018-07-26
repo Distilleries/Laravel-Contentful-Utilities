@@ -32,8 +32,8 @@ trait Localable
         $country = ! empty($country) ? $country : Locale::getAppOrDefaultCountry();
 
         return $query
-            ->whereRaw('LOWER(country) LIKE LOWER("' . $country . '")')
-            ->whereRaw('LOWER(locale) LIKE LOWER("' . $locale . '")');
+            ->whereRaw('LOWER('.$this->getTable().'.country) LIKE LOWER("' . $country . '")')
+            ->whereRaw('LOWER('.$this->getTable().'.locale) LIKE LOWER("' . $locale . '")');
     }
 
 }
