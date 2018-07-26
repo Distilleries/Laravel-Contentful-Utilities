@@ -135,9 +135,10 @@ abstract class ContentfulModel extends Model
      * Return Contentful Entry for given link (sys or ID).
      *
      * @param  array|string|null $link
+     * @param  callback|null $query
      * @return \Distilleries\Contentful\Models\Base\ContentfulModel|null
      */
-    protected function contentfulEntry($link): ?ContentfulModel
+    protected function contentfulEntry($link, $query=null): ?ContentfulModel
     {
         $entryId = $this->contentfulLinkId($link);
 
@@ -146,7 +147,7 @@ abstract class ContentfulModel extends Model
             return null;
         }
 
-        $entries = $this->contentfulEntries([$entryId]);
+        $entries = $this->contentfulEntries([$entryId],$query);
 
         return $entries->isNotEmpty() ? $entries->first() : null;
     }
@@ -155,9 +156,10 @@ abstract class ContentfulModel extends Model
      * Return Contentful Entries for given ID.
      *
      * @param  array $links
+     * @param  callback|null $query
      * @return \Illuminate\Support\Collection
      */
-    protected function contentfulEntries(array $links): Collection
+    protected function contentfulEntries(array $links,$query=null): Collection
     {
         $entries = [];
 
@@ -196,8 +198,14 @@ abstract class ContentfulModel extends Model
                 $instance = $model->query()
                     ->where('country', '=', $this->country)
                     ->where('locale', '=', $this->locale)
-                    ->where('contentful_id', '=', $relationship->related_contentful_id)
-                    ->first();
+                    ->where('contentful_id', '=', $relationship->related_contentful_id);
+
+
+                if(!empty($query)){
+                    $instance = call_user_func($query,$instance);
+                }
+
+                $instance = $instance->first();
 
                 if (!empty($instance))
                 {

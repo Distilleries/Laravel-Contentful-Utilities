@@ -131,9 +131,18 @@ class Locale extends Model
 
     public static function canBeSave(string $country, string $locale): bool
     {
+        return !in_array($country . '_' . $locale, static::_getLocalesDisabled());
+    }
+
+    protected static function _getLocalesDisabled(): array
+    {
         $locales = config('contentful.locales_not_flatten', '');
-        $locales = explode(',', $locales);
-        return !in_array($country . '_' . $locale, $locales);
+        return explode(',', $locales);
+    }
+
+    public function isEnabled(): bool
+    {
+        return !in_array($this->country . '_' . $this->locale, static::_getLocalesDisabled());
     }
 
     public static function getLocale(string $locale): string
@@ -142,8 +151,7 @@ class Locale extends Model
         {
             $tab = explode('_', $locale);
             return $tab[1];
-        }
-        else if (Str::contains($locale, '-'))
+        } else if (Str::contains($locale, '-'))
         {
             $tab = explode('-', $locale);
             return $tab[1];
