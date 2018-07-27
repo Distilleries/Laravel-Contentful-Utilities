@@ -133,32 +133,32 @@ abstract class ContentfulModel extends Model
 
     protected function getAndSetPayloadContentfulEntries(string $payload, array $links, $query = null): Collection
     {
-        if (empty($this->payload[$payload]))
+        if (empty($this->attributes[$payload]))
         {
             return collect();
         }
 
-        if (!is_object($this->payload[$payload]))
+        if (!is_object($this->attributes[$payload]))
         {
-            $this->payload[$payload] = $this->contentfulEntries($links, $query);
+            $this->attributes[$payload] = $this->contentfulEntries($links, $query);
         }
 
-        return $this->payload[$payload];
+        return $this->attributes[$payload];
     }
 
     protected function getAndSetPayloadContentfulEntry(string $payload, array $links, $query = null): ?ContentfulModel
     {
-        if (empty($this->payload[$payload]))
+        if (empty($this->attributes[$payload]))
         {
             return null;
         }
 
-        if (!is_object($this->payload[$payload]))
+        if (!is_object($this->attributes[$payload]))
         {
-            $this->payload[$payload] = $this->contentfulEntry($links, $query);
+            $this->attributes[$payload] = $this->contentfulEntry($links, $query);
         }
 
-        return $this->payload[$payload];
+        return $this->attributes[$payload];
     }
 
     /**
