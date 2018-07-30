@@ -36,7 +36,7 @@ class EntryHandler
     public function handle(string $action, array $payload, bool $isPreview)
     {
         $actionMethods = ['create', 'archive', 'unarchive', 'publish', 'unpublish', 'delete'];
-        $actionMethods = ! empty($isPreview) ? array_merge($actionMethods, ['save', 'auto_save']) : $actionMethods;
+        $actionMethods = ! empty($isPreview) ? array_merge($actionMethods, ['save', 'auto_save']): $actionMethods;
 
         if (method_exists($this, $action) and in_array($action, $actionMethods)) {
             $this->$action($payload);

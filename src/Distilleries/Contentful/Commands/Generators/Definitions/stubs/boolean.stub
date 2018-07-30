@@ -1,9 +1,9 @@
     /**
      * {{FIELD_CAMEL}} attribute accessor.
      *
-     * @return \Illuminate\Support\Collection
+     * @return boolean
      */
-    public function get{{FIELD_CAMEL}}Attribute() : bool
+    public function get{{FIELD_CAMEL}}Attribute(): bool
     {
-        return isset($this->payload['{{FIELD}}']) ? Caster::boolean($this->payload['{{FIELD}}'],false) : false;
+        return isset($this->payload['{{FIELD}}']) ? Caster::boolean($this->payload['{{FIELD}}'],false): false;
     }

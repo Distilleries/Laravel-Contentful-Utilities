@@ -16,7 +16,7 @@ class Image
      * @param  string  $fit
      * @return string
      */
-    public static function url(string $url, int $width = 0, int $height = 0, $format = '', int $quality = 0, ?bool $useProgressive = null, $fit = '') : string
+    public static function url(string $url, int $width = 0, int $height = 0, $format = '', int $quality = 0, ?bool $useProgressive = null, $fit = ''): string
     {
         if (empty($url)) {
             return '';
@@ -62,7 +62,7 @@ class Image
             $url = str_replace(explode(',', $searchHosts), $replaceHost, $url);
         }
 
-        return ! empty($url) ? $url . '?' . trim($imageUrl, '&') : '';
+        return ! empty($url) ? $url . '?' . trim($imageUrl, '&'): '';
     }
 
     /**
@@ -71,7 +71,7 @@ class Image
      * @param  string  $format
      * @return string|null
      */
-    protected static function detectFormat(string $format = '') : ?string
+    protected static function detectFormat(string $format = ''): ?string
     {
         /** @var \Jenssegers\Agent\Agent $agent */
         $agent = app('agent');

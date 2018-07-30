@@ -24,7 +24,7 @@ trait SyncTrait
      * @param  boolean  $isPreview
      * @return string
      */
-    protected function dumpSync(bool $isPreview, string $connector='mysql') : string
+    protected function dumpSync(bool $isPreview, string $connector='mysql'): string
     {
         $path = storage_path('dumps/' . date('YmdHis') . '_sync' . ($isPreview ? '_preview' : '') . '.sql');
         $this->warn('Dump "' . basename($path) . '"...');

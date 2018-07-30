@@ -11,5 +11,5 @@ interface UploadApi
      * @return array
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function uploadFile(string $file) : array;
+    public function uploadFile(string $file): array;
 }

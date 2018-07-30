@@ -14,7 +14,7 @@ class Manager
      * @param  boolean  $isPreview
      * @return array
      */
-    public function handle(array $headers, array $payload, bool $isPreview = false) : array
+    public function handle(array $headers, array $payload, bool $isPreview = false): array
     {
         if (! isset($headers['x-contentful-topic'])) {
             return $this->response('Page not found', 404);
@@ -55,7 +55,7 @@ class Manager
      * @param  integer  $status
      * @return array
      */
-    private function response(string $message = '', int $status = 200) : array
+    private function response(string $message = '', int $status = 200): array
     {
         return [
             'status' => $status,

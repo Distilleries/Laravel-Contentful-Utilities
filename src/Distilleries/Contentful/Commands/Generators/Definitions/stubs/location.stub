@@ -3,7 +3,7 @@
      *
      * @return \Illuminate\Support\Collection
      */
-    public function get{{FIELD_CAMEL}}Attribute() : int
+    public function get{{FIELD_CAMEL}}Attribute(): int
     {
-        return isset($this->payload['{{FIELD}}']) ? Caster::location($this->payload['{{FIELD}}'],new Location()) : new Location();
+        return isset($this->payload['{{FIELD}}']) ? Caster::location($this->payload['{{FIELD}}'], (new Location)) : (new Location);
     }

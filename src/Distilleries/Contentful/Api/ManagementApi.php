@@ -10,7 +10,7 @@ interface ManagementApi
      * @return array
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function locales() : array;
+    public function locales(): array;
 
     /**
      * Return content-types defined in Contentful space.
@@ -18,7 +18,7 @@ interface ManagementApi
      * @return array
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function contentTypes() : array;
+    public function contentTypes(): array;
 
     /**
      * Return editor interface for given content-type.
@@ -27,7 +27,7 @@ interface ManagementApi
      * @return array
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function contentTypeEditorInterface(string $contentTypeId) : array;
+    public function contentTypeEditorInterface(string $contentTypeId): array;
 
     /**
      * Return entries matching given parameters.
@@ -36,7 +36,7 @@ interface ManagementApi
      * @return array
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function entries(array $parameters = []) : array;
+    public function entries(array $parameters = []): array;
 
     /**
      * Return a single entry for given filter fields.
@@ -46,7 +46,7 @@ interface ManagementApi
      * @return array|null
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function entry(string $contentType, array $fields) : ?array;
+    public function entry(string $contentType, array $fields): ?array;
 
     /**
      * Create entry of specified content-type with given fields data.
@@ -57,7 +57,7 @@ interface ManagementApi
      * @return array
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function createEntry(string $contentType, array $fields, array $sys = []) : array;
+    public function createEntry(string $contentType, array $fields, array $sys = []): array;
 
     /**
      * Publish given entry.
@@ -67,7 +67,7 @@ interface ManagementApi
      * @return array
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function publishEntry(string $entryId, int $version = 1) : array;
+    public function publishEntry(string $entryId, int $version = 1): array;
 
     /**
      * Unpublish given entry.
@@ -76,7 +76,7 @@ interface ManagementApi
      * @return array
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function unpublishEntry(string $entryId) : array;
+    public function unpublishEntry(string $entryId): array;
 
     /**
      * Delete given entry.
@@ -85,7 +85,7 @@ interface ManagementApi
      * @return boolean
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function deleteEntry(string $entryId) : bool;
+    public function deleteEntry(string $entryId): bool;
 
     /**
      * Return assets matching given parameters.
@@ -94,7 +94,7 @@ interface ManagementApi
      * @return array
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function assets(array $parameters = []) : array;
+    public function assets(array $parameters = []): array;
 
     /**
      * Create given asset.
@@ -104,7 +104,7 @@ interface ManagementApi
      * @return array
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function createAsset(array $fields, array $sys = []) : array;
+    public function createAsset(array $fields, array $sys = []): array;
 
     /**
      * Process asset for given locale.
@@ -125,7 +125,7 @@ interface ManagementApi
      * @return array
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function publishAsset(string $assetId, int $version = 1) : array;
+    public function publishAsset(string $assetId, int $version = 1): array;
 
     /**
      * Unpublish given asset.
@@ -134,7 +134,7 @@ interface ManagementApi
      * @return array
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function unpublishAsset(string $assetId) : array;
+    public function unpublishAsset(string $assetId): array;
 
     /**
      * Delete given asset.
@@ -143,5 +143,5 @@ interface ManagementApi
      * @return boolean
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function deleteAsset(string $assetId) : bool;
+    public function deleteAsset(string $assetId): bool;
 }

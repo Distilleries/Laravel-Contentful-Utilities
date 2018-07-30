@@ -2,9 +2,8 @@
 
 namespace Distilleries\Contentful\Models;
 
-use Distilleries\Contentful\Models\Traits\Localable;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder;
+use Distilleries\Contentful\Models\Traits\Localable;
 
 /**
  * @property string $contentful_id
@@ -23,6 +22,7 @@ use Illuminate\Database\Eloquent\Builder;
 class Asset extends Model
 {
     use Localable;
+
     /**
      * {@inheritdoc}
      */
@@ -54,15 +54,13 @@ class Asset extends Model
         'height' => 'integer',
     ];
 
-
     /**
      * Return asset URL.
      *
      * @return string|null
      */
-    public function getUrl() : ?string
+    public function getUrl(): ?string
     {
         return $this->url;
     }
-
 }

@@ -2,25 +2,24 @@
 
 namespace Distilleries\Contentful\Models\Base;
 
-use Distilleries\Contentful\Api\DeliveryApi;
-use Distilleries\Contentful\Repositories\Traits\EntryType;
 use Exception;
+use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Distilleries\Contentful\Models\Locale;
-use Illuminate\Support\Str;
+use Distilleries\Contentful\Api\DeliveryApi;
+use Distilleries\Contentful\Repositories\Traits\EntryType;
 
 abstract class ContentfulMapper
 {
-
     use EntryType;
 
     /**
      * Map entry specific payload.
      *
-     * @param  array $entry
-     * @param  string $locale
+     * @param  array  $entry
+     * @param  string  $locale
      * @return array
      * @throws \Exception
      */
@@ -29,42 +28,39 @@ abstract class ContentfulMapper
     /**
      * Map entry with common data + specific payload for each locales.
      *
-     * @param  array $entry
+     * @param  array  $entry
+     * @param  \Illuminate\Support\Collection  $locales
      * @return array
      * @throws \Exception
      */
     public function toLocaleEntries(array $entry, Collection $locales): array
     {
         $entries = [];
+
         $common = [
             'contentful_id' => $entry['sys']['id'],
             'created_at' => new Carbon($entry['sys']['createdAt']),
             'updated_at' => new Carbon($entry['sys']['updatedAt']),
         ];
 
-        foreach ($locales as $locale)
-        {
+        foreach ($locales as $locale) {
             // Add specific fields
             $data = array_merge($common, $this->map($entry, $locale->code));
 
             $data['country'] = Locale::getCountry($locale->code);
             $data['locale'] = Locale::getLocale($locale->code);
 
-            if (!isset($data['payload']))
-            {
+            if (! isset($data['payload'])) {
                 $data['payload'] = $this->mapPayload($entry, $locale->code);
             }
 
-            if (!isset($data['relationships']))
-            {
+            if (! isset($data['relationships'])) {
                 $data['relationships'] = $this->mapRelationships($data['payload']);
             }
 
-            if (isset($data['slug']) && Str::contains($data['slug'], 'untitled-'))
-            {
+            if (isset($data['slug']) && Str::contains($data['slug'], 'untitled-')) {
                 $data['slug'] = null;
             }
-
 
             $entries[] = $data;
         }
@@ -79,8 +75,8 @@ abstract class ContentfulMapper
     /**
      * Return raw entry fields payload for given locale.
      *
-     * @param  array $entry
-     * @param  string $locale
+     * @param  array  $entry
+     * @param  string  $locale
      * @return array
      */
     protected function mapPayload(array $entry, string $locale): array
@@ -88,19 +84,14 @@ abstract class ContentfulMapper
         $payload = [];
 
         $fallbackLocale = Locale::fallback($locale);
-        foreach ($entry['fields'] as $field => $localesData)
-        {
-            if (isset($localesData[$locale]))
-            {
+        foreach ($entry['fields'] as $field => $localesData) {
+            if (isset($localesData[$locale])) {
                 $payload[$field] = $localesData[$locale];
-            } else
-            {
+            } else {
                 // Fallback field...
-                if (isset($localesData[$fallbackLocale]) && $this->levelFallBack($field) == 'all')
-                {
+                if (isset($localesData[$fallbackLocale]) && ($this->levelFallBack($field) === 'all')) {
                     $payload[$field] = $localesData[$fallbackLocale];
-                } else
-                {
+                } else {
                     $payload[$field] = null;
                 }
             }
@@ -109,12 +100,17 @@ abstract class ContentfulMapper
         return $payload;
     }
 
-
-    protected function levelFallBack($field)
+    /**
+     * Level fallback.
+     *
+     * @param  string  $field
+     * @return string
+     */
+    protected function levelFallBack($field): string
     {
         $levelMaster = ['slug'];
-        return in_array($field, $levelMaster) ? 'master' : 'all';
 
+        return in_array($field, $levelMaster) ? 'master' : 'all';
     }
 
     // --------------------------------------------------------------------------------
@@ -124,7 +120,7 @@ abstract class ContentfulMapper
     /**
      * Map relationships in given payload.
      *
-     * @param  array $payload
+     * @param  array  $payload
      * @return array
      * @throws \Exception
      */
@@ -132,37 +128,26 @@ abstract class ContentfulMapper
     {
         $relationships = [];
 
-        foreach ($payload as $field => $value)
-        {
-            if (is_array($value))
-            {
-                if ($this->isLink($value))
-                {
-                    try
-                    {
+        foreach ($payload as $field => $value) {
+            if (is_array($value)) {
+                if ($this->isLink($value)) {
+                    try {
                         $relationships[] = $this->relationshipSignature($value);
-                    } catch (Exception $e)
-                    {
+                    } catch (Exception $e) {
+                        //
                     }
-                } else
-                {
-                    foreach ($value as $entry)
-                    {
-                        if ($this->isLink($entry))
-                        {
-                            try
-                            {
+                } else {
+                    foreach ($value as $entry) {
+                        if ($this->isLink($entry)) {
+                            try {
                                 $relationships[] = $this->relationshipSignature($entry);
-
-                            } catch (Exception $e)
-                            {
-
+                            } catch (Exception $e) {
+                                //
                             }
                         }
                     }
                 }
-            } else
-            {
+            } else {
                 // No relationship
             }
         }
@@ -173,19 +158,16 @@ abstract class ContentfulMapper
     /**
      * Return relationship signature for given "localized" field.
      *
-     * @param  array $localeField
+     * @param  array  $localeField
      * @return array|null
      * @throws \Exception
      */
     private function relationshipSignature($localeField): ?array
     {
-        if ($localeField['sys']['linkType'] === 'Asset')
-        {
+        if ($localeField['sys']['linkType'] === 'Asset') {
             return ['id' => $localeField['sys']['id'], 'type' => 'asset'];
-        } else if ($localeField['sys']['linkType'] === 'Entry')
-        {
+        } else if ($localeField['sys']['linkType'] === 'Entry') {
             return ['id' => $localeField['sys']['id'], 'type' => $this->contentTypeFromEntryTypes($localeField['sys']['id'])];
-
         }
 
         throw new Exception('Invalid field signature... ' . PHP_EOL . print_r($localeField, true));
@@ -194,8 +176,8 @@ abstract class ContentfulMapper
     /**
      * Return if field is a Link one.
      *
-     * @param  mixed $localeField
-     * @return bool
+     * @param  mixed  $localeField
+     * @return boolean
      */
     private function isLink($localeField): bool
     {
@@ -205,7 +187,7 @@ abstract class ContentfulMapper
     /**
      * Return contentful-type for given Contentful ID from `sync_entries` table.
      *
-     * @param  string $contentfulId
+     * @param  string  $contentfulId
      * @return string
      * @throws \Exception
      */
@@ -216,20 +198,20 @@ abstract class ContentfulMapper
             ->where('contentful_id', '=', $contentfulId)
             ->first();
 
-        if (empty($pivot))
-        {
-            try{
+        if (empty($pivot)) {
+            try {
                 $entry = app(DeliveryApi::class)->entries([
                     'id' => $contentfulId,
                     'locale' => '*',
                     'content_type' => 'single_entry',
                 ]);
 
-                if (!empty($entry) and !empty($entry['sys']['contentType']) and !empty($entry['sys']['contentType']['sys'])) {
+                if (! empty($entry) and ! empty($entry['sys']['contentType']) and ! empty($entry['sys']['contentType']['sys'])) {
                     $this->upsertEntryType($entry, $entry['sys']['contentType']['sys']['id']);
+
                     return $entry['sys']['contentType']['sys']['id'];
                 }
-            }catch (Exception $e){
+            } catch (Exception $e) {
                 throw new Exception('Unknown content-type from synced entry: ' . $contentfulId);
             }
         }
@@ -251,8 +233,7 @@ abstract class ContentfulMapper
     {
         $locales = [];
 
-        if (isset($entry['fields']) and !empty($entry['fields']))
-        {
+        if (isset($entry['fields']) and !empty($entry['fields'])) {
             $firstField = array_first($entry['fields']);
             $locales = array_keys($firstField);
         }

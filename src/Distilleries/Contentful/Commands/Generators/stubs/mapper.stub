@@ -9,7 +9,7 @@ class {{MODEL}}Mapper extends ContentfulMapper
     /**
      * {@inheritdoc}
      */
-    protected function map(array $entry, string $locale) : array
+    protected function map(array $entry, string $locale): array
     {
         return [];
     }

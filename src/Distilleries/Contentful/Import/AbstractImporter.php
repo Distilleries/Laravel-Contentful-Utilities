@@ -34,7 +34,7 @@ abstract class AbstractImporter
      * @return array
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    abstract public function import(array $data) : array;
+    abstract public function import(array $data): array;
 
     /**
      * Store entry in imported entries table.
@@ -74,7 +74,7 @@ abstract class AbstractImporter
      * @param  string  $locale
      * @return array
      */
-    protected function indexFieldsWithLocales(array $data, string $locale = '') : array
+    protected function indexFieldsWithLocales(array $data, string $locale = ''): array
     {
         $indexed = [];
 
@@ -92,7 +92,7 @@ abstract class AbstractImporter
      * @param  array  $entry
      * @return array
      */
-    protected function mapEntryLink(array $entry) : array
+    protected function mapEntryLink(array $entry): array
     {
         return [
             'sys' => [

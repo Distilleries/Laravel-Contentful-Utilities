@@ -15,10 +15,10 @@ trait EntryType
      */
     protected function upsertEntryType(array $entry, string $contentfulType)
     {
-
         $pivot = DB::table('entry_types')
             ->where('contentful_id', '=', $entry['sys']['id'])
             ->first();
+
         if (empty($pivot)) {
             DB::table('entry_types')
                 ->insert([

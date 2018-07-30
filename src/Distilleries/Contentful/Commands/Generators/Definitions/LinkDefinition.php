@@ -3,7 +3,6 @@
 namespace Distilleries\Contentful\Commands\Generators\Definitions;
 
 use Exception;
-use App\Eloquent;
 
 class LinkDefinition extends BaseDefinition
 {
@@ -28,5 +27,4 @@ class LinkDefinition extends BaseDefinition
             'field' => $this->id(),
         ]);
     }
-
 }

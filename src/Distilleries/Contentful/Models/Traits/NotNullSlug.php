@@ -1,13 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: mfrancois
- * Date: 12/07/2018
- * Time: 15:33
- */
 
 namespace Distilleries\Contentful\Models\Traits;
-
 
 use Distilleries\Contentful\Models\Scopes\NotNullSlugScope;
 
@@ -20,7 +13,7 @@ trait NotNullSlug
      */
     public static function bootNotNullSlug()
     {
-        static::addGlobalScope(new NotNullSlugScope());
+        static::addGlobalScope(new NotNullSlugScope);
     }
 
     /**

@@ -16,7 +16,7 @@ class Api extends BaseApi implements UploadApi
     /**
      * {@inheritdoc}
      */
-    public function uploadFile(string $file) : array
+    public function uploadFile(string $file): array
     {
         $response = $this->client->request('POST', $this->url('uploads'), [
             RequestOptions::BODY => file_get_contents($file),

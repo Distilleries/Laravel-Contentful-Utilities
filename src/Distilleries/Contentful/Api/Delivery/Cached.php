@@ -11,7 +11,7 @@ class Cached extends Live implements DeliveryApi
     /**
      * {@inheritdoc}
      */
-    public function entries(array $parameters = []) : array
+    public function entries(array $parameters = []): array
     {
         $keyCache = $this->keyCache($parameters);
 
@@ -23,7 +23,7 @@ class Cached extends Live implements DeliveryApi
     /**
      * {@inheritdoc}
      */
-    public function assets(array $parameters = []) : array
+    public function assets(array $parameters = []): array
     {
         $keyCache = $this->keyCache($parameters);
 
@@ -38,7 +38,7 @@ class Cached extends Live implements DeliveryApi
      * @param  array  $parameters
      * @return string
      */
-    private function keyCache(array $parameters) : string
+    private function keyCache(array $parameters): string
     {
         return 'delivery_api_' . (config('contentful.use_preview') ? 'preview_' : '') . md5(json_encode($parameters));
     }
@@ -50,7 +50,7 @@ class Cached extends Live implements DeliveryApi
      * @param  string  $keyCache
      * @return array
      */
-    private function handleResponse(ResponseInterface $response, string $keyCache) : array
+    private function handleResponse(ResponseInterface $response, string $keyCache): array
     {
         if (($response->getStatusCode() >= 300) or ($response->getStatusCode() <= 100)) {
             $data = Cache::get($keyCache);

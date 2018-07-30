@@ -2,12 +2,12 @@
 
 namespace Distilleries\Contentful\Commands\Sync;
 
-use Distilleries\Contentful\Models\Locale;
-use Illuminate\Support\Collection;
 use stdClass;
 use Exception;
 use Illuminate\Console\Command;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Distilleries\Contentful\Models\Locale;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Distilleries\Contentful\Repositories\AssetsRepository;
 use Distilleries\Contentful\Repositories\EntriesRepository;
@@ -128,7 +128,7 @@ class SyncFlatten extends Command
      * @param  integer  $total
      * @return \Symfony\Component\Console\Helper\ProgressBar
      */
-    private function createProgressBar(int $total) : ProgressBar
+    private function createProgressBar(int $total): ProgressBar
     {
         $bar = $this->output->createProgressBar($total);
 
@@ -141,6 +141,7 @@ class SyncFlatten extends Command
      * Map and persist given sync_entries item.
      *
      * @param  \stdClass  $item
+     * @param \Illuminate\Support\Collection $locales
      * @return void
      * @throws \Exception
      */

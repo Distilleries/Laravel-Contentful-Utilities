@@ -3,13 +3,9 @@
 namespace Distilleries\Contentful\Commands\Generators\Definitions;
 
 use Exception;
-use Illuminate\Support\Carbon;
-use App\Eloquent;
-use Distilleries\Contentful\Commands\Generators\Models as EloquentCommand;
 
 class ArrayDefinition extends BaseDefinition
 {
-
     /**
      * {@inheritdoc}
      */
@@ -31,5 +27,4 @@ class ArrayDefinition extends BaseDefinition
             'field' => $this->id(),
         ]);
     }
-
 }

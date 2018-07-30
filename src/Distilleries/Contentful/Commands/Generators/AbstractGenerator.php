@@ -2,10 +2,10 @@
 
 namespace Distilleries\Contentful\Commands\Generators;
 
-use Exception;
 use Illuminate\Console\Command;
-use Distilleries\Contentful\Api\ManagementApi as Api;
 use Illuminate\Support\Facades\DB;
+use Distilleries\Contentful\Api\ManagementApi as Api;
+use Distilleries\Contentful\Commands\Generators\Definitions\DefinitionInterface;
 
 abstract class AbstractGenerator extends Command
 {
@@ -20,6 +20,7 @@ abstract class AbstractGenerator extends Command
      * Create a new command instance.
      *
      * @param  \Distilleries\Contentful\Api\ManagementApi  $api
+     * @return void
      */
     public function __construct(Api $api)
     {
@@ -49,7 +50,7 @@ abstract class AbstractGenerator extends Command
      * @param  array  $replacements
      * @return string
      */
-    public static function writeStub($stubPath, $destPath, $replacements = [])
+    public static function writeStub($stubPath, $destPath, $replacements = []): string
     {
         $content = file_get_contents($stubPath);
         foreach ($replacements as $key => $value) {
@@ -66,7 +67,7 @@ abstract class AbstractGenerator extends Command
      *
      * @return array
      */
-    protected function assetContentType()
+    protected function assetContentType(): array
     {
         $assetContentType = [
             'sys' => [
@@ -115,9 +116,8 @@ abstract class AbstractGenerator extends Command
      * @param  string  $table
      * @param  array  $field
      * @return \Distilleries\Contentful\Commands\Generators\Definitions\DefinitionInterface
-     * @throws \Exception
      */
-    protected function fieldDefinition($table, $field)
+    protected function fieldDefinition($table, $field): ?DefinitionInterface
     {
         $className = '\Distilleries\Contentful\Commands\Generators\Definitions\\' . $field['type'] . 'Definition';
 
@@ -134,7 +134,7 @@ abstract class AbstractGenerator extends Command
      * @param  array  $field
      * @return boolean
      */
-    protected function isFieldEnabled($field)
+    protected function isFieldEnabled($field): bool
     {
         return ! $field['disabled'] and ! $field['omitted'];
     }

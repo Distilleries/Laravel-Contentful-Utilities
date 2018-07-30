@@ -3,7 +3,7 @@
      *
      * @return \Illuminate\Support\Collection
      */
-    public function get{{FIELD_CAMEL}}Attribute() : float
+    public function get{{FIELD_CAMEL}}Attribute(): float
     {
-        return isset($this->payload['{{FIELD}}']) ? Caster::float($this->payload['{{FIELD}}'],0.0) : 0.0;
+        return isset($this->payload['{{FIELD}}']) ? Caster::float($this->payload['{{FIELD}}'], 0.0) : 0.0;
     }

@@ -7,17 +7,17 @@ use Distilleries\Contentful\Models\Scopes\ValidatedScope;
 trait ValidatedTrait
 {
     /**
-     * Boot the not-null-slug scope for a model.
+     * Boot the validated scope for a model.
      *
      * @return void
      */
     public static function bootValidatedTrait()
     {
-        static::addGlobalScope(new ValidatedScope());
+        static::addGlobalScope(new ValidatedScope);
     }
 
     /**
-     * Get a new query builder that also includes null-slug.
+     * Get a new query builder that also non-validated entries.
      *
      * @return \Illuminate\Database\Eloquent\Builder
      */
@@ -26,7 +26,12 @@ trait ValidatedTrait
         return (new static)->withoutGlobalScope(ValidatedScope::class);
     }
 
-    public function getValidatedAtFieldSource()
+    /**
+     * Return "validated_at" field name.
+     *
+     * @return string
+     */
+    public function getValidatedAtFieldSource(): string
     {
         return 'validityDate';
     }

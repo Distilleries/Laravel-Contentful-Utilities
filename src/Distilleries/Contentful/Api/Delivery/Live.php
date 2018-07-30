@@ -24,7 +24,7 @@ class Live extends BaseApi implements DeliveryApi
     /**
      * {@inheritdoc}
      */
-    public function entries(array $parameters = []) : array
+    public function entries(array $parameters = []): array
     {
         $response = $this->query('entries', $parameters);
 
@@ -34,7 +34,7 @@ class Live extends BaseApi implements DeliveryApi
     /**
      * {@inheritdoc}
      */
-    public function assets(array $parameters = []) : array
+    public function assets(array $parameters = []): array
     {
         $response = $this->query('assets', $parameters);
 
@@ -49,7 +49,7 @@ class Live extends BaseApi implements DeliveryApi
      * @return \Psr\Http\Message\ResponseInterface
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    protected function query(string $endpoint, array $parameters) : ResponseInterface
+    protected function query(string $endpoint, array $parameters): ResponseInterface
     {
         $token = ! empty($this->config['use_preview']) ? 'preview' : 'live';
 

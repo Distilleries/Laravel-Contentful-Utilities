@@ -14,7 +14,7 @@ trait WebhookTrait
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function live(Request $request) : JsonResponse
+    public function live(Request $request): JsonResponse
     {
         return $this->handle($request, false);
     }
@@ -25,7 +25,7 @@ trait WebhookTrait
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function preview(Request $request) : JsonResponse
+    public function preview(Request $request): JsonResponse
     {
         use_contentful_preview();
 
@@ -39,7 +39,7 @@ trait WebhookTrait
      * @param  boolean  $isPreview
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function handle(Request $request, bool $isPreview) : JsonResponse
+    protected function handle(Request $request, bool $isPreview): JsonResponse
     {
         $headers = $request->header();
         $payload = $request->all();

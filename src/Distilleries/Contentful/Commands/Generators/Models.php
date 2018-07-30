@@ -25,15 +25,15 @@ class Models extends AbstractGenerator
     {
         $contentTypes = $this->api->contentTypes();
 
-        if (!empty($contentTypes['items'])) {
+        if (! empty($contentTypes['items'])) {
             array_unshift($contentTypes['items'], $this->assetContentType());
+
             foreach ($contentTypes['items'] as $contentType) {
                 $this->info('Content-Type: ' . mb_strtoupper($contentType['name']));
                 $file = $this->createMapper($contentType);
                 $this->line('Mapper "' . $file . '" created');
                 $file = $this->createModel($contentType);
                 $this->line('Model "' . $file . '" created');
-
             }
         }
     }
@@ -41,7 +41,7 @@ class Models extends AbstractGenerator
     /**
      * Create migration file for given content-type.
      *
-     * @param  array $contentType
+     * @param  array  $contentType
      * @return string
      * @throws \Exception
      */
@@ -60,6 +60,12 @@ class Models extends AbstractGenerator
         ]);
     }
 
+    /**
+     * Return model mapper.
+     *
+     * @param  array  $contentType
+     * @return string
+     */
     protected function createMapper(array $contentType): string
     {
         $table = $this->tableName($contentType['sys']['id']);
@@ -71,9 +77,15 @@ class Models extends AbstractGenerator
         return static::writeStub($stubPath, $destPath, [
             'model' => $model
         ]);
-
     }
 
+    /**
+     * Return model getters.
+     *
+     * @param  string  $table
+     * @param  array  $fields
+     * @return string
+     */
     protected function modelGetters($table, $fields): string
     {
         $getters = [];

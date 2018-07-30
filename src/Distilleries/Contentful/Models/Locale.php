@@ -11,6 +11,8 @@ use Illuminate\Support\Str;
  * @property integer $id
  * @property string $label
  * @property string $code
+ * @property string $locale
+ * @property string $country
  * @property string $fallback_code
  * @property boolean $is_editable
  * @property boolean $is_publishable
@@ -56,14 +58,14 @@ class Locale extends Model
     {
         $default = Cache::get('locale_default');
 
-        if ($default === null)
-        {
+        if ($default === null) {
             $default = static::query()
                 ->select('locale')
                 ->where('is_default', '=', true)
                 ->first();
 
             $default = !empty($default) ? $default->locale : config('contentful.default_locale');
+
             // Cache is cleaned in Console\Commands\SyncLocales (run at least daily)
             Cache::forever('locale_default', $default);
         }
@@ -71,15 +73,25 @@ class Locale extends Model
         return $default;
     }
 
-
+    /**
+     * Return application OR Contentful space default locale.
+     *
+     * @return string
+     */
     public static function getAppOrDefaultLocale(): string
     {
-        return app()->getLocale() ?? self::default();
+        return app()->getLocale() ?? static::default();
     }
 
+    /**
+     * Return application OR Contentful space default country.
+     *
+     * @param  string  $key
+     * @return string
+     */
     public static function getAppOrDefaultCountry($key = 'app.country'): string
     {
-        return config($key, self::defaultCountry());
+        return config($key, static::defaultCountry());
     }
 
     /**
@@ -91,13 +103,14 @@ class Locale extends Model
     {
         $default = Cache::get('country_default');
 
-        if ($default === null)
-        {
+        if ($default === null) {
             $default = static::query()
                 ->select('country')
                 ->where('is_default', '=', true)
                 ->first();
-            $default = !empty($default) ? $default->country : config('contentful.default_country');
+
+            $default = ! empty($default) ? $default->country : config('contentful.default_country');
+
             // Cache is cleaned in Console\Commands\SyncLocales (run at least daily)
             Cache::forever('country_default', $default);
         }
@@ -108,21 +121,20 @@ class Locale extends Model
     /**
      * Return fallback code for given locale code.
      *
-     * @param  string $code
+     * @param  string  $code
      * @return string
      */
     public static function fallback(string $code): string
     {
         $fallback = Cache::get('locale_fallback_' . $code);
 
-        if ($fallback === null)
-        {
+        if ($fallback === null) {
             $locale = static::query()
                 ->select('fallback_code')
                 ->where('code', '=', $code)
                 ->first();
 
-            $fallback = (!empty($locale) and !empty($locale->fallback_code)) ? $locale->fallback_code : '';
+            $fallback = (! empty($locale) and ! empty($locale->fallback_code)) ? $locale->fallback_code : '';
 
             Cache::put('locale_fallback_' . $code, $fallback, 5);
         }
@@ -130,70 +142,97 @@ class Locale extends Model
         return $fallback;
     }
 
+    /**
+     * Return if locale can be saved.
+     *
+     * @param  string  $country
+     * @param  string  $locale
+     * @return bool
+     */
     public static function canBeSave(string $country, string $locale): bool
     {
-        return !in_array($country . '_' . $locale, static::_getLocalesDisabled());
+        return ! in_array($country . '_' . $locale, static::_getLocalesDisabled());
     }
 
+    /**
+     * Return disabled locales (for flatten).
+     *
+     * @return array
+     */
     protected static function _getLocalesDisabled(): array
     {
         $locales = config('contentful.locales_not_flatten', '');
+
         return explode(',', $locales);
     }
 
+    /**
+     * Check if current instance is enabled (for flatten).
+     *
+     * @return boolean
+     */
     public function isEnabled(): bool
     {
-        return !in_array($this->country . '_' . $this->locale, static::_getLocalesDisabled());
+        return ! in_array($this->country . '_' . $this->locale, static::_getLocalesDisabled());
     }
 
-    public static function getLocale(string $locale): string
+    /**
+     * Return locale from ISO code.
+     *
+     * @param  string  $code
+     * @return string
+     */
+    public static function getLocale(string $code): string
     {
-        if (Str::contains($locale, '_'))
-        {
-            $tab = explode('_', $locale);
+        if (Str::contains($code, '_')) {
+            $tab = explode('_', $code);
+
             return $tab[1];
-        } else if (Str::contains($locale, '-'))
-        {
-            $tab = explode('-', $locale);
+        } else if (Str::contains($code, '-')) {
+            $tab = explode('-', $code);
+
             return $tab[1];
         }
 
-        return $locale;
+        return $code;
     }
 
-    public static function getCountry(string $locale): string
+    /**
+     * Return country from ISO code.
+     *
+     * @param  string  $code
+     * @return string
+     */
+    public static function getCountry(string $code): string
     {
-        if (Str::contains($locale, '_'))
-        {
-            $tab = explode('_', $locale);
+        if (Str::contains($code, '_')) {
+            $tab = explode('_', $code);
+
             return $tab[0];
-        } else if (Str::contains($locale, '-'))
-        {
-            $tab = explode('-', $locale);
+        } else if (Str::contains($code, '-')) {
+            $tab = explode('-', $code);
+
             return $tab[0];
         }
 
         return config('contentful.default_country');
     }
 
-
     /**
      * Return request accepted languages.
      *
-     * @param  \Illuminate\Http\Request|null $request
+     * @param  \Illuminate\Http\Request|null  $request
      * @return string|array
      */
     public static function getAcceptedLanguages(Request $request = null)
     {
-        $request = !empty($request) ? $request : request();
+        $request = ! empty($request) ? $request : request();
 
-        $langs = $request->server('HTTP_ACCEPT_LANGUAGE');
-        if (!empty($langs))
-        {
-            preg_match_all('/(\W|^)([a-z]{2})([^a-z]|$)/six', $langs, $locales, PREG_PATTERN_ORDER);
+        $languages = $request->server('HTTP_ACCEPT_LANGUAGE');
+        if (! empty($languages)) {
+            preg_match_all('/(\W|^)([a-z]{2})([^a-z]|$)/six', $languages, $locales, PREG_PATTERN_ORDER);
 
-            if (!empty($locales) and !empty($locales[2]))
-            {
+            if (! empty($locales) and ! empty($locales[2])) {
                 return $locales[2];
             }
         }
@@ -204,14 +243,14 @@ class Locale extends Model
     /**
      * Return user default language.
      *
-     * @param  \Illuminate\Http\Request|null $request
+     * @param  \Illuminate\Http\Request|null  $request
      * @return string
      */
     public static function getDefaultLanguageUser(Request $request = null): string
     {
-        $country = self::defaultCountry();
+        $country = static::defaultCountry();
         $locales = static::getAcceptedLanguages($request);
-        $locale = !empty($locales) ? $locales[0] : config('app.fallback_locale');
+        $locale = ! empty($locales) ? $locales[0] : config('app.fallback_locale');
 
         $localeModel = (new static)
             ->where('country', $country)
@@ -222,6 +261,4 @@ class Locale extends Model
 
         return empty($localeModel) ? static::default() : $localeModel->locale;
     }
-
-
 }

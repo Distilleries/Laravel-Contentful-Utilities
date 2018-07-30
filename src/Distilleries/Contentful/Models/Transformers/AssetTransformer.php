@@ -22,7 +22,7 @@ class AssetTransformer
      * @param  array  $parameters
      * @return array
      */
-    public function transform(Asset $model, array $parameters = []) : array
+    public function transform(Asset $model, array $parameters = []): array
     {
         if (starts_with($model->content_type, 'image/')) {
             $width = 0;
@@ -59,7 +59,7 @@ class AssetTransformer
      * @param  array  $parameters
      * @return \Illuminate\Support\Collection
      */
-    public function transformCollection(Collection $collection, array $parameters = []) : Collection
+    public function transformCollection(Collection $collection, array $parameters = []): Collection
     {
         $collection->filter(function ($value) {
             return ! empty($value);

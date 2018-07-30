@@ -11,7 +11,7 @@ interface SyncApi
      * @return array
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function syncInitial(string $type = 'Entry') : array;
+    public function syncInitial(string $type = 'Entry'): array;
 
     /**
      * Next sync API call (based on previous returned syncNextUrl).
@@ -19,5 +19,5 @@ interface SyncApi
      * @return array
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function syncNext() : array;
+    public function syncNext(): array;
 }

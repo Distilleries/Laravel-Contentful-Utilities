@@ -45,7 +45,7 @@ class Migrations extends AbstractGenerator
      * @return string
      * @throws \Exception
      */
-    private function createMigration($contentType)
+    private function createMigration($contentType): string
     {
         $table = $this->tableName($contentType['sys']['id']);
 

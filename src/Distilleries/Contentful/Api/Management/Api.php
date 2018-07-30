@@ -16,7 +16,7 @@ class Api extends BaseApi implements ManagementApi
     /**
      * {@inheritdoc}
      */
-    public function locales() : array
+    public function locales(): array
     {
         $response = $this->client->request('GET', $this->url('locales'), [
             RequestOptions::HEADERS => $this->headers(),
@@ -28,7 +28,7 @@ class Api extends BaseApi implements ManagementApi
     /**
      * {@inheritdoc}
      */
-    public function contentTypes() : array
+    public function contentTypes(): array
     {
         $response = $this->client->request('GET', $this->url('content_types'), [
             RequestOptions::HEADERS => $this->headers(),
@@ -40,7 +40,7 @@ class Api extends BaseApi implements ManagementApi
     /**
      * {@inheritdoc}
      */
-    public function contentTypeEditorInterface(string $contentTypeId) : array
+    public function contentTypeEditorInterface(string $contentTypeId): array
     {
         $response = $this->client->request('GET', $this->url('content_types/' . $contentTypeId . '/editor_interface'), [
             RequestOptions::HEADERS => $this->headers(),
@@ -56,7 +56,7 @@ class Api extends BaseApi implements ManagementApi
     /**
      * {@inheritdoc}
      */
-    public function entries(array $parameters = []) : array
+    public function entries(array $parameters = []): array
     {
         $response = $this->client->request('GET', $this->url('entries'), [
             RequestOptions::QUERY => $parameters,
@@ -69,7 +69,7 @@ class Api extends BaseApi implements ManagementApi
     /**
      * {@inheritdoc}
      */
-    public function entry(string $contentType, array $fields) : ?array
+    public function entry(string $contentType, array $fields): ?array
     {
         $filters['content_type'] = $contentType;
         foreach ($fields as $field => $value) {
@@ -89,7 +89,7 @@ class Api extends BaseApi implements ManagementApi
     /**
      * {@inheritdoc}
      */
-    public function createEntry(string $contentType, array $fields, array $sys = []) : array
+    public function createEntry(string $contentType, array $fields, array $sys = []): array
     {
         $response = $this->client->request('POST', $this->url('entries'), [
             RequestOptions::BODY => json_encode([
@@ -107,7 +107,7 @@ class Api extends BaseApi implements ManagementApi
     /**
      * {@inheritdoc}
      */
-    public function publishEntry(string $entryId, int $version = 1) : array
+    public function publishEntry(string $entryId, int $version = 1): array
     {
         $response = $this->client->request('PUT', $this->url('entries/' . $entryId . '/published'), [
             RequestOptions::HEADERS => $this->headers([
@@ -121,7 +121,7 @@ class Api extends BaseApi implements ManagementApi
     /**
      * {@inheritdoc}
      */
-    public function unpublishEntry(string $entryId) : array
+    public function unpublishEntry(string $entryId): array
     {
         $response = $this->client->request('DELETE', $this->url('entries/' . $entryId . '/published'), [
             RequestOptions::HEADERS => $this->headers(),
@@ -133,7 +133,7 @@ class Api extends BaseApi implements ManagementApi
     /**
      * {@inheritdoc}
      */
-    public function deleteEntry(string $entryId) : bool
+    public function deleteEntry(string $entryId): bool
     {
         $response = $this->client->request('DELETE', $this->url('entries/' . $entryId), [
             RequestOptions::HEADERS => $this->headers(),
@@ -149,7 +149,7 @@ class Api extends BaseApi implements ManagementApi
     /**
      * {@inheritdoc}
      */
-    public function assets(array $parameters = []) : array
+    public function assets(array $parameters = []): array
     {
         $response = $this->client->request('GET', $this->url('assets'), [
             RequestOptions::QUERY => $parameters,
@@ -162,7 +162,7 @@ class Api extends BaseApi implements ManagementApi
     /**
      * {@inheritdoc}
      */
-    public function createAsset(array $fields, array $sys = []) : array
+    public function createAsset(array $fields, array $sys = []): array
     {
         $response = $this->client->request('POST', $this->url('assets'), [
             RequestOptions::BODY => json_encode([
@@ -190,7 +190,7 @@ class Api extends BaseApi implements ManagementApi
     /**
      * {@inheritdoc}
      */
-    public function publishAsset(string $assetId, int $version = 1) : array
+    public function publishAsset(string $assetId, int $version = 1): array
     {
         $response = $this->client->request('PUT', $this->url('assets/' . $assetId . '/published'), [
             RequestOptions::HEADERS => $this->headers([
@@ -204,7 +204,7 @@ class Api extends BaseApi implements ManagementApi
     /**
      * {@inheritdoc}
      */
-    public function unpublishAsset(string $assetId) : array
+    public function unpublishAsset(string $assetId): array
     {
         $response = $this->client->request('DELETE', $this->url('assets/' . $assetId . '/published'), [
             RequestOptions::HEADERS => $this->headers(),
@@ -216,7 +216,7 @@ class Api extends BaseApi implements ManagementApi
     /**
      * {@inheritdoc}
      */
-    public function deleteAsset(string $assetId) : bool
+    public function deleteAsset(string $assetId): bool
     {
         $response = $this->client->request('DELETE', $this->url('assets/' . $assetId), [
             RequestOptions::HEADERS => $this->headers(),
@@ -235,7 +235,7 @@ class Api extends BaseApi implements ManagementApi
      * @param  array  $headers
      * @return array
      */
-    private function headers(array $headers = []) : array
+    private function headers(array $headers = []): array
     {
         return array_merge([
             'Content-Type' => 'application/vnd.contentful.management.v1+json',

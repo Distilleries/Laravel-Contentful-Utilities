@@ -51,7 +51,7 @@ class EntryRelationship extends ContentfulModel
         'related_contentful_type',
         'locale',
         'country',
-        'order'
+        'order',
     ];
 
     /**
@@ -71,16 +71,15 @@ class EntryRelationship extends ContentfulModel
     public function getRelatedEntry()
     {
         $localModel = rtrim(config('contentful.namespaces.model'), '\\') . '\\' . ucfirst($this->src_content_type);
-        if (!class_exists($localModel)) {
+        if (! class_exists($localModel)) {
             return null;
         }
 
         $model = (new $localModel);
+
         return $model
             ->locale()
             ->where($model->getKeyName(), '=', $this->src_contentful_id)
             ->first();
-
-
     }
 }

@@ -41,7 +41,7 @@ abstract class BaseDefinition implements DefinitionInterface
      *
      * @return string
      */
-    protected function id()
+    protected function id(): string
     {
         return mb_strtolower(snake_case($this->field['id']));
     }
@@ -51,14 +51,14 @@ abstract class BaseDefinition implements DefinitionInterface
      *
      * Return relative base path of destination path.
      *
-     * @param  string $stubPath
-     * @param  string $destPath
-     * @param  array $replacements
+     * @param  string  $stubPath
+     * @param  array  $replacements
      * @return string
      */
     public static function getStub(string $stubPath, array $replacements = []): string
     {
         $content = file_get_contents($stubPath);
+
         foreach ($replacements as $key => $value) {
             $content = str_replace('{{' . mb_strtoupper($key) . '}}', $value, $content);
         }

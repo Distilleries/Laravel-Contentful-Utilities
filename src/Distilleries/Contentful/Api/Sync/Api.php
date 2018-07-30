@@ -30,7 +30,7 @@ class Api extends BaseApi implements SyncApi
     /**
      * {@inheritdoc}
      */
-    public function syncInitial(string $type = 'Entry') : array
+    public function syncInitial(string $type = 'Entry'): array
     {
         $response = $this->client->request('GET', $this->url('sync'), [
             RequestOptions::QUERY => [
@@ -49,7 +49,7 @@ class Api extends BaseApi implements SyncApi
     /**
      * {@inheritdoc}
      */
-    public function syncNext() : array
+    public function syncNext(): array
     {
         if (empty($this->syncToken)) {
             return [];
@@ -73,7 +73,7 @@ class Api extends BaseApi implements SyncApi
      *
      * @return string
      */
-    private function accessToken() : string
+    private function accessToken(): string
     {
         $token = config('contentful.use_preview') ? 'preview' : 'live';
 

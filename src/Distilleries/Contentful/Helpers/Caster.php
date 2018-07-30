@@ -3,36 +3,59 @@
 namespace Distilleries\Contentful\Helpers;
 
 use Parsedown;
+use Illuminate\Support\Carbon;
 
 class Caster
 {
     /**
      * Cast value to a string.
      *
-     * @param  mixed $str
+     * @param  mixed  $str
      * @return string
      */
     public static function string($str): string
     {
-        return (string)$str;
+        return (string) $str;
+    }
+
+    /**
+     * Cast value to a string.
+     *
+     * @param  mixed  $str
+     * @param  mixed  $default
+     * @return \Illuminate\Support\Carbon|null
+     */
+    public static function datetime($str, $default = null): ?Carbon
+    {
+        if (empty($str)) {
+            return $default;
+        }
+
+        try {
+            $carbon = new Carbon($str);
+        } catch (\Exception $e) {
+            $carbon = null;
+        }
+
+        return $carbon;
     }
 
     /**
      * Transform data to its JSON representation.
      *
-     * @param  mixed $data
-     * @param  mixed $default
+     * @param  mixed  $data
+     * @param  mixed  $default
      * @return string
      */
     public static function toJson($data, $default = null): string
     {
-        return !empty($data) ? json_encode($data) : $default;
+        return ! empty($data) ? json_encode($data): $default;
     }
 
     /**
      * Transform a JSON string to its associative array representation.
      *
-     * @param  mixed $json
+     * @param  mixed  $json
      * @return array|null
      */
     public static function fromJson($json): ?array
@@ -53,8 +76,8 @@ class Caster
     /**
      * Transform markdown content to an HTML string.
      *
-     * @param  mixed $md
-     * @param  mixed $default
+     * @param  mixed  $md
+     * @param  mixed  $default
      * @return string
      */
     public static function markdown($md, $default = null): ?string
@@ -69,21 +92,21 @@ class Caster
     /**
      * Cast an integer to an integer value otherwise to null.
      *
-     * @param  mixed $int
-     * @param  mixed $default
+     * @param  mixed  $int
+     * @param  mixed  $default
      * @return integer|null
      */
     public static function integer($int, $default = null): ?int
     {
-        return is_numeric($int) ? (int)$int : $default;
+        return is_numeric($int) ? (int) $int : $default;
     }
 
     /**
      * Cast an boolean to an boolean value otherwise to null.
      *
-     * @param  mixed $bool
-     * @param  mixed $default
-     * @return bool|null
+     * @param  mixed  $bool
+     * @param  mixed  $default
+     * @return boolean|null
      */
     public static function boolean($bool, $default = null): ?bool
     {
@@ -93,21 +116,20 @@ class Caster
     /**
      * Cast an float to an float value otherwise to null.
      *
-     * @param  mixed $float
-     * @param  mixed $default
+     * @param  mixed  $float
+     * @param  mixed  $default
      * @return float|null
      */
     public static function float($float, $default = null): ?float
     {
-        return is_float($float) ? (float)$float : $default;
+        return is_float($float) ? (float) $float : $default;
     }
-
 
     /**
      * Return entry ID in given "Link" array.
      *
-     * @param  array $entry
-     * @param  mixed $default
+     * @param  array  $entry
+     * @param  mixed  $default
      * @return string|null
      */
     public static function entryId(array $entry, $default = null): ?string

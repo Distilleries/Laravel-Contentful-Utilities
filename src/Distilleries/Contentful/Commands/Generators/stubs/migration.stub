@@ -20,7 +20,7 @@ class Create{{CLASS}}Table extends Migration
             $table->longText('payload');
             $table->timestamps();
 
-            $table->primary(['contentful_id', 'locale','country']);
+            $table->primary(['contentful_id', 'locale', 'country']);
         });
     }
 

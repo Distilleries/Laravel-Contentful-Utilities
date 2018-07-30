@@ -2,11 +2,11 @@
 
 namespace Distilleries\Contentful\Models\Base;
 
-use Distilleries\Contentful\Models\EntryRelationship;
-use Distilleries\Contentful\Models\Traits\Localable;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Distilleries\Contentful\Models\Asset;
+use Distilleries\Contentful\Models\Traits\Localable;
+use Distilleries\Contentful\Models\EntryRelationship;
 
 abstract class ContentfulModel extends Model
 {
@@ -18,11 +18,11 @@ abstract class ContentfulModel extends Model
     protected $primaryKey = 'contentful_id';
 
     /**
-     * The content Type id
+     * The content-type ID.
+     *
      * @var string
      */
     protected $contentType = null;
-
 
     /**
      * {@inheritdoc}
@@ -37,25 +37,21 @@ abstract class ContentfulModel extends Model
     /**
      * ContentfulModel constructor.
      *
-     * @param  array $attributes
+     * @param  array  $attributes
      * @return void
      */
     public function __construct(array $attributes = [])
     {
         // Override fillable
-        foreach ($this->defaultFillable() as $defaultFillable)
-        {
-            if (!in_array($defaultFillable, $this->fillable))
-            {
+        foreach ($this->defaultFillable() as $defaultFillable) {
+            if (! in_array($defaultFillable, $this->fillable)) {
                 $this->fillable[] = $defaultFillable;
             }
         }
 
         // Override casts
-        foreach ($this->defaultCasts() as $field => $type)
-        {
-            if (!isset($this->casts[$field]))
-            {
+        foreach ($this->defaultCasts() as $field => $type) {
+            if (! isset($this->casts[$field])) {
                 $this->casts[$field] = $type;
             }
         }
@@ -65,10 +61,14 @@ abstract class ContentfulModel extends Model
         parent::__construct($attributes);
     }
 
+    /**
+     * Init model content-type if needed.
+     *
+     * @return void
+     */
     protected function initContentType()
     {
-        if (empty($this->contentType))
-        {
+        if (empty($this->contentType)) {
             $this->contentType = lcfirst(class_basename(get_class($this)));
         }
     }
@@ -102,7 +102,6 @@ abstract class ContentfulModel extends Model
         ];
     }
 
-
     // --------------------------------------------------------------------------------
     // --------------------------------------------------------------------------------
     // --------------------------------------------------------------------------------
@@ -110,15 +109,14 @@ abstract class ContentfulModel extends Model
     /**
      * Return Contentful Asset for given link (sys or ID).
      *
-     * @param  array|string|null $link
+     * @param  array|string|null  $link
      * @return \Distilleries\Contentful\Models\Asset|null
      */
     protected function contentfulAsset($link): ?Asset
     {
         $assetId = $this->contentfulLinkId($link);
 
-        if (empty($assetId))
-        {
+        if (empty($assetId)) {
             return null;
         }
 
@@ -128,33 +126,45 @@ abstract class ContentfulModel extends Model
             ->where('country', '=', $this->country)
             ->first();
 
-        return !empty($asset) ? $asset : null;
+        return ! empty($asset) ? $asset : null;
     }
 
+    /**
+     * Return payload of related Contentful entries.
+     *
+     * @param  string  $payload
+     * @param  array  $links
+     * @param  mixed  $query
+     * @return \Illuminate\Support\Collection
+     */
     protected function getAndSetPayloadContentfulEntries(string $payload, array $links, $query = null): Collection
     {
-        if (empty($this->attributes[$payload]))
-        {
+        if (empty($this->attributes[$payload])) {
             return collect();
         }
 
-        if (!is_object($this->attributes[$payload]))
-        {
+        if (! is_object($this->attributes[$payload])) {
             $this->attributes[$payload] = $this->contentfulEntries($links, $query);
         }
 
         return $this->attributes[$payload];
     }
 
+    /**
+     * Return payload of related Contentful entry.
+     *
+     * @param  string  $payload
+     * @param  array  $links
+     * @param  mixed  $query
+     * @return \Distilleries\Contentful\Models\Base\ContentfulModel|null
+     */
     protected function getAndSetPayloadContentfulEntry(string $payload, array $links, $query = null): ?ContentfulModel
     {
-        if (empty($this->attributes[$payload]))
-        {
+        if (empty($this->attributes[$payload])) {
             return null;
         }
 
-        if (!is_object($this->attributes[$payload]))
-        {
+        if (! is_object($this->attributes[$payload])) {
             $this->attributes[$payload] = $this->contentfulEntry($links, $query);
         }
 
@@ -164,29 +174,28 @@ abstract class ContentfulModel extends Model
     /**
      * Return Contentful Entry for given link (sys or ID).
      *
-     * @param  array|string|null $link
-     * @param  callback|null $query
+     * @param  array|string|null  $link
+     * @param  mixed  $query
      * @return \Distilleries\Contentful\Models\Base\ContentfulModel|null
      */
     protected function contentfulEntry($link, $query = null): ?ContentfulModel
     {
         $entryId = $this->contentfulLinkId($link);
 
-        if (empty($entryId))
-        {
+        if (empty($entryId)) {
             return null;
         }
 
         $entries = $this->contentfulEntries([$entryId], $query);
 
-        return $entries->isNotEmpty() ? $entries->first() : null;
+        return $entries->isNotEmpty() ? $entries->first(): null;
     }
 
     /**
      * Return Contentful Entries for given ID.
      *
-     * @param  array $links
-     * @param  callback|null $query
+     * @param  array  $links
+     * @param  mixed  $query
      * @return \Illuminate\Support\Collection
      */
     protected function contentfulEntries(array $links, $query = null): Collection
@@ -194,17 +203,14 @@ abstract class ContentfulModel extends Model
         $entries = [];
 
         $entryIds = [];
-        foreach ($links as $link)
-        {
+        foreach ($links as $link) {
             $entryId = $this->contentfulLinkId($link);
-            if (!empty($entryId))
-            {
+            if (! empty($entryId)) {
                 $entryIds[] = $entryId;
             }
         }
 
-        if (!empty($entryIds))
-        {
+        if (! empty($entryIds)) {
             $relationships = EntryRelationship::query()
                 ->select('related_contentful_id', 'related_contentful_type', 'order')
                 ->distinct()
@@ -214,13 +220,10 @@ abstract class ContentfulModel extends Model
                 ->orderBy('order', 'asc')
                 ->get();
 
-            foreach ($relationships as $relationship)
-            {
-                if ($relationship->related_contentful_type === 'asset')
-                {
+            foreach ($relationships as $relationship) {
+                if ($relationship->related_contentful_type === 'asset') {
                     $model = new Asset;
-                } else
-                {
+                } else {
                     $modelClass = config('contentful.namespace.model') . '\\' . studly_case($relationship->related_contentful_type);
                     $model = new $modelClass;
                 }
@@ -230,16 +233,13 @@ abstract class ContentfulModel extends Model
                     ->where('locale', '=', $this->locale)
                     ->where('contentful_id', '=', $relationship->related_contentful_id);
 
-
-                if (!empty($query))
-                {
+                if (! empty($query)) {
                     $instance = call_user_func($query, $instance);
                 }
 
                 $instance = $instance->first();
 
-                if (!empty($instance))
-                {
+                if (! empty($instance)) {
                     $entries[] = $instance;
                 }
             }
@@ -248,12 +248,11 @@ abstract class ContentfulModel extends Model
         return collect($entries);
     }
 
-
     /**
      * Return a collection of related models for base Contentful ID.
      *
-     * @param  string $contentfulId
-     * @param  string $contentfulType
+     * @param  string  $contentfulId
+     * @param  string  $contentfulType
      * @return \Illuminate\Support\Collection
      */
     protected function contentfulRelatedEntries(string $contentfulId, string $contentfulType = ''): Collection
@@ -265,19 +264,15 @@ abstract class ContentfulModel extends Model
             ->locale($this->locale, $this->country)
             ->where('related_contentful_id', '=', $contentfulId);
 
-        if (!empty($contentfulType))
-        {
+        if (! empty($contentfulType)) {
             $query = $query->where('source_contentful_type', '=', $contentfulType);
         }
 
         $relationships = $query->orderBy('order', 'asc')->get();
-        foreach ($relationships as $relationship)
-        {
-            if ($relationship->source_contentful_type === 'asset')
-            {
+        foreach ($relationships as $relationship) {
+            if ($relationship->source_contentful_type === 'asset') {
                 $model = new Asset;
-            } else
-            {
+            } else {
                 $modelClass = rtrim(config('contentful.namespace.model'), '\\') . '\\' . studly_case($relationship->source_contentful_type);
                 $model = new $modelClass;
             }
@@ -287,8 +282,7 @@ abstract class ContentfulModel extends Model
                 ->where('contentful_id', '=', $relationship->source_contentful_id)
                 ->first();
 
-            if (!empty($instance))
-            {
+            if (! empty($instance)) {
                 $entries[] = $instance;
             }
         }
@@ -299,50 +293,61 @@ abstract class ContentfulModel extends Model
     /**
      * Return Contentful link ID.
      *
-     * @param  mixed $link
+     * @param  mixed  $link
      * @return string|null
      */
     protected function contentfulLinkId($link): ?string
     {
-        if (empty($link))
-        {
+        if (empty($link)) {
             return null;
         }
 
-        if (is_string($link))
-        {
+        if (is_string($link)) {
             return $link;
         }
 
-        if (is_array($link) and isset($link['sys']) and isset($link['sys']['id']))
-        {
+        if (is_array($link) and isset($link['sys']) and isset($link['sys']['id'])) {
             return $link['sys']['id'];
         }
 
         return null;
     }
 
+    /**
+     * Return model Contentful content-type.
+     *
+     * @return string
+     */
     public function getContentType(): string
     {
         return $this->contentType;
     }
 
+    /**
+     * Return ID attribute.
+     *
+     * @return mixed
+     */
     public function getIdAttribute()
     {
         return $this->getKey();
     }
 
+    /**
+     * Magical extended toArray().
+     *
+     * @return array
+     */
     public function toArray()
     {
         $array = parent::toArray();
-        foreach ($this->getMutatedAttributes() as $key)
-        {
-            if (!array_key_exists($key, $array))
-            {
+
+        foreach ($this->getMutatedAttributes() as $key) {
+            if (! array_key_exists($key, $array)) {
                 $array[$key] = $this->{$key};
             }
         }
+
         return $array;
     }
-
 }

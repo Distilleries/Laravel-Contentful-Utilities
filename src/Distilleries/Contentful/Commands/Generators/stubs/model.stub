@@ -3,20 +3,18 @@
 namespace App\Models;
 
 use Illuminate\Support\Collection;
+use Distilleries\Contentful\Models\Asset;
 use Distilleries\Contentful\Helpers\Caster;
 use Distilleries\Contentful\Models\Base\ContentfulModel;
-use Distilleries\Contentful\Models\Asset;
 
 
 /**
- * Class {{MODEL}}
- * @package App\Models
  * @property string $contentful_id
  * @property string $country
  * @property string $locale
  * @property array $payload
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
+ * @property \Illuminate\Support\Carbon $created_at
+ * @property \Illuminate\Support\Carbon $updated_at
  */
 class {{MODEL}} extends ContentfulModel
 {
@@ -29,7 +27,6 @@ class {{MODEL}} extends ContentfulModel
      * {@inheritdoc}
      */
     protected $fillable = [];
-
 
     /**
      * {@inheritdoc}

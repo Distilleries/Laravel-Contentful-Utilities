@@ -11,7 +11,7 @@ interface DeliveryApi
      * @return array
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function entries(array $parameters = []) : array;
+    public function entries(array $parameters = []): array;
 
     /**
      * Return the "/assets" raw response matching given parameters.
@@ -20,5 +20,5 @@ interface DeliveryApi
      * @return array
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function assets(array $parameters = []) : array;
+    public function assets(array $parameters = []): array;
 }

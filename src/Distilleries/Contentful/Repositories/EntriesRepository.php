@@ -2,12 +2,11 @@
 
 namespace Distilleries\Contentful\Repositories;
 
-use Distilleries\Contentful\Models\Locale;
-use Distilleries\Contentful\Models\Scopes\NotNullSlugScope;
 use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Builder;
+use Distilleries\Contentful\Models\Locale;
 use Distilleries\Contentful\Models\Base\ContentfulModel;
 use Distilleries\Contentful\Models\Base\ContentfulMapper;
 
@@ -34,8 +33,7 @@ class EntriesRepository
                 );
 
             $modelInstance = new $modelClass;
-            if ($modelInstance instanceof ContentfulModel)
-            {
+            if ($modelInstance instanceof ContentfulModel) {
                 $modelInstance->query()->truncate();
             }
         }
@@ -47,7 +45,8 @@ class EntriesRepository
     /**
      * Map Contentful entry payload to an Eloquent one.
      *
-     * @param  array $entry
+     * @param  array  $entry
+     * @param \Illuminate\Support\Collection  $locales
      * @return void
      * @throws \Exception
      */
@@ -57,20 +56,15 @@ class EntriesRepository
         $this->deleteRelationships($entry);
 
         $localeEntries = $this->entryMapper($entry)->toLocaleEntries($entry, $locales);
-        foreach ($localeEntries as $localeEntry)
-        {
-
+        foreach ($localeEntries as $localeEntry) {
             $model = $this->upsertLocale($entry, $localeEntry);
 
-            if (!empty($model))
-            {
-                if (isset($localeEntry['relationships']))
-                {
+            if (! empty($model)) {
+                if (isset($localeEntry['relationships'])) {
                     $this->handleRelationships($localeEntry['locale'], $localeEntry['contentful_id'], $this->entryContentType($entry), $localeEntry['relationships']);
                     unset($localeEntry['relationships']);
                 }
-            } else if (isset($localeEntry['relationships']))
-            {
+            } else if (isset($localeEntry['relationships'])) {
                 unset($localeEntry['relationships']);
             }
         }
@@ -79,7 +73,7 @@ class EntriesRepository
     /**
      * Delete entry and relationships.
      *
-     * @param  array $entry
+     * @param  array  $entry
      * @return void
      * @throws \Exception
      */
@@ -109,7 +103,7 @@ class EntriesRepository
     /**
      * Return entry content-type mapper class instance.
      *
-     * @param  array $entry
+     * @param  array  $entry
      * @return \Distilleries\Contentful\Models\Base\ContentfulMapper
      * @throws \Exception
      */
@@ -118,8 +112,7 @@ class EntriesRepository
         $mapperNamespace = config('contentful.namespace.mapper');
         $mapperClass = $mapperNamespace . '\\' . studly_case($this->entryContentType($entry)) . 'Mapper';
 
-        if (!class_exists($mapperClass))
-        {
+        if (! class_exists($mapperClass)) {
             throw new Exception('Unknown mapper: ' . $mapperClass);
         }
 
@@ -129,7 +122,7 @@ class EntriesRepository
     /**
      * Return entry content-type model class instance.
      *
-     * @param  array $entry
+     * @param  array  $entry
      * @return \Distilleries\Contentful\Models\Base\ContentfulModel
      * @throws \Exception
      */
@@ -138,8 +131,7 @@ class EntriesRepository
         $namespace = config('contentful.namespace.model');
         $modelClass = $namespace . '\\' . studly_case($this->entryContentType($entry));
 
-        if (!class_exists($modelClass))
-        {
+        if (! class_exists($modelClass)) {
             throw new Exception('Unknown model: ' . $modelClass);
         }
 
@@ -153,10 +145,10 @@ class EntriesRepository
     /**
      * Handle mapped relationships to fill `entry_relationships` pivot table.
      *
-     * @param  string $locale
-     * @param  string $sourceId
-     * @param  string $sourceType
-     * @param  array $relationships
+     * @param  string  $locale
+     * @param  string  $sourceId
+     * @param  string  $sourceType
+     * @param  array  $relationships
      * @return void
      * @throws \Exception
      */
@@ -172,10 +164,8 @@ class EntriesRepository
             ->delete();
 
         $order = 1;
-        foreach ($relationships as $relationship)
-        {
-            if (!isset($relationship['id']) or !isset($relationship['type']))
-            {
+        foreach ($relationships as $relationship) {
+            if (! isset($relationship['id']) or ! isset($relationship['type'])) {
                 throw new Exception('Relationships malformed! (' . print_r($relationship, true) . ')');
             }
 
@@ -214,31 +204,27 @@ class EntriesRepository
     /**
      * Return inserted / updated model instance for given parameters.
      *
-     * @param  array $entry
-     * @param  array $data
+     * @param  array  $entry
+     * @param  array  $data
      * @return \Distilleries\Contentful\Models\Base\ContentfulModel|null
      * @throws \Exception
      */
     private function upsertLocale(array $entry, array $data): ?ContentfulModel
     {
         $model = $this->entryModel($entry);
-        if ((method_exists($model, 'bootNotNullSlug') && empty($data['slug'])) || !Locale::canBeSave($data['country'], $data['locale']))
-        {
+        if ((method_exists($model, 'bootNotNullSlug') && empty($data['slug'])) || ! Locale::canBeSave($data['country'], $data['locale'])) {
             return null;
         }
 
-        if (!isset($data['payload']))
-        {
+        if (! isset($data['payload'])) {
             throw new Exception('Mapper for model ' . class_basename($model) . ' must set a "payload" key');
         }
 
         $instance = $this->instanceQueryBuilder($model, $data)->first();
 
-        if (empty($instance))
-        {
+        if (empty($instance)) {
             $model->fill($data)->save();
-        } else
-        {
+        } else {
             $this->overridePayloadAndExtraFillables($model, $data);
         }
 
@@ -248,8 +234,8 @@ class EntriesRepository
     /**
      * Override Eloquent entry with all fillable data.
      *
-     * @param  \Distilleries\Contentful\Models\Base\ContentfulModel $model
-     * @param  array $data
+     * @param  \Distilleries\Contentful\Models\Base\ContentfulModel  $model
+     * @param  array  $data
      * @return void
      */
     private function overridePayloadAndExtraFillables(ContentfulModel $model, array $data)
@@ -259,10 +245,8 @@ class EntriesRepository
         // In this way we can delegate extra field update to
         // the Model itself (eg. adding slug or publishing date).
         $update = [];
-        foreach ($data as $key => $value)
-        {
-            if (in_array($key, $fillables))
-            {
+        foreach ($data as $key => $value) {
+            if (in_array($key, $fillables)) {
                 $update[$key] = $value;
             }
         }
@@ -274,8 +258,8 @@ class EntriesRepository
     /**
      * Return Eloquent QueryBuilder to target given entry.
      *
-     * @param  \Distilleries\Contentful\Models\Base\ContentfulModel $model
-     * @param  array $data
+     * @param  \Distilleries\Contentful\Models\Base\ContentfulModel  $model
+     * @param  array  $data
      * @return \Illuminate\Database\Eloquent\Builder
      */
     private function instanceQueryBuilder(ContentfulModel $model, array $data): Builder
