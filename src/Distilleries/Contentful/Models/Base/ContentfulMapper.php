@@ -18,8 +18,8 @@ abstract class ContentfulMapper
     /**
      * Map entry specific payload.
      *
-     * @param  array  $entry
-     * @param  string  $locale
+     * @param  array $entry
+     * @param  string $locale
      * @return array
      * @throws \Exception
      */
@@ -28,8 +28,8 @@ abstract class ContentfulMapper
     /**
      * Map entry with common data + specific payload for each locales.
      *
-     * @param  array  $entry
-     * @param  \Illuminate\Support\Collection  $locales
+     * @param  array $entry
+     * @param  \Illuminate\Support\Collection $locales
      * @return array
      * @throws \Exception
      */
@@ -50,11 +50,11 @@ abstract class ContentfulMapper
             $data['country'] = Locale::getCountry($locale->code);
             $data['locale'] = Locale::getLocale($locale->code);
 
-            if (! isset($data['payload'])) {
+            if (!isset($data['payload'])) {
                 $data['payload'] = $this->mapPayload($entry, $locale->code);
             }
 
-            if (! isset($data['relationships'])) {
+            if (!isset($data['relationships'])) {
                 $data['relationships'] = $this->mapRelationships($data['payload']);
             }
 
@@ -75,21 +75,22 @@ abstract class ContentfulMapper
     /**
      * Return raw entry fields payload for given locale.
      *
-     * @param  array  $entry
-     * @param  string  $locale
+     * @param  array $entry
+     * @param  string $locale
      * @return array
      */
     protected function mapPayload(array $entry, string $locale): array
     {
         $payload = [];
+        $dontFallback = config('contentful.payload_fields_not_fallback', []);
 
         $fallbackLocale = Locale::fallback($locale);
         foreach ($entry['fields'] as $field => $localesData) {
             if (isset($localesData[$locale])) {
                 $payload[$field] = $localesData[$locale];
             } else {
-                // Fallback field...
-                if (isset($localesData[$fallbackLocale]) && ($this->levelFallBack($field) === 'all')) {
+                if (!in_array($field,
+                        $dontFallback) && isset($localesData[$fallbackLocale]) && ($this->levelFallBack($field) === 'all')) {
                     $payload[$field] = $localesData[$fallbackLocale];
                 } else {
                     $payload[$field] = null;
@@ -103,7 +104,7 @@ abstract class ContentfulMapper
     /**
      * Level fallback.
      *
-     * @param  string  $field
+     * @param  string $field
      * @return string
      */
     protected function levelFallBack($field): string
@@ -120,7 +121,7 @@ abstract class ContentfulMapper
     /**
      * Map relationships in given payload.
      *
-     * @param  array  $payload
+     * @param  array $payload
      * @return array
      * @throws \Exception
      */
@@ -158,7 +159,7 @@ abstract class ContentfulMapper
     /**
      * Return relationship signature for given "localized" field.
      *
-     * @param  array  $localeField
+     * @param  array $localeField
      * @return array|null
      * @throws \Exception
      */
@@ -166,8 +167,13 @@ abstract class ContentfulMapper
     {
         if ($localeField['sys']['linkType'] === 'Asset') {
             return ['id' => $localeField['sys']['id'], 'type' => 'asset'];
-        } else if ($localeField['sys']['linkType'] === 'Entry') {
-            return ['id' => $localeField['sys']['id'], 'type' => $this->contentTypeFromEntryTypes($localeField['sys']['id'])];
+        } else {
+            if ($localeField['sys']['linkType'] === 'Entry') {
+                return [
+                    'id' => $localeField['sys']['id'],
+                    'type' => $this->contentTypeFromEntryTypes($localeField['sys']['id'])
+                ];
+            }
         }
 
         throw new Exception('Invalid field signature... ' . PHP_EOL . print_r($localeField, true));
@@ -176,7 +182,7 @@ abstract class ContentfulMapper
     /**
      * Return if field is a Link one.
      *
-     * @param  mixed  $localeField
+     * @param  mixed $localeField
      * @return boolean
      */
     private function isLink($localeField): bool
@@ -187,7 +193,7 @@ abstract class ContentfulMapper
     /**
      * Return contentful-type for given Contentful ID from `sync_entries` table.
      *
-     * @param  string  $contentfulId
+     * @param  string $contentfulId
      * @return string
      * @throws \Exception
      */
@@ -206,7 +212,7 @@ abstract class ContentfulMapper
                     'content_type' => 'single_entry',
                 ]);
 
-                if (! empty($entry) and ! empty($entry['sys']['contentType']) and ! empty($entry['sys']['contentType']['sys'])) {
+                if (!empty($entry) and !empty($entry['sys']['contentType']) and !empty($entry['sys']['contentType']['sys'])) {
                     $this->upsertEntryType($entry, $entry['sys']['contentType']['sys']['id']);
 
                     return $entry['sys']['contentType']['sys']['id'];
