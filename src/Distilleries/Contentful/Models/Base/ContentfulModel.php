@@ -132,43 +132,45 @@ abstract class ContentfulModel extends Model
     /**
      * Return payload of related Contentful entries.
      *
-     * @param  string  $payload
-     * @param  array  $links
-     * @param  mixed  $query
+     * @param  string $payload
+     * @param  array $links
+     * @param  mixed $query
      * @return \Illuminate\Support\Collection
      */
     protected function getAndSetPayloadContentfulEntries(string $payload, array $links, $query = null): Collection
     {
-        if (empty($this->attributes[$payload])) {
-            return collect();
-        }
-
-        if (! is_object($this->attributes[$payload])) {
+        if (!isset($this->attributes[$payload]) && isset($this->payload[$payload])) {
             $this->attributes[$payload] = $this->contentfulEntries($links, $query);
+            return $this->attributes[$payload];
+        } else {
+            if (isset($this->attributes[$payload])) {
+                return $this->attributes[$payload];
+            } else {
+                return collect();
+            }
         }
-
-        return $this->attributes[$payload];
     }
 
     /**
      * Return payload of related Contentful entry.
      *
-     * @param  string  $payload
-     * @param  array  $links
-     * @param  mixed  $query
+     * @param  string $payload
+     * @param  array $links
+     * @param  mixed $query
      * @return \Distilleries\Contentful\Models\Base\ContentfulModel|null
      */
     protected function getAndSetPayloadContentfulEntry(string $payload, array $links, $query = null): ?ContentfulModel
     {
-        if (empty($this->attributes[$payload])) {
-            return null;
-        }
-
-        if (! is_object($this->attributes[$payload])) {
+        if (!isset($this->attributes[$payload]) && isset($this->payload[$payload])) {
             $this->attributes[$payload] = $this->contentfulEntry($links, $query);
+            return $this->attributes[$payload];
+        } else {
+            if (isset($this->attributes[$payload])) {
+                return $this->attributes[$payload];
+            } else {
+                return null;
+            }
         }
-
-        return $this->attributes[$payload];
     }
 
     /**
