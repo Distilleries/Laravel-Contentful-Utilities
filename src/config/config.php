@@ -42,5 +42,5 @@ return [
         'replace_host' => 'images.ctfassets.net',
     ],
 
-    'payload_fields_not_fallback' => explode(env('CONTENTFUL_PAYLOAD_FIELD_NOT_FALLBACK', ''), ',')
+    'payload_fields_not_fallback' => explode(',',env('CONTENTFUL_PAYLOAD_FIELD_NOT_FALLBACK', ''))
 ];
