@@ -48,10 +48,10 @@ trait SyncTrait
      */
     protected function dumpSql(string $path, string $connector)
     {
-        $exec = 'export MYSQL_PWD=%s; mysqldump --add-drop-table --default-character-set=%s %s -u %s -h %s --port %s > %s';
+        $exec = 'export MYSQL_PWD=\'%s\'; mysqldump --add-drop-table --default-character-set=%s %s -u %s -h %s --port %s > %s';
 
         $command = sprintf($exec,
-            config('database.connections.' . $connector . '.password'),
+            addcslashes(config('database.connections.' . $connector . '.password'),"'"),
             config('database.connections.' . $connector . '.charset'),
             config('database.connections.' . $connector . '.database'),
             config('database.connections.' . $connector . '.username'),
@@ -88,10 +88,10 @@ trait SyncTrait
      */
     protected function putSql(string $path, string $connector)
     {
-        $exec = 'export MYSQL_PWD=%s; mysql -u %s -h %s --port %s %s < %s';
+        $exec = 'export MYSQL_PWD=\'%s\'; mysql -u %s -h %s --port %s %s < %s';
 
         $command = sprintf($exec,
-            config('database.connections.' . $connector . '.password'),
+            addcslashes(config('database.connections.' . $connector . '.password'),"'"),
             config('database.connections.' . $connector . '.username'),
             config('database.connections.' . $connector . '.host'),
             config('database.connections.' . $connector . '.port'),
