@@ -2,6 +2,7 @@
 
 namespace Distilleries\Contentful\Helpers;
 
+use Distilleries\Contentful\Models\Location;
 use Parsedown;
 use Illuminate\Support\Carbon;
 
@@ -135,5 +136,17 @@ class Caster
     public static function entryId(array $entry, $default = null): ?string
     {
         return (isset($entry['sys']) and isset($entry['sys']['id'])) ? $entry['sys']['id'] : $default;
+    }
+
+    /**
+     * Return a Location object
+     *
+     * @param  array  $entry
+     * @param  Location  $default
+     * @return Location|null
+     */
+    public static function location(array $entry, ?Location $default = null): ?Location
+    {
+        return isset($entry['default'])? new Location($entry['default']):$default;
     }
 }
