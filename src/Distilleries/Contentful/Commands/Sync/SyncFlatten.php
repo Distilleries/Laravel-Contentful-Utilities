@@ -1,158 +1,118 @@
 <?php
 
-namespace Distilleries\Contentful\Commands\Sync;
+namespace Distilleries\Contentful\Commands\Sync\Traits;
 
-use stdClass;
-use Exception;
-use Illuminate\Console\Command;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
-use Distilleries\Contentful\Models\Locale;
-use Symfony\Component\Console\Helper\ProgressBar;
-use Distilleries\Contentful\Repositories\AssetsRepository;
-use Distilleries\Contentful\Repositories\EntriesRepository;
-
-class SyncFlatten extends Command
+trait SyncTrait
 {
-    use Traits\SyncTrait;
-
     /**
-     * Number of entries to fetch per pagination.
-     *
-     * @var integer
-     */
-    const PER_BATCH = 50;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected $signature = 'contentful:sync-flatten {--preview}';
-
-    /**
-     * {@inheritdoc}
-     */
-    protected $description = 'Map and persist previously synced Contentful data';
-
-    /**
-     * Assets repository instance.
-     *
-     * @var \Distilleries\Contentful\Repositories\AssetsRepository
-     */
-    protected $assets;
-
-    /**
-     * Entries repository instance.
-     *
-     * @var \Distilleries\Contentful\Repositories\EntriesRepository
-     */
-    protected $entries;
-
-    /**
-     * MapEntries command constructor.
+     * Switch to `sync` database.
      *
      * @return void
      */
-    public function __construct()
+    protected function switchToSyncDb()
     {
-        parent::__construct();
+        $this->warn('Switch to sync database');
 
-        $this->assets = new AssetsRepository;
-
-        $this->entries = new EntriesRepository;
+        config([
+            'database.default' => 'mysql_sync',
+        ]);
     }
 
     /**
-     * Execute the console command.
+     * Dump `sync` database into a SQL file and return its path.
      *
+     * @param  boolean $isPreview
+     * @return string
+     */
+    protected function dumpSync(bool $isPreview, string $connector = 'mysql'): string
+    {
+        $path = storage_path('dumps/' . date('YmdHis') . '_sync' . ($isPreview ? '_preview' : '') . '.sql');
+        $this->warn('Dump "' . basename($path) . '"...');
+
+        $dirName = dirname($path);
+        if (!is_dir($dirName)) {
+            mkdir($dirName, 0777, true);
+        }
+
+        $this->dumpSql($path, $this->getConnector($isPreview, $connector));
+
+        return realpath($path);
+    }
+
+    /**
+     * Dump SQL database in given file path.
+     *
+     * @param  string $path
+     * @param  string $connector
      * @return void
      */
-    public function handle()
+    protected function dumpSql(string $path, string $connector)
     {
-        $isPreview = $this->option('preview');
-        if ($isPreview) {
-            use_contentful_preview();
-        }
+        $exec = 'export MYSQL_PWD=\'%s\'; mysqldump --add-drop-table --default-character-set=%s %s -u %s -h %s --port %s > %s';
 
-        $dumpPath = $this->dumpSync($isPreview);
-        $this->putSync($dumpPath, $isPreview,'mysql_sync');
-
-        $this->switchToSyncDb();
-        $this->line('Truncate Contentful related tables');
-        $this->assets->truncateRelatedTables();
-        $this->entries->truncateRelatedTables();
-        $this->line('Map and persist synced data');
-
-        try {
-            $this->flattenSyncedData();
-        } catch (Exception $e) {
-            echo PHP_EOL;
-            $this->error($e->getMessage());
-            return;
-        }
-
-        $dumpPath = $this->dumpSync($isPreview,'mysql_sync');
-        $this->putSync($dumpPath, $isPreview);
+        $command = sprintf($exec,
+            addcslashes(config('database.connections.' . $connector . '.password'), "'"),
+            config('database.connections.' . $connector . '.charset'),
+            config('database.connections.' . $connector . '.database'),
+            config('database.connections.' . $connector . '.username'),
+            config('database.connections.' . $connector . '.host'),
+            config('database.connections.' . $connector . '.port'),
+            $path
+        );
+        exec($command);
     }
 
+    protected function getConnector(bool $isPreview, string $connector = 'mysql'): string
+    {
+        $compiledConnector = $connector . ($isPreview ? '_preview' : '');
+        if (empty(config('database.connections.' . $compiledConnector . '.username'))) {
+            $compiledConnector = $connector;
+        }
+
+        return $compiledConnector;
+
+    }
+
+
     /**
-     * Map and persist synced data.
+     * Put previous dump in live-preview database.
      *
+     * @param  string $path
+     * @param  boolean $isPreview
      * @return void
-     * @throws \Exception
      */
-    private function flattenSyncedData()
+    protected function putSync(string $path, bool $isPreview, string $connector = 'mysql')
     {
-        $page = 1;
-        $paginator = DB::table('sync_entries')->paginate(static::PER_BATCH, ['*'], 'page', $page);
-        $locales = Locale::all();
+        $compiledConnector = $this->getConnector($isPreview, $connector);
 
-        $bar = $this->createProgressBar($paginator->total());
-        while ($paginator->isNotEmpty()) {
-            foreach ($paginator->items() as $item) {
-                $bar->setMessage('Map entry ID: ' . $item->contentful_id);
-                $this->mapItemToContentfulModel($item,$locales);
-                $bar->advance();
-            }
+        config([
+            'database.default' => $compiledConnector,
+        ]);
 
-            $page++;
-            $paginator = DB::table('sync_entries')->paginate(static::PER_BATCH, ['*'], 'page', $page);
-        }
-        $bar->finish();
-
-        echo PHP_EOL;
+        $this->warn('Put into "' . $compiledConnector . '" database...');
+        $this->putSql($path, $compiledConnector);
     }
 
     /**
-     * Create custom progress bar.
+     * Put SQL file into given database.
      *
-     * @param  integer  $total
-     * @return \Symfony\Component\Console\Helper\ProgressBar
-     */
-    private function createProgressBar(int $total): ProgressBar
-    {
-        $bar = $this->output->createProgressBar($total);
-
-        $bar->setFormat("%message%" . PHP_EOL . " %current%/%max% [%bar%] %percent:3s%%");
-
-        return $bar;
-    }
-
-    /**
-     * Map and persist given sync_entries item.
-     *
-     * @param  \stdClass  $item
-     * @param \Illuminate\Support\Collection $locales
+     * @param  string $path
+     * @param  string $connector
      * @return void
-     * @throws \Exception
      */
-    private function mapItemToContentfulModel(stdClass $item, Collection $locales)
+    protected function putSql(string $path, string $connector)
     {
-        $entry = json_decode($item->payload, true);
+        $exec = 'export MYSQL_PWD=\'%s\'; mysql -u %s -h %s --port %s %s < %s';
 
-        if ($item->contentful_type === 'asset') {
-            $this->assets->toContentfulModel($entry,$locales);
-        } else {
-            $this->entries->toContentfulModel($entry,$locales);
-        }
+        $command = sprintf($exec,
+            addcslashes(config('database.connections.' . $connector . '.password'), "'"),
+            config('database.connections.' . $connector . '.username'),
+            config('database.connections.' . $connector . '.host'),
+            config('database.connections.' . $connector . '.port'),
+            config('database.connections.' . $connector . '.database'),
+            $path
+        );
+
+        exec($command);
     }
 }

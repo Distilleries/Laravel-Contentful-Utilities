@@ -166,7 +166,7 @@ class Caster
 
     /**
      * Return a Location object
-     *
+     *ApiCDN
      * @param  array  $entry
      * @param  Location  $default
      * @return Location|null
