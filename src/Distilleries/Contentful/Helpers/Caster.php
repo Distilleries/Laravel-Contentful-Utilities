@@ -3,6 +3,7 @@
 namespace Distilleries\Contentful\Helpers;
 
 use Distilleries\Contentful\Models\Location;
+use Illuminate\Support\Collection;
 use Parsedown;
 use Illuminate\Support\Carbon;
 
@@ -124,6 +125,31 @@ class Caster
     public static function float($float, $default = null): ?float
     {
         return is_float($float) ? (float) $float : $default;
+    }
+
+
+    /**
+     * Cast an array to an array value otherwise to null.
+     *
+     * @param  mixed  $array
+     * @param  mixed  $default
+     * @return array|null
+     */
+    public static function toArray($array, $default = null): ?array
+    {
+        return is_array($array) ? (array) $array : $default;
+    }
+
+    /**
+     * Cast an array to an collection value otherwise to null.
+     *
+     * @param  mixed  $array
+     * @param  mixed  $default
+     * @return Collection|null
+     */
+    public static function collect($array, $default = null): ?Collection
+    {
+        return is_array($array) ? collect($array) : $default;
     }
 
     /**
