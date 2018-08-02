@@ -36,10 +36,10 @@ class Location
     public function fill(array $attributes)
     {
         foreach ($this->fillable as $key => $value) {
-            if (isset($attributes[$key])) {
-                $this->{$key} = $attributes[$key];
+            if (isset($attributes[$value])) {
+                $this->{$value} = $attributes[$value];
             } else {
-                $this->{$key} = null;
+                $this->{$value} = null;
             }
         }
 

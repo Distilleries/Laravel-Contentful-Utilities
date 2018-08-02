@@ -173,6 +173,6 @@ class Caster
      */
     public static function location(array $entry, ?Location $default = null): ?Location
     {
-        return isset($entry['default'])? new Location($entry['default']):$default;
+        return !empty($entry)? new Location($entry):$default;
     }
 }
