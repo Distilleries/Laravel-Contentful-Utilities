@@ -82,7 +82,7 @@ class Caster
      * @param  mixed  $default
      * @return string
      */
-    public static function markdown($md, $default = null): ?string
+    public static function markdown($md, $default = ''): ?string
     {
         if (empty($md)) {
             return $default;
