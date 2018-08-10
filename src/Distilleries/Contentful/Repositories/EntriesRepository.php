@@ -264,7 +264,8 @@ class EntriesRepository
      */
     private function instanceQueryBuilder(ContentfulModel $model, array $data): Builder
     {
-        return $model->query()
+        return $model
+            ->withoutGlobalScopes()
             ->where('contentful_id', '=', $data['contentful_id'])
             ->where('locale', '=', $data['locale']);
     }
