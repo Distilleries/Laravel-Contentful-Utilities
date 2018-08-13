@@ -101,7 +101,7 @@ class ServiceProvider extends BaseServiceProvider
         $this->commands('command.contentful.model');
         $this->commands('command.contentful.migration');
         $this->commands('command.contentful.sync');
-        $this->commands('command.contentful.sync.switch');
+        $this->commands('command.contentful.sync-switch');
         $this->commands('command.contentful.sync-data');
         $this->commands('command.contentful.sync-flatten');
         $this->commands('command.contentful.sync-locales');
