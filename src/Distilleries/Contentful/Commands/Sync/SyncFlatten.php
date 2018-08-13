@@ -27,7 +27,7 @@ class SyncFlatten extends Command
     /**
      * {@inheritdoc}
      */
-    protected $signature = 'contentful:sync-flatten {--preview} {--no-switch} {--truncate} {--multi}';
+    protected $signature = 'contentful:sync-flatten {--preview} {--no-switch} {--no-truncate} {--multi}';
 
     /**
      * {@inheritdoc}
@@ -68,9 +68,9 @@ class SyncFlatten extends Command
         return !empty($bool) ? false : true;
     }
 
-    protected function withTruncate(): bool
+    protected function withoutTruncate(): bool
     {
-        $bool = $this->option('truncate');
+        $bool = $this->option('no-truncate');
         return !empty($bool) ? true : false;
     }
 
@@ -96,14 +96,14 @@ class SyncFlatten extends Command
         $isPreview = $this->isPreview();
 
         if ($this->canSwitch()) {
-            $this->call('contentful:sync-switch', $isPreview ? ['--preview'] : []);
+            $this->call('contentful:sync-switch', $isPreview ? ['--preview'=>true] : []);
         }
 
         if ($isPreview) {
             use_contentful_preview();
         }
 
-        if ($this->withTruncate()) {
+        if (!$this->withoutTruncate()) {
             $this->line('Truncate Contentful related tables');
             $this->assets->truncateRelatedTables();
             $this->entries->truncateRelatedTables();
@@ -126,9 +126,7 @@ class SyncFlatten extends Command
         }
 
         if ($this->canSwitch()) {
-            if ($this->canSwitch()) {
-                $this->call('contentful:sync-switch', $isPreview ? ['--preview', '--live'] : ['--live']);
-            }
+            $this->call('contentful:sync-switch', $isPreview ? ['--preview'=>true, '--live'=>true] : ['--live'=>true]);
         }
     }
 
@@ -178,7 +176,7 @@ class SyncFlatten extends Command
                     ->get();
 
                 DB::table('sync_entries')
-                    ->whereIn('id', $items->pluck('id')->toArray())
+                    ->whereIn('contentful_id', $items->pluck('contentful_id')->toArray())
                     ->lockForUpdate()
                     ->update(['release_id' => $release->getKey()]);
             });
