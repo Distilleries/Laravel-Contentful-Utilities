@@ -79,6 +79,9 @@ class ServiceProvider extends BaseServiceProvider
         $this->app->singleton('command.contentful.sync', function () {
             return new Commands\Sync\Sync;
         });
+        $this->app->singleton('command.contentful.sync-switch', function () {
+            return new Commands\Sync\SyncSwitch;
+        });
         $this->app->singleton('command.contentful.sync-data', function () {
             return new Commands\Sync\SyncData(app(Api\SyncApi::class));
         });
@@ -98,6 +101,7 @@ class ServiceProvider extends BaseServiceProvider
         $this->commands('command.contentful.model');
         $this->commands('command.contentful.migration');
         $this->commands('command.contentful.sync');
+        $this->commands('command.contentful.sync.switch');
         $this->commands('command.contentful.sync-data');
         $this->commands('command.contentful.sync-flatten');
         $this->commands('command.contentful.sync-locales');

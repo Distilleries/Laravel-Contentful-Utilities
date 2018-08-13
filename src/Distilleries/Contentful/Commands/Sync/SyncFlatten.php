@@ -2,6 +2,7 @@
 
 namespace Distilleries\Contentful\Commands\Sync;
 
+use Distilleries\Contentful\Models\Release;
 use stdClass;
 use Exception;
 use Illuminate\Console\Command;
@@ -26,7 +27,7 @@ class SyncFlatten extends Command
     /**
      * {@inheritdoc}
      */
-    protected $signature = 'contentful:sync-flatten {--preview}';
+    protected $signature = 'contentful:sync-flatten {--preview} {--no-switch} {--truncate} {--multi}';
 
     /**
      * {@inheritdoc}
@@ -61,37 +62,74 @@ class SyncFlatten extends Command
         $this->entries = new EntriesRepository;
     }
 
+    protected function canSwitch(): bool
+    {
+        $bool = $this->option('no-switch');
+        return !empty($bool) ? false : true;
+    }
+
+    protected function withTruncate(): bool
+    {
+        $bool = $this->option('truncate');
+        return !empty($bool) ? true : false;
+    }
+
+    protected function isPreview(): bool
+    {
+        $bool = $this->option('preview');
+        return !empty($bool) ? true : false;
+    }
+
+    protected function isMultiThread(): bool
+    {
+        $bool = $this->option('multi');
+        return !empty($bool) ? true : false;
+    }
+
     /**
      * Execute the console command.
      *
      * @return void
      */
-    public function handle()
+    public function handle(Release $release)
     {
-        $isPreview = $this->option('preview');
+        $isPreview = $this->isPreview();
+
+        if ($this->canSwitch()) {
+            $this->call('contentful:sync-switch', $isPreview ? ['--preview'] : []);
+        }
+
         if ($isPreview) {
             use_contentful_preview();
         }
 
-        $dumpPath = $this->dumpSync($isPreview);
-        $this->putSync($dumpPath, $isPreview,'mysql_sync');
-
-        $this->switchToSyncDb();
-        $this->line('Truncate Contentful related tables');
-        $this->assets->truncateRelatedTables();
-        $this->entries->truncateRelatedTables();
-        $this->line('Map and persist synced data');
+        if ($this->withTruncate()) {
+            $this->line('Truncate Contentful related tables');
+            $this->assets->truncateRelatedTables();
+            $this->entries->truncateRelatedTables();
+        }
 
         try {
-            $this->flattenSyncedData();
+            $this->line('Map and persist synced data');
+            if($this->isMultiThread()){
+                $release = $this->getCurrentRelease($release);
+                $this->flattenSyncedDataMultiThread($release);
+            }else{
+                $this->flattenSyncedData();
+            }
+
+
         } catch (Exception $e) {
             echo PHP_EOL;
             $this->error($e->getMessage());
             return;
         }
 
-        $dumpPath = $this->dumpSync($isPreview,'mysql_sync');
-        $this->putSync($dumpPath, $isPreview);
+        if ($this->canSwitch()) {
+            if ($this->canSwitch()) {
+                $this->call('contentful:sync-switch', $isPreview ? ['--preview', '--live'] : ['--live']);
+            }
+        }
     }
 
     /**
@@ -100,7 +138,7 @@ class SyncFlatten extends Command
      * @return void
      * @throws \Exception
      */
-    private function flattenSyncedData()
+    protected function flattenSyncedData()
     {
         $page = 1;
         $paginator = DB::table('sync_entries')->paginate(static::PER_BATCH, ['*'], 'page', $page);
@@ -110,7 +148,7 @@ class SyncFlatten extends Command
         while ($paginator->isNotEmpty()) {
             foreach ($paginator->items() as $item) {
                 $bar->setMessage('Map entry ID: ' . $item->contentful_id);
-                $this->mapItemToContentfulModel($item,$locales);
+                $this->mapItemToContentfulModel($item, $locales);
                 $bar->advance();
             }
 
@@ -122,13 +160,68 @@ class SyncFlatten extends Command
         echo PHP_EOL;
     }
 
+    protected function flattenSyncedDataMultiThread(Release $release)
+    {
+
+        $locales = Locale::all();
+        $bar = $this->createProgressBar(DB::table('sync_entries')->count());
+
+        try {
+            $this->updateFromOtherThread($bar);
+            $items = collect();
+
+            DB::transaction(function () use ($release, & $items) {
+                $items = DB::table('sync_entries')
+                    ->whereNull('release_id')
+                    ->take(static::PER_BATCH)
+                    ->lockForUpdate()
+                    ->get();
+
+                DB::table('sync_entries')
+                    ->whereIn('id', $items->pluck('id')->toArray())
+                    ->lockForUpdate()
+                    ->update(['release_id' => $release->getKey()]);
+            });
+        } catch (Exception $e) {
+            //
+        }
+
+        $items->each(function ($item, $key) use ($locales, $bar) {
+            $bar->setMessage('Map entry ID: ' . $item->contentful_id);
+            $this->mapItemToContentfulModel($item, $locales);
+            $bar->advance();
+        });
+
+        $bar->finish();
+
+    }
+
+    /**
+     * Update progress from other threads.
+     *
+     * @return void
+     */
+    protected function updateFromOtherThread($bar)
+    {
+        $bar->setProgress((DB::table('sync_entries'))->whereNotNull('release_id')->count());
+    }
+
+    /**
+     * Get current release.
+     *
+     */
+    protected function getCurrentRelease(Release $release)
+    {
+        return $release->where('current', true)->get()->first();
+    }
+
     /**
      * Create custom progress bar.
      *
-     * @param  integer  $total
+     * @param  integer $total
      * @return \Symfony\Component\Console\Helper\ProgressBar
      */
-    private function createProgressBar(int $total): ProgressBar
+    protected function createProgressBar(int $total): ProgressBar
     {
         $bar = $this->output->createProgressBar($total);
 
@@ -140,19 +233,19 @@ class SyncFlatten extends Command
     /**
      * Map and persist given sync_entries item.
      *
-     * @param  \stdClass  $item
+     * @param  \stdClass $item
      * @param \Illuminate\Support\Collection $locales
      * @return void
      * @throws \Exception
      */
-    private function mapItemToContentfulModel(stdClass $item, Collection $locales)
+    protected function mapItemToContentfulModel(stdClass $item, Collection $locales)
     {
         $entry = json_decode($item->payload, true);
 
         if ($item->contentful_type === 'asset') {
-            $this->assets->toContentfulModel($entry,$locales);
+            $this->assets->toContentfulModel($entry, $locales);
         } else {
-            $this->entries->toContentfulModel($entry,$locales);
+            $this->entries->toContentfulModel($entry, $locales);
         }
     }
 }

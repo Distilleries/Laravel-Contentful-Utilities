@@ -2,6 +2,7 @@
 
 namespace Distilleries\Contentful\Commands\Sync;
 
+use Distilleries\Contentful\Models\Release;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Distilleries\Contentful\Api\SyncApi;
@@ -46,12 +47,13 @@ class SyncData extends Command
      *
      * @return void
      */
-    public function handle()
+    public function handle(Release $release)
     {
         if ($this->option('preview')) {
             use_contentful_preview();
         }
 
+        $this->setNewRelease($release);
         $this->line('Clean previous synced data');
         DB::table('sync_entries')->truncate();
 
@@ -62,12 +64,21 @@ class SyncData extends Command
         $this->syncEntries();
     }
 
+
+    protected function setNewRelease(Release $release)
+    {
+        (new $release)->where('current', true)->update(['current' => false]);
+
+        $release->current = true;
+        $release->save();
+    }
+
     /**
      * Synchronize assets via Sync API and store into DB for further use.
      *
      * @return void
      */
-    private function syncAssets()
+    protected function syncAssets()
     {
         try {
             $assets = $this->api->syncInitial('Asset');
@@ -86,7 +97,7 @@ class SyncData extends Command
      * @param  array  $assets
      * @return void
      */
-    private function saveAssets(array $assets)
+    protected function saveAssets(array $assets)
     {
         DB::transaction(function () use ($assets) {
             foreach ($assets as $asset) {
@@ -104,7 +115,7 @@ class SyncData extends Command
      *
      * @return void
      */
-    private function syncEntries()
+    protected function syncEntries()
     {
         try {
             $entries = $this->api->syncInitial('Entry');
@@ -123,7 +134,7 @@ class SyncData extends Command
      * @param  array  $entries
      * @return void
      */
-    private function saveEntries(array $entries)
+    protected function saveEntries(array $entries)
     {
         DB::transaction(function () use ($entries) {
             foreach ($entries as $entry) {
