@@ -96,12 +96,10 @@ class SyncFlatten extends Command
         $isPreview = $this->isPreview();
 
         if ($this->canSwitch()) {
-            $this->call('contentful:sync-switch', $isPreview ? ['--preview'=>true] : []);
+            $this->call('contentful:sync-switch', $isPreview ? ['--preview' => true] : []);
         }
 
-        if ($isPreview) {
-            use_contentful_preview();
-        }
+        $this->switchToSyncDb();
 
         if (!$this->withoutTruncate()) {
             $this->line('Truncate Contentful related tables');
@@ -111,10 +109,10 @@ class SyncFlatten extends Command
 
         try {
             $this->line('Map and persist synced data');
-            if($this->isMultiThread()){
+            if ($this->isMultiThread()) {
                 $release = $this->getCurrentRelease($release);
                 $this->flattenSyncedDataMultiThread($release);
-            }else{
+            } else {
                 $this->flattenSyncedData();
             }
 
@@ -126,7 +124,8 @@ class SyncFlatten extends Command
         }
 
         if ($this->canSwitch()) {
-            $this->call('contentful:sync-switch', $isPreview ? ['--preview'=>true, '--live'=>true] : ['--live'=>true]);
+            $this->call('contentful:sync-switch',
+                $isPreview ? ['--preview' => true, '--live' => true] : ['--live' => true]);
         }
     }
 
@@ -163,32 +162,33 @@ class SyncFlatten extends Command
 
         $locales = Locale::all();
         $bar = $this->createProgressBar(DB::table('sync_entries')->count());
+        do {
+            try {
+                $this->updateFromOtherThread($bar);
+                $items = collect();
 
-        try {
-            $this->updateFromOtherThread($bar);
-            $items = collect();
+                DB::transaction(function () use ($release, & $items) {
+                    $items = DB::table('sync_entries')
+                        ->whereNull('release_id')
+                        ->take(static::PER_BATCH)
+                        ->lockForUpdate()
+                        ->get();
 
-            DB::transaction(function () use ($release, & $items) {
-                $items = DB::table('sync_entries')
-                    ->whereNull('release_id')
-                    ->take(static::PER_BATCH)
-                    ->lockForUpdate()
-                    ->get();
+                    DB::table('sync_entries')
+                        ->whereIn('contentful_id', $items->pluck('contentful_id')->toArray())
+                        ->lockForUpdate()
+                        ->update(['release_id' => $release->getKey()]);
+                });
+            } catch (Exception $e) {
+            }
 
-                DB::table('sync_entries')
-                    ->whereIn('contentful_id', $items->pluck('contentful_id')->toArray())
-                    ->lockForUpdate()
-                    ->update(['release_id' => $release->getKey()]);
+            $items->each(function ($item, $key) use ($locales, $bar) {
+                $bar->setMessage('Map entry ID: ' . $item->contentful_id);
+                $this->mapItemToContentfulModel($item, $locales);
+                $bar->advance();
             });
-        } catch (Exception $e) {
-            //
-        }
 
-        $items->each(function ($item, $key) use ($locales, $bar) {
-            $bar->setMessage('Map entry ID: ' . $item->contentful_id);
-            $this->mapItemToContentfulModel($item, $locales);
-            $bar->advance();
-        });
+        } while (DB::table('sync_entries')->whereNull('release_id')->count() > 0);
 
         $bar->finish();
 
