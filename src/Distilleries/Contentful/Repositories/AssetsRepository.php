@@ -132,12 +132,12 @@ class AssetsRepository
     private function fieldsWithFallback(array $fields, string $locale): array
     {
         $fallbackLocale = Locale::fallback($locale);
-        $file = $this->getFieldValue($fields, 'file', $locale, $fallbackLocale, []);
+        $file = $this->getFieldValue($fields, 'file', $locale, $fallbackLocale,[]);
         $details = isset($file['details']) ? $file['details'] : [];
 
         return [
-            'title' => $this->getFieldValue($fields, 'title', $locale, $fallbackLocale),
-            'description' => $this->getFieldValue($fields, 'description', $locale, $fallbackLocale),
+            'title' => $this->getFieldValue($fields, 'title', $locale, $fallbackLocale,''),
+            'description' => $this->getFieldValue($fields, 'description', $locale, $fallbackLocale,''),
             'url' => isset($file['url']) ? $file['url'] : '',
             'file_name' => isset($file['fileName']) ? $file['fileName'] : '',
             'content_type' => isset($file['contentType']) ? $file['contentType'] : '',
@@ -152,7 +152,7 @@ class AssetsRepository
         string $field,
         string $locale,
         string $fallbackLocale,
-        $default = ''
+        $default
     ) {
         return !empty($fields[$field][$locale]) ?
             $fields[$field][$locale] : (!empty($fields[$field][$fallbackLocale]) ?
