@@ -46,9 +46,10 @@ trait WebhookTrait
         $payload = $request->all();
 
         $response = (new Manager)->handle($headers, $payload, $isPreview);
+        $responseClass = response();
 
-        if (method_exists(response(), 'json')) {
-            return response()->json($response['message'], $response['status']);
+        if (method_exists($responseClass, 'json')) {
+            return $responseClass->json($response['message'], $response['status']);
         } else {
             return response(json_encode($response['message']), $response['status']);
         }
