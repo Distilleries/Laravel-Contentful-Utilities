@@ -71,6 +71,7 @@ class Api extends BaseApi implements ManagementApi
      */
     public function entry(string $contentType, array $fields): ?array
     {
+        $filters = [];
         $filters['content_type'] = $contentType;
         foreach ($fields as $field => $value) {
             $filters['fields.' . $field] = $value;
@@ -83,7 +84,7 @@ class Api extends BaseApi implements ManagementApi
 
         $results = $this->decodeResponse($response);
 
-        return (isset($results['items']) and isset($results['items'][0]) and ! empty($results['items'][0])) ? $results['items'][0] : null;
+        return (isset($results['items']) and isset($results['items'][0]) and !empty($results['items'][0])) ? $results['items'][0] : null;
     }
 
     /**
@@ -155,7 +156,7 @@ class Api extends BaseApi implements ManagementApi
             RequestOptions::QUERY => $parameters,
             RequestOptions::HEADERS => $this->headers(),
         ]);
-        
+
         return $this->decodeResponse($response);
     }
 
@@ -180,11 +181,12 @@ class Api extends BaseApi implements ManagementApi
      */
     public function processAsset(string $assetId, string $locale, int $version = 1)
     {
-        $this->client->request('PUT', $this->url('environments/master/assets/' . $assetId . '/files/' . $locale . '/process'), [
-            RequestOptions::HEADERS => $this->headers([
-                'X-Contentful-Version' => $version,
-            ]),
-        ]);
+        $this->client->request('PUT',
+            $this->url('environments/master/assets/' . $assetId . '/files/' . $locale . '/process'), [
+                RequestOptions::HEADERS => $this->headers([
+                    'X-Contentful-Version' => $version,
+                ]),
+            ]);
     }
 
     /**
@@ -232,7 +234,7 @@ class Api extends BaseApi implements ManagementApi
     /**
      * Return default headers + given headers.
      *
-     * @param  array  $headers
+     * @param  array $headers
      * @return array
      */
     private function headers(array $headers = []): array
