@@ -46,6 +46,7 @@ abstract class BaseApi
         $this->client = $client;
 
         $this->config = config('contentful', []);
+        $this->config = !is_array($this->config) ? (array)$this->config : $this->config;
     }
 
     /**
