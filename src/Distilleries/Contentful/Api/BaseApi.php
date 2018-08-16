@@ -39,7 +39,6 @@ abstract class BaseApi
      * BaseApi constructor.
      *
      * @param  \GuzzleHttp\ClientInterface $client
-     * @return void
      */
     public function __construct(ClientInterface $client)
     {
