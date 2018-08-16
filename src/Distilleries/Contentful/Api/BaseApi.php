@@ -58,6 +58,9 @@ abstract class BaseApi
     {
         $baseUrl = rtrim($this->baseUrl, '/');
 
+        //Mandatory to make sure we have the last version modified by the scripts
+        $this->config['use_preview'] = config('contentful.use_preview');
+
         if ((isset($this->config['use_preview']) && $this->config['use_preview'] == true) && !empty($this->previewBaseUrl)) {
             $baseUrl = rtrim($this->previewBaseUrl, '/');
         }

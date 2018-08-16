@@ -38,7 +38,6 @@ abstract class ContentfulModel extends Model
      * ContentfulModel constructor.
      *
      * @param  array $attributes
-     * @return void
      */
     public function __construct(array $attributes = [])
     {
