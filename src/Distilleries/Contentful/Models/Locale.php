@@ -59,8 +59,7 @@ class Locale extends Model
         $default = Cache::get('locale_default');
 
         if ($default === null) {
-            $default = static::query()
-                ->select('locale')
+            $default = static::select('locale')
                 ->where('is_default', '=', true)
                 ->first();
 
@@ -104,8 +103,7 @@ class Locale extends Model
         $default = Cache::get('country_default');
 
         if ($default === null) {
-            $default = static::query()
-                ->select('country')
+            $default = static::select('country')
                 ->where('is_default', '=', true)
                 ->first();
 
@@ -129,8 +127,7 @@ class Locale extends Model
         $fallback = Cache::get('locale_fallback_' . $code);
 
         if ($fallback === null) {
-            $locale = static::query()
-                ->select('fallback_code')
+            $locale = static::select('fallback_code')
                 ->where('code', '=', $code)
                 ->first();
 
