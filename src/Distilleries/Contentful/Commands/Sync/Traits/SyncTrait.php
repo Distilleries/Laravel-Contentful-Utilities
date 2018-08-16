@@ -4,6 +4,14 @@ namespace Distilleries\Contentful\Commands\Sync\Traits;
 
 trait SyncTrait
 {
+
+    protected function displayWarn(string $string): void
+    {
+        if (method_exists($this, 'warn')) {
+            $this->warn($string);
+        }
+    }
+
     /**
      * Switch to `sync` database.
      *
@@ -11,7 +19,7 @@ trait SyncTrait
      */
     protected function switchToSyncDb()
     {
-        $this->warn('Switch to sync database');
+        $this->displayWarn('Switch to sync database');
 
         config([
             'database.default' => 'mysql_sync',
@@ -27,7 +35,7 @@ trait SyncTrait
     protected function dumpSync(bool $isPreview, string $connector = 'mysql'): string
     {
         $path = storage_path('dumps/' . date('YmdHis') . '_sync' . ($isPreview ? '_preview' : '') . '.sql');
-        $this->warn('Dump "' . basename($path) . '"...');
+        $this->displayWarn('Dump "' . basename($path) . '"...');
 
         $dirName = dirname($path);
         if (!is_dir($dirName)) {
@@ -89,7 +97,7 @@ trait SyncTrait
             'database.default' => $compiledConnector,
         ]);
 
-        $this->warn('Put into "' . $compiledConnector . '" database...');
+        $this->displayWarn('Put into "' . $compiledConnector . '" database...');
         $this->putSql($path, $compiledConnector);
     }
 
