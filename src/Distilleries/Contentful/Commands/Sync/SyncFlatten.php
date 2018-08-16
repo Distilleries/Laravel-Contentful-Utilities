@@ -140,6 +140,7 @@ class SyncFlatten extends Command
         $page = 1;
         $paginator = DB::table('sync_entries')->paginate(static::PER_BATCH, ['*'], 'page', $page);
         $locales = Locale::all();
+        $locales = is_array($locales) ? collect($locales) : $locales;
 
         $bar = $this->createProgressBar($paginator->total());
         while ($paginator->isNotEmpty()) {
@@ -160,7 +161,9 @@ class SyncFlatten extends Command
     protected function flattenSyncedDataMultiThread(Release $release)
     {
 
-        $locales = Locale::all();
+        $locales = collect(Locale::all());
+        $locales = is_array($locales) ? collect($locales) : $locales;
+
         $bar = $this->createProgressBar(DB::table('sync_entries')->count());
         do {
             try {
