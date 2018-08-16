@@ -29,6 +29,13 @@ abstract class BaseApi
     protected $baseUrl;
 
     /**
+     * API preview Base URL.
+     *
+     * @var string
+     */
+    protected $previewBaseUrl;
+
+    /**
      * BaseApi constructor.
      *
      * @param  \GuzzleHttp\ClientInterface $client
@@ -38,7 +45,7 @@ abstract class BaseApi
     {
         $this->client = $client;
 
-        $this->config = config('contentful');
+        $this->config = config('contentful', []);
     }
 
     /**
@@ -51,11 +58,11 @@ abstract class BaseApi
     {
         $baseUrl = rtrim($this->baseUrl, '/');
 
-        if (config('contentful.use_preview') and isset($this->previewBaseUrl)) {
+        if ((isset($this->config['use_preview']) && $this->config['use_preview'] == true) && !empty($this->previewBaseUrl)) {
             $baseUrl = rtrim($this->previewBaseUrl, '/');
         }
 
-        $environment = config('contentful.use_environment', false) ? '/environments/' . config('contentful.environment') . '/' : '/';
+        $environment = (isset($this->config['use_environment']) && $this->config['use_environment'] == true) ? '/environments/' . $this->config['environment'] . '/' : '/';
         return $baseUrl . '/spaces/' . $this->config['space_id'] . $environment . trim($endpoint, '/');
     }
 
