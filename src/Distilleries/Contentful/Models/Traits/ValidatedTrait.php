@@ -7,8 +7,6 @@ use Distilleries\Contentful\Models\Scopes\ValidatedScope;
 trait ValidatedTrait
 {
 
-    abstract public function withoutGlobalScope($scope);
-
     /**
      * Boot the validated scope for a model.
      *
@@ -26,7 +24,7 @@ trait ValidatedTrait
      */
     public static function withoutValidatedTrait()
     {
-        return (new static)->withoutGlobalScope(ValidatedScope::class);
+        return static::withoutGlobalScope(ValidatedScope::class);
     }
 
     /**
