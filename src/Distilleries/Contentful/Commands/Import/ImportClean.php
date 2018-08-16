@@ -31,7 +31,6 @@ class ImportClean extends Command
      * ContentfulClean command constructor.
      *
      * @param  \Distilleries\Contentful\Api\ManagementApi  $api
-     * @return void
      */
     public function __construct(ManagementApi $api)
     {

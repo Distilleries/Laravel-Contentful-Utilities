@@ -148,8 +148,6 @@ abstract class ContentfulMapper
                         }
                     }
                 }
-            } else {
-                // No relationship
             }
         }
 
@@ -187,7 +185,7 @@ abstract class ContentfulMapper
      */
     private function isLink($localeField): bool
     {
-        return isset($localeField['sys']) and isset($localeField['sys']['type']) and ($localeField['sys']['type'] === 'Link');
+        return isset($localeField['sys']) && isset($localeField['sys']['type']) && ($localeField['sys']['type'] === 'Link');
     }
 
     /**
@@ -212,7 +210,7 @@ abstract class ContentfulMapper
                     'content_type' => 'single_entry',
                 ]);
 
-                if (!empty($entry) and !empty($entry['sys']['contentType']) and !empty($entry['sys']['contentType']['sys'])) {
+                if (!empty($entry) && !empty($entry['sys']['contentType']) && !empty($entry['sys']['contentType']['sys'])) {
                     $this->upsertEntryType($entry, $entry['sys']['contentType']['sys']['id']);
 
                     return $entry['sys']['contentType']['sys']['id'];
@@ -239,7 +237,7 @@ abstract class ContentfulMapper
     {
         $locales = [];
 
-        if (isset($entry['fields']) and !empty($entry['fields'])) {
+        if (isset($entry['fields']) && !empty($entry['fields'])) {
             $firstField = array_first($entry['fields']);
             $locales = array_keys($firstField);
         }

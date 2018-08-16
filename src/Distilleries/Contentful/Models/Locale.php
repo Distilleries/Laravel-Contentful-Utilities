@@ -131,7 +131,7 @@ class Locale extends Model
                 ->where('code', '=', $code)
                 ->first();
 
-            $fallback = (! empty($locale) and ! empty($locale->fallback_code)) ? $locale->fallback_code : '';
+            $fallback = (! empty($locale) && ! empty($locale->fallback_code)) ? $locale->fallback_code : '';
 
             Cache::put('locale_fallback_' . $code, $fallback, 5);
         }
@@ -229,7 +229,7 @@ class Locale extends Model
         if (! empty($languages)) {
             preg_match_all('/(\W|^)([a-z]{2})([^a-z]|$)/six', $languages, $locales, PREG_PATTERN_ORDER);
 
-            if (! empty($locales) and ! empty($locales[2])) {
+            if (! empty($locales) && ! empty($locales[2])) {
                 return $locales[2];
             }
         }

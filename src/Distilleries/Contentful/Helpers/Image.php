@@ -58,7 +58,7 @@ class Image
 
         $searchHosts = config('contentful.image.search_hosts');
         $replaceHost = config('contentful.image.replace_host');
-        if (! empty($searchHosts) and ! empty($replaceHost)) {
+        if (! empty($searchHosts) && ! empty($replaceHost)) {
             $url = str_replace(explode(',', $searchHosts), $replaceHost, $url);
         }
 
@@ -78,7 +78,7 @@ class Image
 
         if (empty($format)) {
             $browser = mb_strtolower($agent->browser());
-            if (($browser === 'chrome') and ! $agent->isMobile()) {
+            if (($browser === 'chrome') && ! $agent->isMobile()) {
                 $format = config('contentful.image.use_webp') ? 'webp' : null;
             }
         }

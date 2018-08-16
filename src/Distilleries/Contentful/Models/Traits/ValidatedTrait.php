@@ -6,6 +6,9 @@ use Distilleries\Contentful\Models\Scopes\ValidatedScope;
 
 trait ValidatedTrait
 {
+
+    abstract public function withoutGlobalScope($scope);
+
     /**
      * Boot the validated scope for a model.
      *

@@ -59,7 +59,7 @@ class AssetsRepository
     {
         $locales = [];
 
-        if (isset($asset['fields']) and ! empty($asset['fields'])) {
+        if (isset($asset['fields']) && ! empty($asset['fields'])) {
             $firstField = array_first($asset['fields']);
             $locales = array_keys($firstField);
         }
@@ -140,9 +140,9 @@ class AssetsRepository
             'url' => isset($file['url']) ? $file['url'] : '',
             'file_name' => isset($file['fileName']) ? $file['fileName'] : '',
             'content_type' => isset($file['contentType']) ? $file['contentType'] : '',
-            'size' => (isset($file['details']) and isset($file['details']['size'])) ? intval($file['details']['size']): 0,
-            'width' => (isset($file['details']) and isset($file['details']['image']) and isset($file['details']['image']['width'])) ? intval($file['details']['image']['width']): 0,
-            'height' => (isset($file['details']) and isset($file['details']['image']) and isset($file['details']['image']['height'])) ? intval($file['details']['image']['height']): 0,
+            'size' => (isset($file['details']) && isset($file['details']['size'])) ? intval($file['details']['size']): 0,
+            'width' => (isset($file['details']) && isset($file['details']['image']) && isset($file['details']['image']['width'])) ? intval($file['details']['image']['width']): 0,
+            'height' => (isset($file['details']) && isset($file['details']['image']) && isset($file['details']['image']['height'])) ? intval($file['details']['image']['height']): 0,
         ];
     }
 }

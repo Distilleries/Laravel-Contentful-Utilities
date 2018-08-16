@@ -161,7 +161,7 @@ class Caster
      */
     public static function entryId(array $entry, $default = null): ?string
     {
-        return (isset($entry['sys']) and isset($entry['sys']['id'])) ? $entry['sys']['id'] : $default;
+        return (isset($entry['sys']) && isset($entry['sys']['id'])) ? $entry['sys']['id'] : $default;
     }
 
     /**

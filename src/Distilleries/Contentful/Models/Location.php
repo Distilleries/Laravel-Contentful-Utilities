@@ -19,7 +19,6 @@ class Location
 
     /**
      * @param  array $attributes
-     * @return void
      */
     public function __construct(array $attributes = [])
     {

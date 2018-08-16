@@ -51,7 +51,6 @@ class SyncFlatten extends Command
     /**
      * MapEntries command constructor.
      *
-     * @return void
      */
     public function __construct()
     {
@@ -183,6 +182,7 @@ class SyncFlatten extends Command
                         ->update(['release_id' => $release->getKey()]);
                 });
             } catch (Exception $e) {
+                $items = collect();
             }
 
             $items->each(function ($item, $key) use ($locales, $bar) {

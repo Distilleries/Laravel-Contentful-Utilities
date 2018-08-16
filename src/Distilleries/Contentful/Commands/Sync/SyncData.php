@@ -33,7 +33,6 @@ class SyncData extends Command
      * SyncData command constructor.
      *
      * @param  \Distilleries\Contentful\Api\SyncApi  $api
-     * @return void
      */
     public function __construct(SyncApi $api)
     {

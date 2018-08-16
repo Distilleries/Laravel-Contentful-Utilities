@@ -17,7 +17,6 @@ class EntryHandler
     /**
      * EntryHandler constructor.
      *
-     * @return void
      */
     public function __construct()
     {
@@ -38,7 +37,7 @@ class EntryHandler
         $actionMethods = ['create', 'archive', 'unarchive', 'publish', 'unpublish', 'delete'];
         $actionMethods = ! empty($isPreview) ? array_merge($actionMethods, ['save', 'auto_save']): $actionMethods;
 
-        if (method_exists($this, $action) and in_array($action, $actionMethods)) {
+        if (method_exists($this, $action) && in_array($action, $actionMethods)) {
             $this->$action($payload);
         }
     }
@@ -157,7 +156,9 @@ class EntryHandler
 
     private function upsertEntry($payload)
     {
-        $this->entries->toContentfulModel($payload,Locale::all());
+        $locales = Locale::all();
+        $locales = is_array($locales) ? collect($locales) : $locales;
+        $this->entries->toContentfulModel($payload,$locales);
     }
 
     /**

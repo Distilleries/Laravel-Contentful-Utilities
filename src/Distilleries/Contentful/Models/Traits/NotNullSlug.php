@@ -6,6 +6,8 @@ use Distilleries\Contentful\Models\Scopes\NotNullSlugScope;
 
 trait NotNullSlug
 {
+    abstract public function withoutGlobalScope($scope);
+
     /**
      * Boot the not-null-slug scope for a model.
      *
