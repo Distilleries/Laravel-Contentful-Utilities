@@ -56,20 +56,20 @@ class Locale extends Model
      */
     public static function default(): string
     {
-        $locale_default = Cache::get('locale_default');
+        $default = Cache::get('locale_default');
 
-        if ($locale_default === null) {
-            $locale_default = static::select('locale')
+        if ($default === null) {
+            $default = static::select('locale')
                 ->where('is_default', '=', true)
                 ->first();
 
-            $locale_default = !empty($locale_default) ? $locale_default->locale : config('contentful.default_locale');
+            $default = !empty($default) ? $default->locale : config('contentful.default_locale');
 
             // Cache is cleaned in Console\Commands\SyncLocales (run at least daily)
-            Cache::forever('locale_default', $locale_default);
+            Cache::forever('locale_default', $default);
         }
 
-        return $locale_default;
+        return $default;
     }
 
     /**
