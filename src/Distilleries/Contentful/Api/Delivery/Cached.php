@@ -52,7 +52,7 @@ class Cached extends Live implements DeliveryApi
      */
     private function handleResponse(ResponseInterface $response, string $keyCache): array
     {
-        if (($response->getStatusCode() >= 300) or ($response->getStatusCode() <= 100)) {
+        if (($response->getStatusCode() >= 300) || ($response->getStatusCode() <= 100)) {
             $data = Cache::get($keyCache);
         } else {
             $data = $this->decodeResponse($response);

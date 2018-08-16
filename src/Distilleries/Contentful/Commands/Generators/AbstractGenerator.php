@@ -20,7 +20,6 @@ abstract class AbstractGenerator extends Command
      * Create a new command instance.
      *
      * @param  \Distilleries\Contentful\Api\ManagementApi  $api
-     * @return void
      */
     public function __construct(Api $api)
     {
@@ -136,6 +135,6 @@ abstract class AbstractGenerator extends Command
      */
     protected function isFieldEnabled($field): bool
     {
-        return ! $field['disabled'] and ! $field['omitted'];
+        return ! $field['disabled'] && ! $field['omitted'];
     }
 }

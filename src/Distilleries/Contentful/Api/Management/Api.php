@@ -84,7 +84,7 @@ class Api extends BaseApi implements ManagementApi
 
         $results = $this->decodeResponse($response);
 
-        return (isset($results['items']) and isset($results['items'][0]) and !empty($results['items'][0])) ? $results['items'][0] : null;
+        return (isset($results['items']) && isset($results['items'][0]) and !empty($results['items'][0])) ? $results['items'][0] : null;
     }
 
     /**

@@ -90,10 +90,10 @@ class Api extends BaseApi implements SyncApi
     {
         $this->syncToken = '';
 
-        if (isset($response['nextPageUrl']) and ! empty($response['nextPageUrl'])) {
+        if (isset($response['nextPageUrl']) && ! empty($response['nextPageUrl'])) {
             $data = parse_url($response['nextPageUrl']);
 
-            if (isset($data['query']) and ! empty($data['query'])) {
+            if (isset($data['query']) && ! empty($data['query'])) {
                 parse_str($data['query'], $params);
 
                 if (isset($params['sync_token'])) {
