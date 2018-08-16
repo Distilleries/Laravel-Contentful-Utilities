@@ -171,7 +171,7 @@ class EntriesRepository
 
         $order = 1;
         foreach ($relationships as $relationship) {
-            if (!isset($relationship['id']) or !isset($relationship['type'])) {
+            if (!isset($relationship['id']) || !isset($relationship['type'])) {
                 throw new Exception('Relationships malformed! (' . print_r($relationship, true) . ')');
             }
 
