@@ -53,7 +53,7 @@ class EntryHandler
      * @return void
      * @throws \Exception
      */
-    private function auto_save($payload)
+    protected function auto_save($payload)
     {
         $this->upsertEntry($payload);
     }
@@ -65,7 +65,7 @@ class EntryHandler
      * @return void
      * @throws \Exception
      */
-    private function save($payload)
+    protected function save($payload)
     {
         $this->upsertEntry($payload);
     }
@@ -77,7 +77,7 @@ class EntryHandler
      * @return void
      * @throws \Exception
      */
-    private function create($payload)
+    protected function create($payload)
     {
         $this->upsertEntry($payload);
     }
@@ -89,7 +89,7 @@ class EntryHandler
      * @return void
      * @throws \Exception
      */
-    private function archive($payload)
+    protected function archive($payload)
     {
         $this->deleteEntry($payload);
     }
@@ -101,7 +101,7 @@ class EntryHandler
      * @return void
      * @throws \Exception
      */
-    private function unarchive($payload)
+    protected function unarchive($payload)
     {
         $this->upsertEntry($payload);
     }
@@ -113,7 +113,7 @@ class EntryHandler
      * @return void
      * @throws \Exception
      */
-    private function publish($payload)
+    protected function publish($payload)
     {
         $this->upsertEntry($payload);
     }
@@ -125,7 +125,7 @@ class EntryHandler
      * @return void
      * @throws \Exception
      */
-    private function unpublish($payload)
+    protected function unpublish($payload)
     {
         $this->deleteEntry($payload);
     }
@@ -137,7 +137,7 @@ class EntryHandler
      * @return void
      * @throws \Exception
      */
-    private function delete($payload)
+    protected function delete($payload)
     {
         $this->deleteEntry($payload);
     }
@@ -154,7 +154,7 @@ class EntryHandler
      * @throws \Exception
      */
 
-    private function upsertEntry($payload)
+    protected function upsertEntry($payload)
     {
         $locales = Locale::all();
         $locales = is_array($locales) ? collect($locales) : $locales;
@@ -168,7 +168,7 @@ class EntryHandler
      * @return void
      * @throws \Exception
      */
-    private function deleteEntry($payload)
+    protected function deleteEntry($payload)
     {
         $this->entries->delete($payload);
     }
