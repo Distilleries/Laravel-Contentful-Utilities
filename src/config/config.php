@@ -12,9 +12,9 @@ return [
     'locales_not_flatten' => env('CONTENTFUL_LOCALES_NOT_FLATTEN', 'www_default'),
 
     'namespace' => [
-        'model' => env('MODEL_BASE_NAMESPACE', 'App\Models'),
-        'transformer' => env('TRANSFORMER_BASE_NAMESPACE', 'App\Models\Transformers'),
-        'mapper' => env('MAPPER_BASE_NAMESPACE', 'App\Models\Mappers'),
+        'model' =>[env('MODEL_BASE_NAMESPACE', 'App\Models')],
+        'transformer' =>[env('TRANSFORMER_BASE_NAMESPACE', 'App\Models\Transformers')],
+        'mapper' => [env('MAPPER_BASE_NAMESPACE', 'App\Models\Mappers')],
     ],
 
     'generator' => [

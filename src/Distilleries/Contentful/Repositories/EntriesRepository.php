@@ -2,6 +2,7 @@
 
 namespace Distilleries\Contentful\Repositories;
 
+use Distilleries\Contentful\Helpers\NamespaceResolver;
 use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -22,17 +23,15 @@ class EntriesRepository
     public function truncateRelatedTables()
     {
         $modelPath = config('contentful.generator.model');
-        $namespace = config('contentful.namespace.model');
 
         foreach (glob($modelPath . '/*.php') as $file) {
-            $modelClass = $namespace . str_replace(
-                    [$modelPath, '.php', '/'],
-                    ['', '', '\\'],
-                    $file
-                );
+            $modelInstance = NamespaceResolver::model(str_replace(
+                [$modelPath, '.php', '/'],
+                ['', '', '\\'],
+                $file
+            ));
 
-            $modelInstance = new $modelClass;
-            if ($modelInstance instanceof ContentfulModel) {
+            if (!empty($modelInstance) && $modelInstance instanceof ContentfulModel) {
                 $modelInstance->query()->truncate();
             }
         }
@@ -111,11 +110,11 @@ class EntriesRepository
      */
     private function entryMapper(array $entry): ContentfulMapper
     {
-        $mapperNamespace = config('contentful.namespace.mapper');
-        $mapperClass = $mapperNamespace . '\\' . studly_case($this->entryContentType($entry)) . 'Mapper';
+        $class = studly_case($this->entryContentType($entry)) . 'Mapper';
+        $mapperClass = NamespaceResolver::mapper($class);
 
         if (!class_exists($mapperClass)) {
-            throw new Exception('Unknown mapper: ' . $mapperClass);
+            throw new Exception('Unknown mapper: ' . $class);
         }
 
         return new $mapperClass;
@@ -130,11 +129,11 @@ class EntriesRepository
      */
     private function entryModel(array $entry): ContentfulModel
     {
-        $namespace = config('contentful.namespace.model');
-        $modelClass = $namespace . '\\' . studly_case($this->entryContentType($entry));
+        $model = studly_case($this->entryContentType($entry));
+        $modelClass = NamespaceResolver::modelClass($model);
 
-        if (!class_exists($modelClass)) {
-            throw new Exception('Unknown model: ' . $modelClass);
+        if (empty($modelClass)) {
+            throw new Exception('Unknown model: ' . $model);
         }
 
         return new $modelClass;

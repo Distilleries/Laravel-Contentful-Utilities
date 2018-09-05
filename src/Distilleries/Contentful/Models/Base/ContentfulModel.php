@@ -2,6 +2,7 @@
 
 namespace Distilleries\Contentful\Models\Base;
 
+use Distilleries\Contentful\Helpers\NamespaceResolver;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Distilleries\Contentful\Models\Asset;
@@ -245,20 +246,22 @@ abstract class ContentfulModel extends Model
                 if ($relationship->related_contentful_type === 'asset') {
                     $model = new Asset;
                 } else {
-                    $modelClass = config('contentful.namespace.model') . '\\' . studly_case($relationship->related_contentful_type);
-                    $model = new $modelClass;
+                    $model = NamespaceResolver::model($relationship->related_contentful_type);
                 }
 
-                $instance = $model->query()
-                    ->where('country', '=', $this->country)
-                    ->where('locale', '=', $this->locale)
-                    ->where('contentful_id', '=', $relationship->related_contentful_id);
+                if (!empty($model)) {
+                    $instance = $model->query()
+                        ->where('country', '=', $this->country)
+                        ->where('locale', '=', $this->locale)
+                        ->where('contentful_id', '=', $relationship->related_contentful_id);
 
-                if (!empty($query)) {
-                    $instance = call_user_func($query, $instance);
+                    if (!empty($query)) {
+                        $instance = call_user_func($query, $instance);
+                    }
+
+                    $instance = $instance->first();
+
                 }
-
-                $instance = $instance->first();
 
                 if (!empty($instance)) {
                     $entries[] = $instance;
@@ -293,15 +296,13 @@ abstract class ContentfulModel extends Model
             if ($relationship->source_contentful_type === 'asset') {
                 $model = new Asset;
             } else {
-                $modelClass = rtrim(config('contentful.namespace.model'),
-                        '\\') . '\\' . studly_case($relationship->source_contentful_type);
-                $model = new $modelClass;
+                $model = NamespaceResolver::model($relationship->related_contentful_type);
             }
 
-            $instance = $model->query()
+            $instance = !empty($model) ? $model->query()
                 ->locale($this->locale, $this->country)
                 ->where('contentful_id', '=', $relationship->source_contentful_id)
-                ->first();
+                ->first() : null;
 
             if (!empty($instance)) {
                 $entries[] = $instance;
