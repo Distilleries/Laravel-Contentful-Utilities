@@ -10,6 +10,7 @@ namespace Distilleries\Contentful\Helpers;
 
 
 use Distilleries\Contentful\Models\Base\ContentfulMapper;
+use Distilleries\Contentful\Models\Base\ContentfulModel;
 
 class NamespaceResolver
 {
