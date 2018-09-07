@@ -32,7 +32,6 @@ class NamespaceResolver
     }
 
 
-
     public static function mapperClass(string $mapper): ?string
     {
         return self::load('contentful.namespace.mapper', $mapper);
@@ -54,7 +53,7 @@ class NamespaceResolver
     {
         foreach (config($key, []) as $namespace) {
             $modelClass = rtrim($namespace,
-                    '\\') . '\\' . studly_case($element);
+                    '\\') . '\\' . ltrim(studly_case($element), '\\');
 
             if (class_exists($modelClass)) {
                 return $modelClass;

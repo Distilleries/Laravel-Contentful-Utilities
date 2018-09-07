@@ -113,7 +113,7 @@ class EntriesRepository
         $class = studly_case($this->entryContentType($entry)) . 'Mapper';
         $mapperClass = NamespaceResolver::mapper($class);
 
-        if (!class_exists($mapperClass)) {
+        if (empty($mapperClass) && !($mapperClass instanceof ContentfulMapper)) {
             throw new Exception('Unknown mapper: ' . $class);
         }
 
