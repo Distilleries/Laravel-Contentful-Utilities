@@ -25,7 +25,8 @@ class NamespaceResolver
         $class = self::modelClass($model);
 
         if (!empty($class)) {
-            return new $class;
+            $model = new $class;
+            return $model instanceof ContentfulModel?$model:null;
         }
 
         return null;
