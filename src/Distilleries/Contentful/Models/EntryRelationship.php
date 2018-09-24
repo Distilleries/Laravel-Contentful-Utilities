@@ -52,6 +52,7 @@ class EntryRelationship extends ContentfulModel
         'locale',
         'country',
         'order',
+        'relation_type',
     ];
 
     /**
