@@ -133,7 +133,7 @@ abstract class ContentfulMapper
             if (is_array($value)) {
                 if ($this->isLink($value)) {
                     try {
-                        $relationships[] = $this->relationshipSignature($value);
+                        $relationships[] = $this->relationshipSignature($value,$field);
                     } catch (Exception $e) {
                         //
                     }
@@ -141,7 +141,7 @@ abstract class ContentfulMapper
                     foreach ($value as $entry) {
                         if ($this->isLink($entry)) {
                             try {
-                                $relationships[] = $this->relationshipSignature($entry);
+                                $relationships[] = $this->relationshipSignature($entry,$field);
                             } catch (Exception $e) {
                                 //
                             }
@@ -161,15 +161,20 @@ abstract class ContentfulMapper
      * @return array|null
      * @throws \Exception
      */
-    private function relationshipSignature($localeField): ?array
+    private function relationshipSignature(array $localeField,string $field=''): ?array
     {
         if ($localeField['sys']['linkType'] === 'Asset') {
-            return ['id' => $localeField['sys']['id'], 'type' => 'asset'];
+            return [
+                'id' => $localeField['sys']['id'],
+                'type' => 'asset',
+                'field' => $field,
+            ];
         } else {
             if ($localeField['sys']['linkType'] === 'Entry') {
                 return [
                     'id' => $localeField['sys']['id'],
-                    'type' => $this->contentTypeFromEntryTypes($localeField['sys']['id'])
+                    'type' => $this->contentTypeFromEntryTypes($localeField['sys']['id']),
+                    'field' => $field,
                 ];
             }
         }

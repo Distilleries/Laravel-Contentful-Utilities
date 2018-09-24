@@ -182,6 +182,7 @@ class EntriesRepository
                 'related_contentful_id' => $relationship['id'],
                 'related_contentful_type' => $relationship['type'],
                 'order' => $order,
+                'relation' => isset($relationship['field']) ? $relationship['field'] : null,
             ]);
 
             $order++;

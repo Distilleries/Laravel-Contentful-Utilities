@@ -161,7 +161,7 @@ abstract class ContentfulModel extends Model
     protected function getAndSetPayloadContentfulEntries(string $payload, array $links, $query = null): Collection
     {
         if (!isset($this->attributes[$payload]) && isset($this->payload[$payload])) {
-            $this->attributes[$payload] = $this->contentfulEntries($links, $query);
+            $this->attributes[$payload] = $this->contentfulEntries($links, $query, $payload);
             return $this->attributes[$payload];
         } else {
             if (isset($this->attributes[$payload])) {
@@ -183,7 +183,7 @@ abstract class ContentfulModel extends Model
     protected function getAndSetPayloadContentfulEntry(string $payload, array $links, $query = null): ?ContentfulModel
     {
         if (!isset($this->attributes[$payload]) && isset($this->payload[$payload])) {
-            $this->attributes[$payload] = $this->contentfulEntry($links, $query);
+            $this->attributes[$payload] = $this->contentfulEntry($links, $query, $payload);
             return $this->attributes[$payload];
         } else {
             if (isset($this->attributes[$payload])) {
@@ -199,9 +199,10 @@ abstract class ContentfulModel extends Model
      *
      * @param  array|string|null $link
      * @param  mixed $query
+     * @param  mixed $field
      * @return \Distilleries\Contentful\Models\Base\ContentfulModel|null
      */
-    protected function contentfulEntry($link, $query = null): ?ContentfulModel
+    protected function contentfulEntry($link, $query = null, $field = null): ?ContentfulModel
     {
         $entryId = $this->contentfulLinkId($link);
 
@@ -209,7 +210,7 @@ abstract class ContentfulModel extends Model
             return null;
         }
 
-        $entries = $this->contentfulEntries([$entryId], $query);
+        $entries = $this->contentfulEntries([$entryId], $query, $field);
 
         return $entries->isNotEmpty() ? $entries->first() : null;
     }
@@ -219,9 +220,10 @@ abstract class ContentfulModel extends Model
      *
      * @param  array $links
      * @param  mixed $query
+     * @param  mixed $field
      * @return \Illuminate\Support\Collection
      */
-    protected function contentfulEntries(array $links, $query = null): Collection
+    protected function contentfulEntries(array $links, $query = null, $field = null): Collection
     {
         $entries = [];
 
@@ -239,7 +241,7 @@ abstract class ContentfulModel extends Model
                 ->locale($this->locale, $this->country)
                 ->where('source_contentful_id', '=', $this->contentful_id)
                 ->whereIn('related_contentful_id', $entryIds)
-                ->where('related_contentful_type', $link)
+                ->where('relation', $field)
                 ->orderBy('order', 'asc')
                 ->get();
 
