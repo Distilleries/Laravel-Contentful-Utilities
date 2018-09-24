@@ -239,7 +239,7 @@ abstract class ContentfulModel extends Model
                 ->locale($this->locale, $this->country)
                 ->where('source_contentful_id', '=', $this->contentful_id)
                 ->whereIn('related_contentful_id', $entryIds)
-                ->where('relation_type', $link)
+                ->where('related_contentful_type', $link)
                 ->orderBy('order', 'asc')
                 ->get();
 
