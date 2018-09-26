@@ -158,7 +158,8 @@ class Locale extends Model
      */
     protected static function _getLocalesDisabled(): array
     {
-        $locales = config('contentful.locales_not_flatten', '');
+
+        $locales =config('contentful.use_preview')?config('contentful.locales_not_flatten_preview', ''):config('contentful.locales_not_flatten', '');
 
         return explode(',', $locales);
     }

@@ -10,6 +10,7 @@ return [
     'default_locale' => env('CONTENTFUL_DEFAULT_LOCALE', 'fr'),
     'default_country' => env('CONTENTFUL_DEFAULT_COUNTRY', 'www'),
     'locales_not_flatten' => env('CONTENTFUL_LOCALES_NOT_FLATTEN', 'www_default'),
+    'locales_not_flatten_preview' => env('CONTENTFUL_LOCALES_NOT_FLATTEN_PREVIEW', 'www_default'),
 
     'namespace' => [
         'model' =>[env('MODEL_BASE_NAMESPACE', 'App\Models')],
