@@ -64,7 +64,7 @@ class SyncLocales extends Command
      * @param  array  $locales
      * @return void
      */
-    private function resetLocales(array $locales)
+    protected function resetLocales(array $locales)
     {
         if (! empty($locales)) {
             Cache::forget('locale_default');
@@ -82,7 +82,7 @@ class SyncLocales extends Command
      * @param  array  $locale
      * @return void
      */
-    private function createLocale(array $locale)
+    protected function createLocale(array $locale)
     {
         Locale::query()->create([
             'label' => $locale['name'],
