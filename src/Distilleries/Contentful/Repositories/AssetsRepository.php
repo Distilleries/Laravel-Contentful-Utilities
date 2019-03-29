@@ -76,15 +76,18 @@ class AssetsRepository
      */
     private function upsertAsset(array $asset, string $locale): ?Asset
     {
-        if (!Locale::canBeSave(Locale::getCountry($locale), Locale::getLocale($locale))) {
+        $country = Locale::getCountry($locale);
+        $iso = Locale::getLocale($locale);
+
+        if (!Locale::canBeSave($country, $iso)) {
             return null;
         }
 
         $data = $this->mapAsset($asset, $locale);
         $instance = Asset::query()
             ->where('contentful_id', '=', $asset['sys']['id'])
-            ->where('locale', '=', Locale::getLocale($locale))
-            ->where('country', '=', Locale::getCountry($locale))
+            ->where('locale', '=', $iso)
+            ->where('country', '=', $country)
             ->first();
 
         if (empty($instance)) {
@@ -92,14 +95,14 @@ class AssetsRepository
         } else {
             Asset::query()
                 ->where('contentful_id', '=', $asset['sys']['id'])
-                ->where('locale', '=', Locale::getLocale($locale))
-                ->where('country', '=', Locale::getCountry($locale))
+                ->where('locale', '=', $iso)
+                ->where('country', '=', $country)
                 ->update($data);
 
             $instance = Asset::query()
                 ->where('contentful_id', '=', $asset['sys']['id'])
-                ->where('locale', '=', Locale::getLocale($locale))
-                ->where('country', '=', Locale::getCountry($locale))
+                ->where('locale', '=', $iso)
+                ->where('country', '=', $country)
                 ->first();
         }
 
@@ -132,12 +135,14 @@ class AssetsRepository
     private function fieldsWithFallback(array $fields, string $locale): array
     {
         $fallbackLocale = Locale::fallback($locale);
-        $file = $this->getFieldValue($fields, 'file', $locale, $fallbackLocale,[]);
+        $secondFallback = Locale::fallback($fallbackLocale);
+        $file = $this->getFieldValue($fields, 'file', $locale, $fallbackLocale, [], $secondFallback);
         $details = isset($file['details']) ? $file['details'] : [];
 
         return [
-            'title' => $this->getFieldValue($fields, 'title', $locale, $fallbackLocale,''),
-            'description' => $this->getFieldValue($fields, 'description', $locale, $fallbackLocale,''),
+            'title' => $this->getFieldValue($fields, 'title', $locale, $fallbackLocale, '', $secondFallback),
+            'description' => $this->getFieldValue($fields, 'description', $locale, $fallbackLocale, '',
+                $secondFallback),
             'url' => isset($file['url']) ? $file['url'] : '',
             'file_name' => isset($file['fileName']) ? $file['fileName'] : '',
             'content_type' => isset($file['contentType']) ? $file['contentType'] : '',
@@ -152,10 +157,14 @@ class AssetsRepository
         string $field,
         string $locale,
         string $fallbackLocale,
-        $default
+        $default,
+        string $secondFallback = null
     ) {
+
         return !empty($fields[$field][$locale]) ?
-            $fields[$field][$locale] : (!empty($fields[$field][$fallbackLocale]) ?
-                $fields[$field][$fallbackLocale] : $default);
+            $fields[$field][$locale] :
+            (!empty($fields[$field][$fallbackLocale]) ? $fields[$field][$fallbackLocale] :
+                (!empty($secondFallback) && !empty($fields[$field][$secondFallback]) ? $fields[$field][$secondFallback] : $default)
+            );
     }
 }

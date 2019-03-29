@@ -85,15 +85,24 @@ abstract class ContentfulMapper
         $dontFallback = config('contentful.payload_fields_not_fallback', []);
 
         $fallbackLocale = Locale::fallback($locale);
+        $fallbackSecondLevel = !empty($fallbackLocale) ? Locale::fallback($fallbackLocale) : null;
+
         foreach ($entry['fields'] as $field => $localesData) {
             if (isset($localesData[$locale])) {
                 $payload[$field] = $localesData[$locale];
             } else {
-                if (!in_array($field,
-                        $dontFallback) && isset($localesData[$fallbackLocale]) && ($this->levelFallBack($field) === 'all')) {
+                if (!in_array($field, $dontFallback)
+                    && isset($localesData[$fallbackLocale])
+                    && ($this->levelFallBack($field) === 'all')) {
                     $payload[$field] = $localesData[$fallbackLocale];
                 } else {
-                    $payload[$field] = null;
+                    if (!empty($fallbackSecondLevel) && !in_array($field, $dontFallback)
+                        && isset($localesData[$fallbackSecondLevel])
+                        && ($this->levelFallBack($field) === 'all')) {
+                        $payload[$field] = $localesData[$fallbackSecondLevel];
+                    } else {
+                        $payload[$field] = null;
+                    }
                 }
             }
         }

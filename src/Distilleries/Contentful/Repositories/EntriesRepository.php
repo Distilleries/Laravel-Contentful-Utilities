@@ -59,7 +59,7 @@ class EntriesRepository
 
             if (!empty($model)) {
                 if (isset($localeEntry['relationships'])) {
-                    $this->handleRelationships($localeEntry['locale'], $localeEntry['contentful_id'],
+                    $this->handleRelationships($localeEntry['locale'],$localeEntry['country'], $localeEntry['contentful_id'],
                         $this->entryContentType($entry), $localeEntry['relationships']);
                     unset($localeEntry['relationships']);
                 }
@@ -147,6 +147,7 @@ class EntriesRepository
      * Handle mapped relationships to fill `entry_relationships` pivot table.
      *
      * @param  string $locale
+     * @param  string $country
      * @param  string $sourceId
      * @param  string $sourceType
      * @param  array $relationships
@@ -155,15 +156,14 @@ class EntriesRepository
      */
     private function handleRelationships(
         string $locale,
+        string $country,
         string $sourceId,
         string $sourceType,
         array $relationships = []
     ) {
-        $country = Locale::getCountry($locale);
-        $iso = Locale::getLocale($locale);
 
         DB::table('entry_relationships')
-            ->where('locale', '=', $iso)
+            ->where('locale', '=', $locale)
             ->where('country', '=', $country)
             ->where('source_contentful_id', '=', $sourceId)
             ->delete();
@@ -175,7 +175,7 @@ class EntriesRepository
             }
 
             DB::table('entry_relationships')->insert([
-                'locale' => $iso,
+                'locale' => $locale,
                 'country' => $country,
                 'source_contentful_id' => $sourceId,
                 'source_contentful_type' => $sourceType,
