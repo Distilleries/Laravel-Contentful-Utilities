@@ -17,11 +17,6 @@ abstract class ContentfulTestCase extends TestCase
         return $service;
     }
 
-    public function setUp()
-    {
-        parent::setUp();
-    }
-
     protected function getEnvironmentSetUp($app)
     {
         $app['config']->set('database.default', 'testbench');
@@ -44,7 +39,7 @@ abstract class ContentfulTestCase extends TestCase
         return [];
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 
