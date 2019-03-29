@@ -185,14 +185,14 @@ class Locale extends Model
         if (Str::contains($code, '_')) {
             $tab = explode('_', $code);
 
-            return $tab[0];
+            return Str::lower($tab[0]);
         } else if (Str::contains($code, '-')) {
             $tab = explode('-', $code);
 
-            return $tab[0];
+            return Str::lower($tab[0]);
         }
 
-        return $code;
+        return Str::lower($code);
     }
 
     /**
@@ -206,11 +206,11 @@ class Locale extends Model
         if (Str::contains($code, '_')) {
             $tab = explode('_', $code);
 
-            return $tab[1];
+            return Str::lower($tab[1]);
         } else if (Str::contains($code, '-')) {
             $tab = explode('-', $code);
 
-            return $tab[1];
+            return Str::lower($tab[1]);
         }
 
         return config('contentful.default_country');

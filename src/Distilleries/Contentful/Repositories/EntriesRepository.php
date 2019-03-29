@@ -281,6 +281,7 @@ class EntriesRepository
         return $model
             ->withoutGlobalScopes()
             ->where('contentful_id', '=', $data['contentful_id'])
-            ->where('locale', '=', $data['locale']);
+            ->where('locale', '=', $data['locale'])
+            ->where('country', '=', $data['country']);
     }
 }
