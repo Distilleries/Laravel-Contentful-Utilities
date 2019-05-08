@@ -4,7 +4,6 @@ namespace Distilleries\Contentful\Helpers;
 
 use Distilleries\Contentful\Models\Location;
 use Illuminate\Support\Collection;
-use Parsedown;
 use Illuminate\Support\Carbon;
 
 class Caster
