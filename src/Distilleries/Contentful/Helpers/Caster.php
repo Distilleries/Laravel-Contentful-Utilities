@@ -123,7 +123,7 @@ class Caster
      */
     public static function float($float, $default = null): ?float
     {
-        return is_float($float) ? (float) $float : $default;
+        return is_numeric($float) ? (float) $float : $default;
     }
 
 
