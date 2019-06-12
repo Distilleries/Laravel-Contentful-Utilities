@@ -14,8 +14,7 @@ class AddRelationFromEntryRelationshipsTable extends Migration
     public function up()
     {
         Schema::table('entry_relationships', function (Blueprint $table) {
-            $table->string('relation')
-                ->nullable();
+            $table->string('relation')->nullable();
         });
     }
 

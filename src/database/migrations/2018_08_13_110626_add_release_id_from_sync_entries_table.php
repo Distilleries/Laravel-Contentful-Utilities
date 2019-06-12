@@ -14,9 +14,7 @@ class AddReleaseIdFromSyncEntriesTable extends Migration
     public function up()
     {
         Schema::table('sync_entries', function (Blueprint $table) {
-            $table->integer('release_id')
-                ->unsigned()
-                ->nullable();
+            $table->integer('release_id')->unsigned()->nullable();
         });
     }
 

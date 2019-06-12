@@ -1,5 +1,5 @@
-/vendor
-composer.phar
 .DS_Store
 .idea
+/vendor
 tests/report
+composer.phar
