@@ -3,6 +3,7 @@
 namespace Distilleries\Contentful\Commands\Generators\Definitions;
 
 use Exception;
+use Illuminate\Support\Str;
 
 class ArrayDefinition extends BaseDefinition
 {
@@ -23,7 +24,7 @@ class ArrayDefinition extends BaseDefinition
         }
 
         return self::getStub($stubPath, [
-            'field_camel' => studly_case($this->id()),
+            'field_camel' => Str::studly($this->id()),
             'field' => $this->id(),
         ]);
     }

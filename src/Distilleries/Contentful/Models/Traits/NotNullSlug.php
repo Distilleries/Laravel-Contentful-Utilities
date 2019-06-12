@@ -6,7 +6,6 @@ use Distilleries\Contentful\Models\Scopes\NotNullSlugScope;
 
 trait NotNullSlug
 {
-
     /**
      * Boot the not-null-slug scope for a model.
      *

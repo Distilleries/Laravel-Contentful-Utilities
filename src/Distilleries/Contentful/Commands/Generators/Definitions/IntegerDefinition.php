@@ -2,6 +2,8 @@
 
 namespace Distilleries\Contentful\Commands\Generators\Definitions;
 
+use Illuminate\Support\Str;
+
 class IntegerDefinition extends BaseDefinition
 {
     /**
@@ -12,7 +14,7 @@ class IntegerDefinition extends BaseDefinition
         $stubPath = __DIR__ . '/stubs/integer.stub';
 
         return self::getStub($stubPath, [
-            'field_camel' => studly_case($this->id()),
+            'field_camel' => Str::studly($this->id()),
             'field' => $this->id(),
         ]);
     }

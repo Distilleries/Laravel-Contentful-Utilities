@@ -2,6 +2,7 @@
 
 namespace Distilleries\Contentful\Commands\Generators;
 
+use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 
 class Migrations extends AbstractGenerator
@@ -53,7 +54,7 @@ class Migrations extends AbstractGenerator
         $destPath = database_path('migrations/' . Carbon::now()->format('Y_m_d_His') . '_create_' . $table . '_table.php');
 
         return static::writeStub($stubPath, $destPath, [
-            'class' => studly_case($table),
+            'class' => Str::studly($table),
             'table' => $table
         ]);
     }

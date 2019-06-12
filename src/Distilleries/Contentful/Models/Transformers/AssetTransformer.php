@@ -2,6 +2,7 @@
 
 namespace Distilleries\Contentful\Models\Transformers;
 
+use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Distilleries\Contentful\Models\Asset;
 use Distilleries\Contentful\Helpers\Image;
@@ -24,7 +25,7 @@ class AssetTransformer
      */
     public function transform(Asset $model, array $parameters = []): array
     {
-        if (starts_with($model->content_type, 'image/')) {
+        if (Str::startsWith($model->content_type, 'image/')) {
             $width = 0;
             if (isset($parameters['width'])) {
                 $width = (int) $parameters['width'];

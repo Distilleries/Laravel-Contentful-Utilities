@@ -2,6 +2,8 @@
 
 namespace Distilleries\Contentful\Commands\Generators\Definitions;
 
+use Illuminate\Support\Str;
+
 abstract class BaseDefinition implements DefinitionInterface
 {
     /**
@@ -21,8 +23,9 @@ abstract class BaseDefinition implements DefinitionInterface
     /**
      * BaseDefinition constructor.
      *
-     * @param  string $table
-     * @param  array $field
+     * @param  string  $table
+     * @param  array  $field
+     * @return void
      */
     public function __construct($table, $field)
     {
@@ -43,7 +46,7 @@ abstract class BaseDefinition implements DefinitionInterface
      */
     protected function id(): string
     {
-        return mb_strtolower(snake_case($this->field['id']));
+        return mb_strtolower(Str::snake($this->field['id']));
     }
 
     /**

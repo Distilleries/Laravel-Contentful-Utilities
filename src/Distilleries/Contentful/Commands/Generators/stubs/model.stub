@@ -5,9 +5,8 @@ namespace App\Models;
 use Illuminate\Support\Collection;
 use Distilleries\Contentful\Models\Asset;
 use Distilleries\Contentful\Helpers\Caster;
-use Distilleries\Contentful\Models\Base\ContentfulModel;
 use Distilleries\Contentful\Models\Location;
-
+use Distilleries\Contentful\Models\Base\ContentfulModel;
 
 /**
  * @property string $contentful_id

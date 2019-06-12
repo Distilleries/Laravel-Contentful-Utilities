@@ -2,6 +2,7 @@
 
 namespace Distilleries\Contentful\Commands\Generators;
 
+use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Distilleries\Contentful\Api\ManagementApi as Api;
@@ -20,6 +21,7 @@ abstract class AbstractGenerator extends Command
      * Create a new command instance.
      *
      * @param  \Distilleries\Contentful\Api\ManagementApi  $api
+     * @return void
      */
     public function __construct(Api $api)
     {
@@ -36,7 +38,7 @@ abstract class AbstractGenerator extends Command
      */
     protected function tableName($id)
     {
-        return DB::getTablePrefix() . str_plural(snake_case($id));
+        return DB::getTablePrefix() . Str::plural(Str::snake($id));
     }
 
     /**

@@ -6,14 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Release extends Model
 {
+    /**
+     * {@inheritdoc}
+     */
+    protected $table = 'releases';
 
     /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
+     * {@inheritdoc}
      */
     protected $fillable = [
         'current',
     ];
-
 }

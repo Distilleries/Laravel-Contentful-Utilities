@@ -2,6 +2,8 @@
 
 namespace Distilleries\Contentful\Commands\Generators\Definitions;
 
+use Illuminate\Support\Str;
+
 class TextDefinition extends SymbolDefinition
 {
     /**
@@ -12,7 +14,7 @@ class TextDefinition extends SymbolDefinition
         $stubPath = __DIR__ . '/stubs/string.stub';
 
         return self::getStub($stubPath, [
-            'field_camel' => studly_case($this->id()),
+            'field_camel' => Str::studly($this->id()),
             'field' => $this->id(),
         ]);
     }

@@ -6,7 +6,6 @@ use Distilleries\Contentful\Models\Scopes\ValidatedScope;
 
 trait ValidatedTrait
 {
-
     /**
      * Boot the validated scope for a model.
      *

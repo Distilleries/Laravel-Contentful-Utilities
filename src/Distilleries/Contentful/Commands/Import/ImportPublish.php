@@ -29,9 +29,10 @@ class ImportPublish extends Command
     protected $api;
 
     /**
-     * ContentfulPublish command constructor.
+     * ImportPublish command constructor.
      *
      * @param  \Distilleries\Contentful\Api\ManagementApi  $managementApi
+     * @return void
      */
     public function __construct(ManagementApi $managementApi)
     {

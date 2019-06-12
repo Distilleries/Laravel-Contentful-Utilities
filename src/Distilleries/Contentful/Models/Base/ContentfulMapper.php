@@ -3,6 +3,7 @@
 namespace Distilleries\Contentful\Models\Base;
 
 use Exception;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -18,8 +19,8 @@ abstract class ContentfulMapper
     /**
      * Map entry specific payload.
      *
-     * @param  array $entry
-     * @param  string $locale
+     * @param  array  $entry
+     * @param  string  $locale
      * @return array
      * @throws \Exception
      */
@@ -28,8 +29,8 @@ abstract class ContentfulMapper
     /**
      * Map entry with common data + specific payload for each locales.
      *
-     * @param  array $entry
-     * @param  \Illuminate\Support\Collection $locales
+     * @param  array  $entry
+     * @param  \Illuminate\Support\Collection  $locales
      * @return array
      * @throws \Exception
      */
@@ -50,14 +51,12 @@ abstract class ContentfulMapper
             $data['country'] = Locale::getCountry($locale->code);
             $data['locale'] = Locale::getLocale($locale->code);
 
-            if (!isset($data['payload'])) {
+            if (! isset($data['payload'])) {
                 $data['payload'] = $this->mapPayload($entry, $locale->code);
             }
-
-            if (!isset($data['relationships'])) {
+            if (! isset($data['relationships'])) {
                 $data['relationships'] = $this->mapRelationships($data['payload']);
             }
-
             if (isset($data['slug']) && Str::contains($data['slug'], 'untitled-')) {
                 $data['slug'] = null;
             }
@@ -75,8 +74,8 @@ abstract class ContentfulMapper
     /**
      * Return raw entry fields payload for given locale.
      *
-     * @param  array $entry
-     * @param  string $locale
+     * @param  array  $entry
+     * @param  string  $locale
      * @return array
      */
     protected function mapPayload(array $entry, string $locale): array
@@ -85,20 +84,16 @@ abstract class ContentfulMapper
         $dontFallback = config('contentful.payload_fields_not_fallback', []);
 
         $fallbackLocale = Locale::fallback($locale);
-        $fallbackSecondLevel = !empty($fallbackLocale) ? Locale::fallback($fallbackLocale) : null;
+        $fallbackSecondLevel = ! empty($fallbackLocale) ? Locale::fallback($fallbackLocale) : null;
 
         foreach ($entry['fields'] as $field => $localesData) {
             if (isset($localesData[$locale])) {
                 $payload[$field] = $localesData[$locale];
             } else {
-                if (!in_array($field, $dontFallback)
-                    && isset($localesData[$fallbackLocale])
-                    && ($this->levelFallBack($field) === 'all')) {
+                if (! in_array($field, $dontFallback) && isset($localesData[$fallbackLocale]) && ($this->levelFallBack($field) === 'all')) {
                     $payload[$field] = $localesData[$fallbackLocale];
                 } else {
-                    if (!empty($fallbackSecondLevel) && !in_array($field, $dontFallback)
-                        && isset($localesData[$fallbackSecondLevel])
-                        && ($this->levelFallBack($field) === 'all')) {
+                    if (! empty($fallbackSecondLevel) && ! in_array($field, $dontFallback) && isset($localesData[$fallbackSecondLevel]) && ($this->levelFallBack($field) === 'all')) {
                         $payload[$field] = $localesData[$fallbackSecondLevel];
                     } else {
                         $payload[$field] = null;
@@ -113,7 +108,7 @@ abstract class ContentfulMapper
     /**
      * Level fallback.
      *
-     * @param  string $field
+     * @param  string  $field
      * @return string
      */
     protected function levelFallBack($field): string
@@ -130,7 +125,7 @@ abstract class ContentfulMapper
     /**
      * Map relationships in given payload.
      *
-     * @param  array $payload
+     * @param  array  $payload
      * @return array
      * @throws \Exception
      */
@@ -166,11 +161,12 @@ abstract class ContentfulMapper
     /**
      * Return relationship signature for given "localized" field.
      *
-     * @param  array $localeField
+     * @param  array  $localeField
+     * @param  string  $field
      * @return array|null
      * @throws \Exception
      */
-    private function relationshipSignature(array $localeField,string $field=''): ?array
+    private function relationshipSignature(array $localeField, string $field = ''): ?array
     {
         if ($localeField['sys']['linkType'] === 'Asset') {
             return [
@@ -194,7 +190,7 @@ abstract class ContentfulMapper
     /**
      * Return if field is a Link one.
      *
-     * @param  mixed $localeField
+     * @param  mixed  $localeField
      * @return boolean
      */
     private function isLink($localeField): bool
@@ -205,7 +201,7 @@ abstract class ContentfulMapper
     /**
      * Return contentful-type for given Contentful ID from `sync_entries` table.
      *
-     * @param  string $contentfulId
+     * @param  string  $contentfulId
      * @return string
      * @throws \Exception
      */
@@ -224,7 +220,7 @@ abstract class ContentfulMapper
                     'content_type' => 'single_entry',
                 ]);
 
-                if (!empty($entry) && !empty($entry['sys']['contentType']) && !empty($entry['sys']['contentType']['sys'])) {
+                if (! empty($entry) && ! empty($entry['sys']['contentType']) && ! empty($entry['sys']['contentType']['sys'])) {
                     $this->upsertEntryType($entry, $entry['sys']['contentType']['sys']['id']);
 
                     return $entry['sys']['contentType']['sys']['id'];
@@ -244,15 +240,15 @@ abstract class ContentfulMapper
     /**
      * Return all locales in entry payload.
      *
-     * @param  array $entry
+     * @param  array  $entry
      * @return array
      */
     private function entryLocales(array $entry): array
     {
         $locales = [];
 
-        if (isset($entry['fields']) && !empty($entry['fields'])) {
-            $firstField = array_first($entry['fields']);
+        if (isset($entry['fields']) && ! empty($entry['fields'])) {
+            $firstField = Arr::first($entry['fields']);
             $locales = array_keys($firstField);
         }
 

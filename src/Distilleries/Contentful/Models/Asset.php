@@ -8,6 +8,7 @@ use Distilleries\Contentful\Models\Traits\Localable;
 /**
  * @property string $contentful_id
  * @property string $locale
+ * @property string $country
  * @property string $title
  * @property string $description
  * @property string $url
@@ -33,8 +34,8 @@ class Asset extends Model
      */
     protected $fillable = [
         'contentful_id',
-        'country',
         'locale',
+        'country',
         'title',
         'description',
         'url',

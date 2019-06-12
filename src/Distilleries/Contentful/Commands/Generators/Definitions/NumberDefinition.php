@@ -2,6 +2,8 @@
 
 namespace Distilleries\Contentful\Commands\Generators\Definitions;
 
+use Illuminate\Support\Str;
+
 class NumberDefinition extends BaseDefinition
 {
 
@@ -13,7 +15,7 @@ class NumberDefinition extends BaseDefinition
         $stubPath = __DIR__ . '/stubs/float.stub';
 
         return self::getStub($stubPath, [
-            'field_camel' => studly_case($this->id()),
+            'field_camel' => Str::studly($this->id()),
             'field' => $this->id(),
         ]);
     }

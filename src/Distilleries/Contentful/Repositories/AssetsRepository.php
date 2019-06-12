@@ -2,6 +2,7 @@
 
 namespace Distilleries\Contentful\Repositories;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Distilleries\Contentful\Models\Asset;
 use Distilleries\Contentful\Models\Locale;
@@ -23,8 +24,8 @@ class AssetsRepository
     /**
      * Map Contentful asset payload to an Eloquent one.
      *
-     * @param  array $asset
-     * @param \Illuminate\Support\Collection $locales
+     * @param  array  $asset
+     * @param \Illuminate\Support\Collection  $locales
      * @return void
      */
     public function toContentfulModel(array $asset, Collection $locales)
@@ -39,7 +40,7 @@ class AssetsRepository
     /**
      * Delete asset with given Contentful ID.
      *
-     * @param  string $assetId
+     * @param  string  $assetId
      * @return void
      */
     public function delete(string $assetId)
@@ -52,15 +53,15 @@ class AssetsRepository
     /**
      * Return all locales in asset payload.
      *
-     * @param  array $asset
+     * @param  array  $asset
      * @return array
      */
     private function assetLocales(array $asset): array
     {
         $locales = [];
 
-        if (isset($asset['fields']) && !empty($asset['fields'])) {
-            $firstField = array_first($asset['fields']);
+        if (isset($asset['fields']) && ! empty($asset['fields'])) {
+            $firstField = Arr::first($asset['fields']);
             $locales = array_keys($firstField);
         }
 
@@ -70,8 +71,8 @@ class AssetsRepository
     /**
      * Insert OR update given asset.
      *
-     * @param  array $asset
-     * @param  string $locale
+     * @param  array  $asset
+     * @param  string  $locale
      * @return \Distilleries\Contentful\Models\Asset
      */
     private function upsertAsset(array $asset, string $locale): ?Asset
@@ -79,7 +80,7 @@ class AssetsRepository
         $country = Locale::getCountry($locale);
         $iso = Locale::getLocale($locale);
 
-        if (!Locale::canBeSave($country, $iso)) {
+        if (! Locale::canBeSave($country, $iso)) {
             return null;
         }
 
@@ -112,24 +113,24 @@ class AssetsRepository
     /**
      * Map a Contentful asset to it's Eloquent model signature.
      *
-     * @param  array $asset
-     * @param  string $locale
+     * @param  array  $asset
+     * @param  string  $locale
      * @return array
      */
     private function mapAsset(array $asset, string $locale): array
     {
         return [
-                'contentful_id' => $asset['sys']['id'],
-                'locale' => Locale::getLocale($locale),
-                'country' => Locale::getCountry($locale),
-            ] + $this->fieldsWithFallback($asset['fields'], $locale);
+            'contentful_id' => $asset['sys']['id'],
+            'locale' => Locale::getLocale($locale),
+            'country' => Locale::getCountry($locale),
+        ] + $this->fieldsWithFallback($asset['fields'], $locale);
     }
 
     /**
      * Return asset fields with locale OR locale fallback data.
      *
-     * @param  array $fields
-     * @param  string $locale
+     * @param  array  $fields
+     * @param  string  $locale
      * @return array
      */
     private function fieldsWithFallback(array $fields, string $locale): array
@@ -141,8 +142,7 @@ class AssetsRepository
 
         return [
             'title' => $this->getFieldValue($fields, 'title', $locale, $fallbackLocale, '', $secondFallback),
-            'description' => $this->getFieldValue($fields, 'description', $locale, $fallbackLocale, '',
-                $secondFallback),
+            'description' => $this->getFieldValue($fields, 'description', $locale, $fallbackLocale, '', $secondFallback),
             'url' => isset($file['url']) ? $file['url'] : '',
             'file_name' => isset($file['fileName']) ? $file['fileName'] : '',
             'content_type' => isset($file['contentType']) ? $file['contentType'] : '',
@@ -152,19 +152,23 @@ class AssetsRepository
         ];
     }
 
-    protected function getFieldValue(
-        array $fields,
-        string $field,
-        string $locale,
-        string $fallbackLocale,
-        $default,
-        string $secondFallback = null
-    ) {
-
-        return !empty($fields[$field][$locale]) ?
+    /**
+     * Get given field value.
+     *
+     * @param  array  $fields
+     * @param  string  $field
+     * @param  string  $locale
+     * @param  string  $fallbackLocale
+     * @param  mixed  $default
+     * @param  string|null  $secondFallback
+     * @return mixed
+     */
+    protected function getFieldValue(array $fields, string $field, string $locale, string $fallbackLocale, $default, string $secondFallback = null)
+    {
+        return ! empty($fields[$field][$locale]) ?
             $fields[$field][$locale] :
-            (!empty($fields[$field][$fallbackLocale]) ? $fields[$field][$fallbackLocale] :
-                (!empty($secondFallback) && !empty($fields[$field][$secondFallback]) ? $fields[$field][$secondFallback] : $default)
+            (! empty($fields[$field][$fallbackLocale]) ? $fields[$field][$fallbackLocale] :
+                (! empty($secondFallback) && ! empty($fields[$field][$secondFallback]) ? $fields[$field][$secondFallback] : $default)
             );
     }
 }

@@ -2,13 +2,13 @@
 
 namespace Distilleries\Contentful\Commands\Sync;
 
-use Distilleries\Contentful\Models\Release;
 use stdClass;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Distilleries\Contentful\Models\Locale;
+use Distilleries\Contentful\Models\Release;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Distilleries\Contentful\Repositories\AssetsRepository;
 use Distilleries\Contentful\Repositories\EntriesRepository;
@@ -51,6 +51,7 @@ class SyncFlatten extends Command
     /**
      * MapEntries command constructor.
      *
+     * @return void
      */
     public function __construct()
     {
@@ -61,33 +62,58 @@ class SyncFlatten extends Command
         $this->entries = new EntriesRepository;
     }
 
+    /**
+     * Check if switch.
+     *
+     * @return bool
+     */
     protected function canSwitch(): bool
     {
         $bool = $this->option('no-switch');
-        return !empty($bool) ? false : true;
+
+        return ! empty($bool) ? false : true;
     }
 
+    /**
+     * Check if no truncate.
+     *
+     * @return bool
+     */
     protected function withoutTruncate(): bool
     {
         $bool = $this->option('no-truncate');
-        return !empty($bool) ? true : false;
+
+        return ! empty($bool) ? true : false;
     }
 
+    /**
+     * Check if preview.
+     *
+     * @return bool
+     */
     protected function isPreview(): bool
     {
         $bool = $this->option('preview');
-        return !empty($bool) ? true : false;
+
+        return ! empty($bool) ? true : false;
     }
 
+    /**
+     * Check if multi-thread.
+     *
+     * @return bool
+     */
     protected function isMultiThread(): bool
     {
         $bool = $this->option('multi');
-        return !empty($bool) ? true : false;
+
+        return ! empty($bool) ? true : false;
     }
 
     /**
      * Execute the console command.
      *
+     * @param  \Distilleries\Contentful\Models\Release  $release
      * @return void
      */
     public function handle(Release $release)
@@ -100,7 +126,7 @@ class SyncFlatten extends Command
 
         $this->switchToSyncDb();
 
-        if (!$this->withoutTruncate()) {
+        if (! $this->withoutTruncate()) {
             $this->line('Truncate Contentful related tables');
             $this->assets->truncateRelatedTables();
             $this->entries->truncateRelatedTables();
@@ -114,8 +140,6 @@ class SyncFlatten extends Command
             } else {
                 $this->flattenSyncedData();
             }
-
-
         } catch (Exception $e) {
             echo PHP_EOL;
             $this->error($e->getMessage());
@@ -123,8 +147,7 @@ class SyncFlatten extends Command
         }
 
         if ($this->canSwitch()) {
-            $this->call('contentful:sync-switch',
-                $isPreview ? ['--preview' => true, '--live' => true] : ['--live' => true]);
+            $this->call('contentful:sync-switch', $isPreview ? ['--preview' => true, '--live' => true] : ['--live' => true]);
         }
     }
 
@@ -159,7 +182,6 @@ class SyncFlatten extends Command
 
     protected function flattenSyncedDataMultiThread(Release $release)
     {
-
         $locales = collect(Locale::all());
         $locales = is_array($locales) ? collect($locales) : $locales;
 
@@ -194,7 +216,6 @@ class SyncFlatten extends Command
         } while (DB::table('sync_entries')->whereNull('release_id')->count() > 0);
 
         $bar->finish();
-
     }
 
     /**
@@ -210,6 +231,8 @@ class SyncFlatten extends Command
     /**
      * Get current release.
      *
+     * @param  \Distilleries\Contentful\Models\Release  $release
+     * @return \Distilleries\Contentful\Models\Release|null
      */
     protected function getCurrentRelease(Release $release)
     {
@@ -219,7 +242,7 @@ class SyncFlatten extends Command
     /**
      * Create custom progress bar.
      *
-     * @param  integer $total
+     * @param  integer  $total
      * @return \Symfony\Component\Console\Helper\ProgressBar
      */
     protected function createProgressBar(int $total): ProgressBar
@@ -234,8 +257,8 @@ class SyncFlatten extends Command
     /**
      * Map and persist given sync_entries item.
      *
-     * @param  \stdClass $item
-     * @param \Illuminate\Support\Collection $locales
+     * @param  \stdClass  $item
+     * @param  \Illuminate\Support\Collection $locales
      * @return void
      * @throws \Exception
      */

@@ -1,18 +1,28 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: mfrancois
- * Date: 08/05/2019
- * Time: 15:18
- */
 
 namespace Distilleries\Contentful\Helpers;
 
+use Parsedown as BaseParsedown;
 
-class Parsedown extends \Parsedown
+class Parsedown extends BaseParsedown
 {
-    protected $voidElements = array(
-        'area', 'base', 'br', 'col', 'command', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source','blockquote',
-    );
-
+    /**
+     * {@inheritdoc}
+     */
+    protected $voidElements = [
+        'area',
+        'base',
+        'br',
+        'col',
+        'command',
+        'embed',
+        'hr',
+        'img',
+        'input',
+        'link',
+        'meta',
+        'param',
+        'source',
+        'blockquote',
+    ];
 }

@@ -2,6 +2,8 @@
 
 namespace Distilleries\Contentful\Commands\Generators;
 
+use Illuminate\Support\Str;
+
 class Models extends AbstractGenerator
 {
     /**
@@ -48,7 +50,7 @@ class Models extends AbstractGenerator
     protected function createModel(array $contentType): string
     {
         $table = $this->tableName($contentType['sys']['id']);
-        $model = studly_case(str_singular($table));
+        $model = Str::studly(Str::singular($table));
 
         $stubPath = __DIR__ . '/stubs/model.stub';
         $destPath = rtrim(config('contentful.generator.model'), '/') . '/' . $model . '.php';
@@ -69,7 +71,7 @@ class Models extends AbstractGenerator
     protected function createMapper(array $contentType): string
     {
         $table = $this->tableName($contentType['sys']['id']);
-        $model = studly_case(str_singular($table));
+        $model = Str::studly(Str::singular($table));
 
         $stubPath = __DIR__ . '/stubs/mapper.stub';
         $destPath = rtrim(config('contentful.generator.mapper'), '/') . '/' . $model . 'Mapper.php';
@@ -85,6 +87,7 @@ class Models extends AbstractGenerator
      * @param  string  $table
      * @param  array  $fields
      * @return string
+     * @throws \Exception
      */
     protected function modelGetters($table, $fields): string
     {
