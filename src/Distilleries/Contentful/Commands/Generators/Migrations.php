@@ -10,7 +10,7 @@ class Migrations extends AbstractGenerator
     /**
      * {@inheritdoc}
      */
-    protected $signature = 'contentful:generate:migrations';
+    protected $signature = 'contentful:generate-migrations';
 
     /**
      * {@inheritdoc}
@@ -31,10 +31,12 @@ class Migrations extends AbstractGenerator
         if (! empty($contentTypes['items'])) {
             array_unshift($contentTypes['items'], $this->assetContentType());
             foreach ($contentTypes['items'] as $contentType) {
-                $this->info('Content-Type: ' . mb_strtoupper($contentType['name']));
-                $file = $this->createMigration($contentType);
-                $this->line('Migration "' . $file . '" created');
-                sleep(1);
+                if ($contentType['sys']['id'] !== 'asset') {
+                    $this->info('Content-Type: ' . mb_strtoupper($contentType['name']));
+                    $file = $this->createMigration($contentType);
+                    $this->line('Migration "' . $file . '" created');
+                    sleep(1);
+                }
             }
         }
     }

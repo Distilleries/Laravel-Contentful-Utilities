@@ -9,7 +9,7 @@ class Models extends AbstractGenerator
     /**
      * {@inheritdoc}
      */
-    protected $signature = 'contentful:generate:models';
+    protected $signature = 'contentful:generate-models';
 
     /**
      * {@inheritdoc}
