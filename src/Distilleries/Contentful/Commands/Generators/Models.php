@@ -31,11 +31,13 @@ class Models extends AbstractGenerator
             array_unshift($contentTypes['items'], $this->assetContentType());
 
             foreach ($contentTypes['items'] as $contentType) {
-                $this->info('Content-Type: ' . mb_strtoupper($contentType['name']));
-                $file = $this->createMapper($contentType);
-                $this->line('Mapper "' . $file . '" created');
-                $file = $this->createModel($contentType);
-                $this->line('Model "' . $file . '" created');
+                if ($contentType['sys']['id'] !== 'asset') {
+                    $this->info('Content-Type: '.mb_strtoupper($contentType['name']));
+                    $file = $this->createMapper($contentType);
+                    $this->line('Mapper "'.$file.'" created');
+                    $file = $this->createModel($contentType);
+                    $this->line('Model "'.$file.'" created');
+                }
             }
         }
     }
