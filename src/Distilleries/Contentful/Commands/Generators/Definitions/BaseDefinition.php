@@ -46,7 +46,7 @@ abstract class BaseDefinition implements DefinitionInterface
      */
     protected function id(): string
     {
-        return mb_strtolower(Str::snake($this->field['id']));
+        return Str::lower(Str::snake($this->field['id']));
     }
 
     /**
@@ -63,7 +63,7 @@ abstract class BaseDefinition implements DefinitionInterface
         $content = file_get_contents($stubPath);
 
         foreach ($replacements as $key => $value) {
-            $content = str_replace('{{' . mb_strtoupper($key) . '}}', $value, $content);
+            $content = str_replace('{{' . Str::upper($key) . '}}', $value, $content);
         }
 
         return $content;

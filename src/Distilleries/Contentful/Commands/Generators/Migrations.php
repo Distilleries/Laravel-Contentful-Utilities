@@ -32,7 +32,7 @@ class Migrations extends AbstractGenerator
             array_unshift($contentTypes['items'], $this->assetContentType());
             foreach ($contentTypes['items'] as $contentType) {
                 if ($contentType['sys']['id'] !== 'asset') {
-                    $this->info('Content-Type: ' . mb_strtoupper($contentType['name']));
+                    $this->info('Content-Type: ' . Str::upper($contentType['name']));
                     $file = $this->createMigration($contentType);
                     $this->line('Migration "' . $file . '" created');
                     sleep(1);

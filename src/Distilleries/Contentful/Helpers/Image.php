@@ -79,7 +79,7 @@ class Image
         $agent = app('agent');
 
         if (empty($format)) {
-            $browser = mb_strtolower($agent->browser());
+            $browser = Str::lower($agent->browser());
             if (($browser === 'chrome') && !$agent->isMobile()) {
                 $format = config('contentful.image.use_webp') ? 'webp' : null;
             }

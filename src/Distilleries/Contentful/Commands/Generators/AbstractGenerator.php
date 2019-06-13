@@ -55,7 +55,7 @@ abstract class AbstractGenerator extends Command
     {
         $content = file_get_contents($stubPath);
         foreach ($replacements as $key => $value) {
-            $content = str_replace('{{' . mb_strtoupper($key) . '}}', $value, $content);
+            $content = str_replace('{{' . Str::upper($key) . '}}', $value, $content);
         }
 
         file_put_contents($destPath, $content);
