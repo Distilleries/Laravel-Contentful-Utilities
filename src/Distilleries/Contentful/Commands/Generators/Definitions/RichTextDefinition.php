@@ -2,8 +2,6 @@
 
 namespace Distilleries\Contentful\Commands\Generators\Definitions;
 
-use Illuminate\Support\Str;
-
 class RichTextDefinition extends SymbolDefinition
 {
     /**
@@ -14,8 +12,16 @@ class RichTextDefinition extends SymbolDefinition
         $stubPath = __DIR__ . '/stubs/string.stub';
 
         return self::getStub($stubPath, [
-            'field_camel' => Str::studly($this->id()),
             'field' => $this->id(),
+            'field_studly' => $this->studlyId(),
         ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function modelProperty()
+    {
+        return ' * @property string $' . $this->attribute();
     }
 }

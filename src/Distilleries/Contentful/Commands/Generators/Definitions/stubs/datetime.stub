@@ -1,9 +1,9 @@
     /**
-     * {{FIELD_CAMEL}} attribute accessor.
+     * {{FIELD_STUDLY}} attribute accessor.
      *
      * @return \Illuminate\Support\Carbon
      */
-    public function get{{FIELD_CAMEL}}Attribute(): ?Carbon
+    public function get{{FIELD_STUDLY}}Attribute(): ?Carbon
     {
         return isset($this->payload['{{FIELD}}']) ? Caster::datetime($this->payload['{{FIELD}}'], null) : null;
     }

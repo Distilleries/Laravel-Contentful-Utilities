@@ -1,9 +1,9 @@
     /**
-     * {{FIELD_CAMEL}} attribute accessor.
+     * {{FIELD_STUDLY}} attribute accessor.
      *
      * @return \Distilleries\Contentful\Models\Location|null
      */
-    public function get{{FIELD_CAMEL}}Attribute(): ?Location
+    public function get{{FIELD_STUDLY}}Attribute(): ?Location
     {
         return isset($this->payload['{{FIELD}}']) ? Caster::location($this->payload['{{FIELD}}'], (new Location)) : (new Location);
     }

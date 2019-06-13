@@ -32,11 +32,11 @@ class Models extends AbstractGenerator
 
             foreach ($contentTypes['items'] as $contentType) {
                 if ($contentType['sys']['id'] !== 'asset') {
-                    $this->info('Content-Type: '.mb_strtoupper($contentType['name']));
+                    $this->info('Content-Type: ' . Str::upper($contentType['name']));
                     $file = $this->createMapper($contentType);
-                    $this->line('Mapper "'.$file.'" created');
+                    $this->line('Mapper "' . $file . '" created');
                     $file = $this->createModel($contentType);
-                    $this->line('Model "'.$file.'" created');
+                    $this->line('Model "' . $file . '" created');
                 }
             }
         }
@@ -61,6 +61,7 @@ class Models extends AbstractGenerator
             'model' => $model,
             'table' => $table,
             'getters' => $this->modelGetters($table, $contentType['fields']),
+            'properties' => $this->modelProperties($table, $contentType['fields']),
         ]);
     }
 
@@ -101,12 +102,31 @@ class Models extends AbstractGenerator
             }
         }
 
-        if (empty($getters)) {
-            return "\t\t//";
+        $getters = rtrim(implode("\n", array_map(function ($getter) {
+            return $getter;
+        }, $getters)));
+
+        return ! empty($getters) ? "\n" . $getters : "\n\t\t//";
+    }
+
+    /**
+     * Return model properties doc-block.
+     *
+     * @param  string  $table
+     * @param  array  $fields
+     * @return string
+     * @throws \Exception
+     */
+    protected function modelProperties($table, $fields): string
+    {
+        $properties = [];
+        foreach ($fields as $field) {
+            if ($this->isFieldEnabled($field)) {
+                $fieldDefinition = $this->fieldDefinition($table, $field);
+                $properties[] = $fieldDefinition->modelProperty();
+            }
         }
 
-        return implode("\n", array_map(function ($getter) {
-            return $getter;
-        }, $getters));
+        return ! empty($properties) ? "\n" . implode("\n", $properties) : '';
     }
 }

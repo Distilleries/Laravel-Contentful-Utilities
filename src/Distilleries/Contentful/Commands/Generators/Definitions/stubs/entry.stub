@@ -1,9 +1,9 @@
     /**
-     * {{FIELD_CAMEL}} attribute accessor.
+     * {{FIELD_STUDLY}} attribute accessor.
      *
      * @return \Distilleries\Contentful\Models\Base\ContentfulModel|null
      */
-    public function get{{FIELD_CAMEL}}Attribute(): ?ContentfulModel
+    public function get{{FIELD_STUDLY}}Attribute(): ?ContentfulModel
     {
         return isset($this->payload['{{FIELD}}']) ? $this->getAndSetPayloadContentfulEntry('{{FIELD}}', $this->payload['{{FIELD}}']) : null;
     }

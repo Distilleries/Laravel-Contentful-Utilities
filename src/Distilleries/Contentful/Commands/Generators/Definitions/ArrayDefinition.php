@@ -3,7 +3,6 @@
 namespace Distilleries\Contentful\Commands\Generators\Definitions;
 
 use Exception;
-use Illuminate\Support\Str;
 
 class ArrayDefinition extends BaseDefinition
 {
@@ -24,8 +23,29 @@ class ArrayDefinition extends BaseDefinition
         }
 
         return self::getStub($stubPath, [
-            'field_camel' => Str::studly($this->id()),
             'field' => $this->id(),
+            'field_studly' => $this->studlyId(),
         ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function modelProperty()
+    {
+        $property = ' * @property ';
+
+        switch ($this->field['items']['type']) {
+            case 'Link':
+                $property .= '\Illuminate\Support\Collection';
+                break;
+            case 'Symbol':
+                $property .= 'string';
+                break;
+            default:
+                throw new Exception('Unknown Array items type "' . $this->field['items']['type'] . '"');
+        }
+
+        return $property . ' $' . $this->attribute();
     }
 }

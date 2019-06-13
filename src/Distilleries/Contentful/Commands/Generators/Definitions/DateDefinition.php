@@ -2,8 +2,6 @@
 
 namespace Distilleries\Contentful\Commands\Generators\Definitions;
 
-use Illuminate\Support\Str;
-
 class DateDefinition extends BaseDefinition
 {
     /**
@@ -14,8 +12,16 @@ class DateDefinition extends BaseDefinition
         $stubPath = __DIR__ . '/stubs/datetime.stub';
 
         return self::getStub($stubPath, [
-            'field_camel' => Str::studly($this->id()),
             'field' => $this->id(),
+            'field_studly' => $this->studlyId(),
         ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function modelProperty()
+    {
+        return ' * @property \Illuminate\Support\Carbon $' . $this->attribute();
     }
 }

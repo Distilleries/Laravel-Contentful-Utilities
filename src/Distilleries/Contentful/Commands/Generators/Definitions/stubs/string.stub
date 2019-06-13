@@ -1,9 +1,9 @@
     /**
-     * {{FIELD_CAMEL}} attribute accessor.
+     * {{FIELD_STUDLY}} attribute accessor.
      *
      * @return string
      */
-    public function get{{FIELD_CAMEL}}Attribute(): string
+    public function get{{FIELD_STUDLY}}Attribute(): string
     {
         return isset($this->payload['{{FIELD}}']) ? Caster::string($this->payload['{{FIELD}}']) : '';
     }

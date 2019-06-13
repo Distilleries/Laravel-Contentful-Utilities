@@ -2,8 +2,6 @@
 
 namespace Distilleries\Contentful\Commands\Generators\Definitions;
 
-use Illuminate\Support\Str;
-
 class BooleanDefinition extends BaseDefinition
 {
     /**
@@ -14,8 +12,16 @@ class BooleanDefinition extends BaseDefinition
         $stubPath = __DIR__ . '/stubs/boolean.stub';
 
         return self::getStub($stubPath, [
-            'field_camel' => Str::studly($this->id()),
             'field' => $this->id(),
+            'field_studly' => $this->studlyId(),
         ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function modelProperty()
+    {
+        return ' * @property bool $' . $this->attribute();
     }
 }

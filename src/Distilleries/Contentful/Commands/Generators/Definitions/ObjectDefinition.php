@@ -2,8 +2,6 @@
 
 namespace Distilleries\Contentful\Commands\Generators\Definitions;
 
-use Illuminate\Support\Str;
-
 class ObjectDefinition extends BaseDefinition
 {
     /**
@@ -14,8 +12,16 @@ class ObjectDefinition extends BaseDefinition
         $stubPath = __DIR__ . '/stubs/json.stub';
 
         return self::getStub($stubPath, [
-            'field_camel' => Str::studly($this->id()),
             'field' => $this->id(),
+            'field_studly' => $this->studlyId(),
         ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function modelProperty()
+    {
+        return ' * @property array $' . $this->attribute();
     }
 }

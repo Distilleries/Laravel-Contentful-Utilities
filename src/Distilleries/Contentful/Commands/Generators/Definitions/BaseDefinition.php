@@ -50,6 +50,28 @@ abstract class BaseDefinition implements DefinitionInterface
     }
 
     /**
+     * Return studly case ID of current field.
+     *
+     * @return string
+     */
+    protected function studlyId(): string
+    {
+        return Str::studly($this->id());
+    }
+
+    /**
+     * Return attribute of current field.
+     *
+     * @return string
+     */
+    protected function attribute(): string
+    {
+        $attribute = $this->studlyId();
+
+        return Str::lower(Str::substr($attribute, 0, 1)) . Str::substr($attribute, 1);
+    }
+
+    /**
      * Write stub to destination path with given string replacements.
      *
      * Return relative base path of destination path.
