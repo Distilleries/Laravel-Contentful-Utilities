@@ -83,13 +83,13 @@ All the model generated have a getters for all the payload fields. If you want t
 
 To make model and mapper from contentful
 
- * `php artisan contentful:generate:models`
+ * `php artisan contentful:generate-models`
 
-> Models are generated on app_path('Models'); and the mappers are generated on app_path('Models/Mappers');
+:information_source: Models are generated on app_path('Models'); and the mappers are generated on app_path('Models/Mappers');
 
 To make migration from contentful model
 
- * `php artisan contentful:generate:migrations`
+ * `php artisan contentful:generate-migrations`
 
 To launch the synchronisation you can use this command line 
 
@@ -97,7 +97,7 @@ To launch the synchronisation you can use this command line
  
  * `php artisan contentful:sync-flatten  {--preview}`
  
-> --preview is optional and use if you want to flatten the preview database.
+:information_source: --preview is optional and use if you want to flatten the preview database.
  
  | Command | Explain |
  | -------: | -------: |
