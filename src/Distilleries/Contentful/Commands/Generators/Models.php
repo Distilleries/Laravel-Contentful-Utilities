@@ -105,7 +105,7 @@ class Models extends AbstractGenerator
             return "\t\t//";
         }
 
-        return implode("\n\n", array_map(function ($getter) {
+        return implode("\n", array_map(function ($getter) {
             return $getter;
         }, $getters));
     }

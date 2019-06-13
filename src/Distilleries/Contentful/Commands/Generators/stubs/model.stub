@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Distilleries\Contentful\Models\Asset;
 use Distilleries\Contentful\Helpers\Caster;
@@ -38,5 +39,5 @@ class {{MODEL}} extends ContentfulModel
      */
     protected $cast = [];
 
-    {{GETTERS}}
+{{GETTERS}}
 }
