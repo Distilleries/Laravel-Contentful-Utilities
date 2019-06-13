@@ -46,6 +46,6 @@ class LinkDefinition extends BaseDefinition
                 throw new Exception('Unknown Link items type "' . $this->field['items']['type'] . '"');
         }
 
-        return $property . ' $' . $this->id();
+        return $property . ' $' . $this->snakeId();
     }
 }

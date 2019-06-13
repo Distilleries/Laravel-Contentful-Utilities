@@ -22,6 +22,6 @@ class ObjectDefinition extends BaseDefinition
      */
     public function modelProperty()
     {
-        return ' * @property array $' . $this->id();
+        return ' * @property array $' . $this->snakeId();
     }
 }

@@ -46,7 +46,7 @@ abstract class BaseDefinition implements DefinitionInterface
      */
     protected function id(): string
     {
-        return Str::lower(Str::snake($this->field['id']));
+        return $this->field['id'];
     }
 
     /**
@@ -57,6 +57,16 @@ abstract class BaseDefinition implements DefinitionInterface
     protected function studlyId(): string
     {
         return Str::studly($this->id());
+    }
+
+    /**
+     * Return snake case ID of current field.
+     *
+     * @return string
+     */
+    protected function snakeId(): string
+    {
+        return Str::snake($this->id());
     }
 
     /**

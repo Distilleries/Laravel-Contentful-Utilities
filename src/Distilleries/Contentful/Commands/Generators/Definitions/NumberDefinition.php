@@ -22,6 +22,6 @@ class NumberDefinition extends BaseDefinition
      */
     public function modelProperty()
     {
-        return ' * @property float $' . $this->id();
+        return ' * @property float $' . $this->snakeId();
     }
 }

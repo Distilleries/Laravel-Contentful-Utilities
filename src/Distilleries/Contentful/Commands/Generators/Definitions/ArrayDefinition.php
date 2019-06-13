@@ -46,6 +46,6 @@ class ArrayDefinition extends BaseDefinition
                 throw new Exception('Unknown Array items type "' . $this->field['items']['type'] . '"');
         }
 
-        return $property . ' $' . $this->id();
+        return $property . ' $' . $this->snakeId();
     }
 }

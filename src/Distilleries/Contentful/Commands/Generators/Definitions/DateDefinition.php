@@ -22,6 +22,6 @@ class DateDefinition extends BaseDefinition
      */
     public function modelProperty()
     {
-        return ' * @property \Illuminate\Support\Carbon $' . $this->id();
+        return ' * @property \Illuminate\Support\Carbon $' . $this->snakeId();
     }
 }

@@ -22,6 +22,6 @@ class SymbolDefinition extends BaseDefinition
      */
     public function modelProperty()
     {
-        return ' * @property string $' . $this->id();
+        return ' * @property string $' . $this->snakeId();
     }
 }

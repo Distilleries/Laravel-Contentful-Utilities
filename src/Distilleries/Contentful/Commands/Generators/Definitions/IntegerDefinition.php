@@ -22,6 +22,6 @@ class IntegerDefinition extends BaseDefinition
      */
     public function modelProperty()
     {
-        return ' * @property int $' . $this->id();
+        return ' * @property int $' . $this->snakeId();
     }
 }
