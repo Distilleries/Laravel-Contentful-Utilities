@@ -66,6 +66,10 @@ class Caster
             return null;
         }
 
+        if (is_array($json)) {
+            return $json;
+        }
+
         $data = json_decode($json, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
             return null;
