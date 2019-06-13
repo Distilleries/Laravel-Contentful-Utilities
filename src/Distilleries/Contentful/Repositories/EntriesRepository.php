@@ -113,7 +113,7 @@ class EntriesRepository
         $class = Str::studly($this->entryContentType($entry)) . 'Mapper';
         $mapperClass = NamespaceResolver::mapper($class);
 
-        if (empty($mapperClass) && !($mapperClass instanceof ContentfulMapper)) {
+        if (empty($mapperClass) && ! ($mapperClass instanceof ContentfulMapper)) {
             throw new Exception('Unknown mapper: ' . $class);
         }
 
@@ -164,7 +164,7 @@ class EntriesRepository
 
         $order = 1;
         foreach ($relationships as $relationship) {
-            if (!isset($relationship['id']) || !isset($relationship['type'])) {
+            if (! isset($relationship['id']) || ! isset($relationship['type'])) {
                 throw new Exception('Relationships malformed! (' . print_r($relationship, true) . ')');
             }
 
