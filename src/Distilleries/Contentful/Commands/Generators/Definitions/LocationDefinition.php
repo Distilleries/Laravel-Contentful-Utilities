@@ -22,6 +22,6 @@ class LocationDefinition extends BaseDefinition
      */
     public function modelProperty()
     {
-        return ' * @property \Distilleries\Contentful\Models\Location $' . $this->attribute();
+        return ' * @property \Distilleries\Contentful\Models\Location $' . $this->id();
     }
 }

@@ -22,6 +22,6 @@ class BooleanDefinition extends BaseDefinition
      */
     public function modelProperty()
     {
-        return ' * @property bool $' . $this->attribute();
+        return ' * @property bool $' . $this->id();
     }
 }
