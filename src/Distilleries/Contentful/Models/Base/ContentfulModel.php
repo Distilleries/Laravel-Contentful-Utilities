@@ -246,7 +246,7 @@ abstract class ContentfulModel extends Model
         }
 
         if (! empty($entryIds)) {
-            $relationships = EntryRelationship::select('related_contentful_id', 'related_contentful_type')
+            $relationships = EntryRelationship::select('related_contentful_id', 'related_contentful_type', 'order')
                 ->distinct()
                 ->locale($this->locale, $this->country)
                 ->where('source_contentful_id', '=', $this->contentful_id)

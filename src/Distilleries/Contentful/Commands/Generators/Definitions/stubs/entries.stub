@@ -5,5 +5,5 @@
      */
     public function get{{FIELD_STUDLY}}Attribute(): Collection
     {
-        return isset($this->payload['{{FIELD}}']) ? $this->getAndSetPayloadContentfulEntries('{{FIELD}}', $this->payload['{{FIELD}}']): collect();
+        return isset($this->payload['{{FIELD}}']) ? $this->getAndSetPayloadContentfulEntries('{{FIELD}}', $this->payload['{{FIELD}}']) : collect();
     }
