@@ -11,7 +11,7 @@ trait WebhookTrait
     /**
      * Handle Contentful live webhook.
      *
-     * @param  \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function live(Request $request): JsonResponse
@@ -22,7 +22,7 @@ trait WebhookTrait
     /**
      * Handle Contentful preview webhook.
      *
-     * @param  \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function preview(Request $request): JsonResponse
@@ -35,8 +35,8 @@ trait WebhookTrait
     /**
      * Handle webhook request.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @param  boolean $isPreview
+     * @param  \Illuminate\Http\Request  $request
+     * @param  boolean  $isPreview
      * @return \Illuminate\Http\JsonResponse
      */
     protected function handle(Request $request, bool $isPreview): JsonResponse

@@ -14,6 +14,7 @@ use Illuminate\Support\Str;
  * @property string $locale
  * @property string $country
  * @property string $fallback_code
+ * @property boolean $is_default
  * @property boolean $is_editable
  * @property boolean $is_publishable
  * @property \Illuminate\Support\Carbon $created_at
@@ -59,11 +60,8 @@ class Locale extends Model
         $default = Cache::get('locale_default');
 
         if ($default === null) {
-            $default = static::select('locale')
-                ->where('is_default', '=', true)
-                ->first();
-
-            $default = !empty($default) ? $default->locale : config('contentful.default_locale');
+            $default = static::select('locale')->where('is_default', '=', true)->first();
+            $default = ! empty($default) ? $default->locale : config('contentful.default_locale');
 
             // Cache is cleaned in Console\Commands\SyncLocales (run at least daily)
             Cache::forever('locale_default', $default);
@@ -103,10 +101,7 @@ class Locale extends Model
         $default = Cache::get('country_default');
 
         if ($default === null) {
-            $default = static::select('country')
-                ->where('is_default', '=', true)
-                ->first();
-
+            $default = static::select('country')->where('is_default', '=', true)->first();
             $default = ! empty($default) ? $default->country : config('contentful.default_country');
 
             // Cache is cleaned in Console\Commands\SyncLocales (run at least daily)
@@ -127,10 +122,7 @@ class Locale extends Model
         $fallback = Cache::get('locale_fallback_' . $code);
 
         if ($fallback === null) {
-            $locale = static::select('fallback_code')
-                ->where('code', '=', $code)
-                ->first();
-
+            $locale = static::select('fallback_code')->where('code', '=', $code)->first();
             $fallback = (! empty($locale) && ! empty($locale->fallback_code)) ? $locale->fallback_code : '';
 
             Cache::put('locale_fallback_' . $code, $fallback, 5);
@@ -158,7 +150,6 @@ class Locale extends Model
      */
     protected static function _getLocalesDisabled(): array
     {
-
         $locales =config('contentful.use_preview')?config('contentful.locales_not_flatten_preview', ''):config('contentful.locales_not_flatten', '');
 
         return explode(',', $locales);
@@ -229,7 +220,6 @@ class Locale extends Model
         $languages = $request->server('HTTP_ACCEPT_LANGUAGE');
         if (! empty($languages)) {
             preg_match_all('/(\W|^)([a-z]{2})([^a-z]|$)/six', $languages, $locales, PREG_PATTERN_ORDER);
-
             if (! empty($locales) && ! empty($locales[2])) {
                 return $locales[2];
             }

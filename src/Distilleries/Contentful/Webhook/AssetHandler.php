@@ -17,6 +17,7 @@ class AssetHandler
     /**
      * AssetHandler constructor.
      *
+     * @return void
      */
     public function __construct()
     {
@@ -27,15 +28,15 @@ class AssetHandler
      * Handle an incoming ContentManagementAsset request.
      * (create, save, auto_save, archive, unarchive, publish, unpublish, delete)
      *
-     * @param  string $action
-     * @param  array $payload
-     * @param  boolean $isPreview
+     * @param  string  $action
+     * @param  array  $payload
+     * @param  boolean  $isPreview
      * @return void
      */
     public function handle(string $action, array $payload, bool $isPreview)
     {
         $actionMethods = ['create', 'archive', 'unarchive', 'publish', 'unpublish', 'delete'];
-        $actionMethods = !empty($isPreview) ? array_merge($actionMethods, ['save', 'auto_save']) : $actionMethods;
+        $actionMethods = ! empty($isPreview) ? array_merge($actionMethods, ['save', 'auto_save']) : $actionMethods;
 
         if (method_exists($this, $action) && in_array($action, $actionMethods)) {
             $this->$action($payload);
@@ -49,7 +50,7 @@ class AssetHandler
     /**
      * Auto-save asset.
      *
-     * @param  array $payload
+     * @param  array  $payload
      * @return void
      */
     protected function auto_save($payload)
@@ -60,7 +61,7 @@ class AssetHandler
     /**
      * Save asset.
      *
-     * @param  array $payload
+     * @param  array  $payload
      * @return void
      */
     protected function save($payload)
@@ -71,7 +72,7 @@ class AssetHandler
     /**
      * Create asset.
      *
-     * @param  array $payload
+     * @param  array  $payload
      * @return void
      */
     protected function create($payload)
@@ -82,7 +83,7 @@ class AssetHandler
     /**
      * Archive asset.
      *
-     * @param  array $payload
+     * @param  array  $payload
      * @return void
      */
     protected function archive($payload)
@@ -93,7 +94,7 @@ class AssetHandler
     /**
      * Un-archive asset.
      *
-     * @param  array $payload
+     * @param  array  $payload
      * @return void
      */
     protected function unarchive($payload)
@@ -104,7 +105,7 @@ class AssetHandler
     /**
      * Publish asset.
      *
-     * @param  array $payload
+     * @param  array  $payload
      * @return void
      */
     protected function publish($payload)
@@ -115,7 +116,7 @@ class AssetHandler
     /**
      * Un-publish asset.
      *
-     * @param  array $payload
+     * @param  array  $payload
      * @return void
      */
     protected function unpublish($payload)
@@ -126,7 +127,7 @@ class AssetHandler
     /**
      * Delete asset.
      *
-     * @param  array $payload
+     * @param  array  $payload
      * @return void
      */
     protected function delete($payload)
@@ -141,7 +142,7 @@ class AssetHandler
     /**
      * Upsert asset in DB.
      *
-     * @param  array $payload
+     * @param  array  $payload
      * @return void
      */
 
@@ -155,7 +156,7 @@ class AssetHandler
     /**
      * Delete asset from DB.
      *
-     * @param  array $payload
+     * @param  array  $payload
      * @return void
      */
     protected function deleteAsset($payload)

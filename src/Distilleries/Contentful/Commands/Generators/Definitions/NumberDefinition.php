@@ -4,7 +4,6 @@ namespace Distilleries\Contentful\Commands\Generators\Definitions;
 
 class NumberDefinition extends BaseDefinition
 {
-
     /**
      * {@inheritdoc}
      */
@@ -13,8 +12,16 @@ class NumberDefinition extends BaseDefinition
         $stubPath = __DIR__ . '/stubs/float.stub';
 
         return self::getStub($stubPath, [
-            'field_camel' => studly_case($this->id()),
             'field' => $this->id(),
+            'field_studly' => $this->studlyId(),
         ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function modelProperty()
+    {
+        return ' * @property float $' . $this->snakeId();
     }
 }

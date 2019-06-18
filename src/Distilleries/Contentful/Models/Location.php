@@ -2,7 +2,6 @@
 
 namespace Distilleries\Contentful\Models;
 
-
 /**
  * @property string $lon
  * @property string $lat
@@ -14,11 +13,14 @@ class Location
      */
     protected $fillable = [
         'lon',
-        'lat'
+        'lat',
     ];
 
     /**
-     * @param  array $attributes
+     * Location constructor.
+     *
+     * @param  array  $attributes
+     * @return void
      */
     public function __construct(array $attributes = [])
     {
@@ -28,9 +30,8 @@ class Location
     /**
      * Fill the model with an array of attributes.
      *
-     * @param  array $attributes
+     * @param  array  $attributes
      * @return $this
-     *
      */
     public function fill(array $attributes)
     {
@@ -44,5 +45,4 @@ class Location
 
         return $this;
     }
-
 }

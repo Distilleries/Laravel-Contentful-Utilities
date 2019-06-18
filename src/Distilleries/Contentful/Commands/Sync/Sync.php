@@ -32,7 +32,6 @@ class Sync extends Command
 
         $this->call('contentful:sync-data', $arguments);
 
-
         if ($this->option('no-switch')) {
             $arguments['--no-switch'] = true;
         }
@@ -40,7 +39,6 @@ class Sync extends Command
         if ($this->option('no-truncate')) {
             $arguments['--no-truncate'] = true;
         }
-
 
         $this->call('contentful:sync-flatten', $arguments);
     }

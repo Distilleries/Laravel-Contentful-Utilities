@@ -2,6 +2,8 @@
 
 namespace Distilleries\Contentful\Commands\Generators\Definitions;
 
+use Illuminate\Support\Str;
+
 abstract class BaseDefinition implements DefinitionInterface
 {
     /**
@@ -21,8 +23,9 @@ abstract class BaseDefinition implements DefinitionInterface
     /**
      * BaseDefinition constructor.
      *
-     * @param  string $table
-     * @param  array $field
+     * @param  string  $table
+     * @param  array  $field
+     * @return void
      */
     public function __construct($table, $field)
     {
@@ -43,7 +46,27 @@ abstract class BaseDefinition implements DefinitionInterface
      */
     protected function id(): string
     {
-        return mb_strtolower(snake_case($this->field['id']));
+        return $this->field['id'];
+    }
+
+    /**
+     * Return studly case ID of current field.
+     *
+     * @return string
+     */
+    protected function studlyId(): string
+    {
+        return Str::studly($this->id());
+    }
+
+    /**
+     * Return snake case ID of current field.
+     *
+     * @return string
+     */
+    protected function snakeId(): string
+    {
+        return Str::snake($this->id());
     }
 
     /**
@@ -60,7 +83,7 @@ abstract class BaseDefinition implements DefinitionInterface
         $content = file_get_contents($stubPath);
 
         foreach ($replacements as $key => $value) {
-            $content = str_replace('{{' . mb_strtoupper($key) . '}}', $value, $content);
+            $content = str_replace('{{' . Str::upper($key) . '}}', $value, $content);
         }
 
         return $content;

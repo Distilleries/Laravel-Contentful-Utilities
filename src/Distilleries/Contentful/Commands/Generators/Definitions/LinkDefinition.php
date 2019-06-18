@@ -19,12 +19,33 @@ class LinkDefinition extends BaseDefinition
                 $stubPath = __DIR__ . '/stubs/asset.stub';
                 break;
             default:
-                throw new Exception('Unknown Array items type "' . $this->field['linkType'] . '"');
+                throw new Exception('Unknown Link items type "' . $this->field['linkType'] . '"');
         }
 
         return self::getStub($stubPath, [
-            'field_camel' => studly_case($this->id()),
             'field' => $this->id(),
+            'field_studly' => $this->studlyId(),
         ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function modelProperty()
+    {
+        $property = ' * @property ';
+
+        switch ($this->field['linkType']) {
+            case 'Entry':
+                $property .= '\Distilleries\Contentful\Models\Base\ContentfulModel';
+                break;
+            case 'Asset':
+                $property .= '\Distilleries\Contentful\Models\Asset';
+                break;
+            default:
+                throw new Exception('Unknown Link items type "' . $this->field['items']['type'] . '"');
+        }
+
+        return $property . ' $' . $this->snakeId();
     }
 }

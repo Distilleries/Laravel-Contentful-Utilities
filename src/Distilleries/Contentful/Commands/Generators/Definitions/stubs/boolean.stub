@@ -1,9 +1,9 @@
     /**
-     * {{FIELD_CAMEL}} attribute accessor.
+     * {{FIELD_STUDLY}} attribute accessor.
      *
-     * @return boolean
+     * @return bool
      */
-    public function get{{FIELD_CAMEL}}Attribute(): bool
+    public function get{{FIELD_STUDLY}}Attribute(): bool
     {
-        return isset($this->payload['{{FIELD}}']) ? Caster::boolean($this->payload['{{FIELD}}'],false): false;
+        return isset($this->payload['{{FIELD}}']) ? Caster::boolean($this->payload['{{FIELD}}'], false): false;
     }

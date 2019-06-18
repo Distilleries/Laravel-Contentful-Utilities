@@ -1,9 +1,9 @@
     /**
-     * {{FIELD_CAMEL}} attribute accessor.
+     * {{FIELD_STUDLY}} attribute accessor.
      *
      * @return \Illuminate\Support\Collection
      */
-    public function get{{FIELD_CAMEL}}Attribute(): Collection
+    public function get{{FIELD_STUDLY}}Attribute(): Collection
     {
-        return isset($this->payload['{{FIELD}}']) ? $this->getAndSetPayloadContentfulEntries('{{FIELD}}', $this->payload['{{FIELD}}']): collect();
+        return isset($this->payload['{{FIELD}}']) ? $this->getAndSetPayloadContentfulEntries('{{FIELD}}', $this->payload['{{FIELD}}']) : collect();
     }

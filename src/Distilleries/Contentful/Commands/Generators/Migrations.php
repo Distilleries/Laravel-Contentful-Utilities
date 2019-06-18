@@ -2,6 +2,7 @@
 
 namespace Distilleries\Contentful\Commands\Generators;
 
+use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 
 class Migrations extends AbstractGenerator
@@ -9,7 +10,7 @@ class Migrations extends AbstractGenerator
     /**
      * {@inheritdoc}
      */
-    protected $signature = 'contentful:generate:migrations';
+    protected $signature = 'contentful:generate-migrations';
 
     /**
      * {@inheritdoc}
@@ -30,10 +31,12 @@ class Migrations extends AbstractGenerator
         if (! empty($contentTypes['items'])) {
             array_unshift($contentTypes['items'], $this->assetContentType());
             foreach ($contentTypes['items'] as $contentType) {
-                $this->info('Content-Type: ' . mb_strtoupper($contentType['name']));
-                $file = $this->createMigration($contentType);
-                $this->line('Migration "' . $file . '" created');
-                sleep(1);
+                if ($contentType['sys']['id'] !== 'asset') {
+                    $this->info('Content-Type: ' . Str::upper($contentType['name']));
+                    $file = $this->createMigration($contentType);
+                    $this->line('Migration "' . $file . '" created');
+                    sleep(1);
+                }
             }
         }
     }
@@ -53,7 +56,7 @@ class Migrations extends AbstractGenerator
         $destPath = database_path('migrations/' . Carbon::now()->format('Y_m_d_His') . '_create_' . $table . '_table.php');
 
         return static::writeStub($stubPath, $destPath, [
-            'class' => studly_case($table),
+            'class' => Str::studly($table),
             'table' => $table
         ]);
     }

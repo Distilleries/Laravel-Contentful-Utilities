@@ -2,12 +2,14 @@
 
 namespace Distilleries\Contentful\Commands\Generators;
 
+use Illuminate\Support\Str;
+
 class Models extends AbstractGenerator
 {
     /**
      * {@inheritdoc}
      */
-    protected $signature = 'contentful:generate:models';
+    protected $signature = 'contentful:generate-models';
 
     /**
      * {@inheritdoc}
@@ -29,11 +31,13 @@ class Models extends AbstractGenerator
             array_unshift($contentTypes['items'], $this->assetContentType());
 
             foreach ($contentTypes['items'] as $contentType) {
-                $this->info('Content-Type: ' . mb_strtoupper($contentType['name']));
-                $file = $this->createMapper($contentType);
-                $this->line('Mapper "' . $file . '" created');
-                $file = $this->createModel($contentType);
-                $this->line('Model "' . $file . '" created');
+                if ($contentType['sys']['id'] !== 'asset') {
+                    $this->info('Content-Type: ' . Str::upper($contentType['name']));
+                    $file = $this->createMapper($contentType);
+                    $this->line('Mapper "' . $file . '" created');
+                    $file = $this->createModel($contentType);
+                    $this->line('Model "' . $file . '" created');
+                }
             }
         }
     }
@@ -48,7 +52,7 @@ class Models extends AbstractGenerator
     protected function createModel(array $contentType): string
     {
         $table = $this->tableName($contentType['sys']['id']);
-        $model = studly_case(str_singular($table));
+        $model = Str::studly(Str::singular($table));
 
         $stubPath = __DIR__ . '/stubs/model.stub';
         $destPath = rtrim(config('contentful.generator.model'), '/') . '/' . $model . '.php';
@@ -57,6 +61,7 @@ class Models extends AbstractGenerator
             'model' => $model,
             'table' => $table,
             'getters' => $this->modelGetters($table, $contentType['fields']),
+            'properties' => $this->modelProperties($table, $contentType['fields']),
         ]);
     }
 
@@ -69,7 +74,7 @@ class Models extends AbstractGenerator
     protected function createMapper(array $contentType): string
     {
         $table = $this->tableName($contentType['sys']['id']);
-        $model = studly_case(str_singular($table));
+        $model = Str::studly(Str::singular($table));
 
         $stubPath = __DIR__ . '/stubs/mapper.stub';
         $destPath = rtrim(config('contentful.generator.mapper'), '/') . '/' . $model . 'Mapper.php';
@@ -85,6 +90,7 @@ class Models extends AbstractGenerator
      * @param  string  $table
      * @param  array  $fields
      * @return string
+     * @throws \Exception
      */
     protected function modelGetters($table, $fields): string
     {
@@ -96,12 +102,31 @@ class Models extends AbstractGenerator
             }
         }
 
-        if (empty($getters)) {
-            return "\t\t//";
+        $getters = rtrim(implode("\n", array_map(function ($getter) {
+            return $getter;
+        }, $getters)));
+
+        return ! empty($getters) ? "\n" . $getters : "\n\t\t//";
+    }
+
+    /**
+     * Return model properties doc-block.
+     *
+     * @param  string  $table
+     * @param  array  $fields
+     * @return string
+     * @throws \Exception
+     */
+    protected function modelProperties($table, $fields): string
+    {
+        $properties = [];
+        foreach ($fields as $field) {
+            if ($this->isFieldEnabled($field)) {
+                $fieldDefinition = $this->fieldDefinition($table, $field);
+                $properties[] = $fieldDefinition->modelProperty();
+            }
         }
 
-        return implode("\n\n", array_map(function ($getter) {
-            return $getter;
-        }, $getters));
+        return ! empty($properties) ? "\n" . implode("\n", $properties) : '';
     }
 }

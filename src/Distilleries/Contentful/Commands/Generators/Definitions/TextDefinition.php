@@ -12,8 +12,16 @@ class TextDefinition extends SymbolDefinition
         $stubPath = __DIR__ . '/stubs/string.stub';
 
         return self::getStub($stubPath, [
-            'field_camel' => studly_case($this->id()),
             'field' => $this->id(),
+            'field_studly' => $this->studlyId(),
         ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function modelProperty()
+    {
+        return ' * @property string $' . $this->snakeId();
     }
 }

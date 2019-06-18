@@ -2,18 +2,18 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Distilleries\Contentful\Models\Asset;
 use Distilleries\Contentful\Helpers\Caster;
-use Distilleries\Contentful\Models\Base\ContentfulModel;
 use Distilleries\Contentful\Models\Location;
-
+use Distilleries\Contentful\Models\Base\ContentfulModel;
 
 /**
  * @property string $contentful_id
  * @property string $country
  * @property string $locale
- * @property array $payload
+ * @property array $payload{{PROPERTIES}}
  * @property \Illuminate\Support\Carbon $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  */
@@ -23,21 +23,5 @@ class {{MODEL}} extends ContentfulModel
      * {@inheritdoc}
      */
     protected $table = '{{TABLE}}';
-
-    /**
-     * {@inheritdoc}
-     */
-    protected $fillable = [];
-
-    /**
-     * {@inheritdoc}
-     */
-    protected $dates = [];
-
-    /**
-     * {@inheritdoc}
-     */
-    protected $cast = [];
-
-    {{GETTERS}}
+{{GETTERS}}
 }

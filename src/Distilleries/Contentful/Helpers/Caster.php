@@ -2,9 +2,10 @@
 
 namespace Distilleries\Contentful\Helpers;
 
-use Distilleries\Contentful\Models\Location;
-use Illuminate\Support\Collection;
+use Exception;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
+use Distilleries\Contentful\Models\Location;
 
 class Caster
 {
@@ -34,7 +35,7 @@ class Caster
 
         try {
             $carbon = new Carbon($str);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $carbon = null;
         }
 
@@ -65,8 +66,11 @@ class Caster
             return null;
         }
 
-        $data = json_decode($json, true);
+        if (is_array($json)) {
+            return $json;
+        }
 
+        $data = json_decode($json, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
             return null;
         }
@@ -126,7 +130,6 @@ class Caster
         return is_numeric($float) ? (float) $float : $default;
     }
 
-
     /**
      * Cast an array to an array value otherwise to null.
      *
@@ -165,13 +168,13 @@ class Caster
 
     /**
      * Return a Location object
-     *ApiCDN
+     *
      * @param  array  $entry
      * @param  Location  $default
      * @return Location|null
      */
     public static function location(array $entry, ?Location $default = null): ?Location
     {
-        return !empty($entry)? new Location($entry):$default;
+        return ! empty($entry)? new Location($entry) : $default;
     }
 }

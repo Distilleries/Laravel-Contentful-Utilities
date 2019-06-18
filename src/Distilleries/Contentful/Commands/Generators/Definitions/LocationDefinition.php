@@ -12,8 +12,16 @@ class LocationDefinition extends BaseDefinition
         $stubPath = __DIR__ . '/stubs/location.stub';
 
         return self::getStub($stubPath, [
-            'field_camel' => studly_case($this->id()),
             'field' => $this->id(),
+            'field_studly' => $this->studlyId(),
         ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function modelProperty()
+    {
+        return ' * @property \Distilleries\Contentful\Models\Location $' . $this->snakeId();
     }
 }

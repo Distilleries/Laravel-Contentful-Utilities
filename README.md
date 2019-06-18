@@ -7,35 +7,37 @@
 
 # Distilleries / Laravel-Contentful-Utilities
 
-Laravel-Contentful-Utilities is a Laravel 5.6 / Lumen package 5.6 package to use [contentful](https://www.contentful.com/) in offline mode with and without preview.
+Laravel-Contentful-Utilities is a Laravel 5.6 - 5.8 / Lumen package 5.6 - 5.8 package to use [contentful](https://www.contentful.com/) in offline mode with and without preview.
 Contentful is a headless CMS in cloud you can have more information on their website https://www.contentful.com
 
+## Features
 
-### Features
+ * Model generator from contentful
+ 
+ * Migration generator from contentful
+ 
+ * Synchronization from contentful to database
 
-* Model generator from contentful
-* Migration generator from contentful
-* Synchronization from contentful to database
+## Installation
 
+### Composer
 
-### Installation
-#### Composer
 Install the [composer package] by running the following command:
 
-    composer require distilleries/contentful
+ `composer require distilleries/contentful`
 
-### Models and Mapper
+## Models and Mapper
 
 When we synchronize all the data on database the mapper link to the model are call. This mapper car provide the extract of field you would like one the database.
-For example you want to externilize the title and the slug on the database you have to change the migation generated and the mapper
+For example you want to externalize the title and the slug on the database you have to change the migration generated and the mapper.
 
-
+```php
     class TerritoryMapper extends ContentfulMapper
     {
         /**
          * {@inheritdoc}
          */
-        protected function map(array $entry, string $locale) : array
+        protected function map(array $entry, string $locale): array
         {
             $payload = $this->mapPayload($entry, $locale);
     
@@ -45,29 +47,9 @@ For example you want to externilize the title and the slug on the database you h
             ];
         }
     }
+```
     
-    
-    <?php
-    
-    namespace App\Models;
-    
-    use Illuminate\Support\Collection;
-    use Distilleries\Contentful\Models\Asset;
-    use Distilleries\Contentful\Helpers\Caster;
-    use Distilleries\Contentful\Models\Base\ContentfulModel;
-    
-    /**
-     * @property string $contentful_id
-     * @property string $locale
-     * @property string $country
-     * @property string $slug
-     * @property string $url
-     * @property array $payload
-     * @property string $title
-     * @property \Distilleries\Contentful\Models\Asset $picture
-     * @property \Illuminate\Support\Carbon $created_at
-     * @property \Illuminate\Support\Carbon $updated_at
-     */
+```php
     class Territory extends ContentfulModel
     {
         /**
@@ -83,73 +65,74 @@ For example you want to externilize the title and the slug on the database you h
             'title',
         ];
     
-    
         /**
          * Picture attribute accessor.
          *
          * @return \Distilleries\Contentful\Models\Asset|null
          */
-        public function getPictureAttribute() : ?Asset
+        public function getPictureAttribute(): ?Asset
         {
             return isset($this->payload['picture']) ? $this->contentfulAsset($this->payload['picture']) : null;
         }
-    
     }
+```
 
+All the model generated have a getters for all the payload fields. If you want to externalize the field on database.
 
- 
-All the model generated have a getters for all the payload fields. If you want to externilize the field on database
-
-
-### Command-line tools
+## Command-line tools
 
 To make model and mapper from contentful
 
-* php artisan contentful:generate:models
+ * `php artisan contentful:generate-models`
 
-> Models à generated on app_path('Models'); and the mappers à generated on app_path('Models/Mappers');
+:information_source: Models are generated on app_path('Models'); and the mappers are generated on app_path('Models/Mappers');
 
 To make migration from contentful model
 
-* php artisan contentful:generate:migrations
-
+ * `php artisan contentful:generate-migrations`
 
 To launch the synchronisation you can use this command line 
 
- * php artisan contentful:sync-data  {--preview}
- * php artisan contentful:sync-flatten  {--preview}
+ * `php artisan contentful:sync-data  {--preview}`
  
- > --preview is optional and use if you want to flatten the preview database.
+ * `php artisan contentful:sync-flatten  {--preview}`
+ 
+:information_source: --preview is optional and use if you want to flatten the preview database.
  
  | Command | Explain |
  | -------: | -------: |
  | sync-data | Get all the entries from contentful and put in the flatten database | 
- | sync-flatten | Get all the entries from data table to explode on all the other types  |
+ | sync-flatten | Get all the entries from data table to explode on all the other types |
  
- 
- ### Webhook
- To flatten the preview or the regular database you need to set the webhook on contentful
- 
- Create a controller and use the trait :
- 
-    use \Distilleries\Contentful\Http\Controllers\WebhookTrait;
-    
-    
-Make the route callable in post 
+## Webhook
 
+To flatten the preview or the regular database you need to set the webhook on Contentful
+ 
+Create a controller and use the trait:
+ 
+ `use \Distilleries\Contentful\Http\Controllers\WebhookTrait;`
+    
+Make the route callable in post:
+
+```php
     $router->post('/webhook/live', 'WebhookController@live');
     $router->post('/webhook/preview', 'WebhookController@preview');
+```
 
-* Live method is called to save on live mode
-* Preview metho is called to save the preview datas
+ * Live method is called to save on live mode
+ 
+ * Preview method is called to save the preview data
 
+To display the site with preview database you have to use UsePreview middleware.
 
-To display the site with preview database you have to use UsePreview middleware 
+```php
+    $router->group(['prefix' => 'preview', 'middleware' => 'use_preview'], function () use ($router) {
+        //
+    });
+```
 
-        $router->group(['prefix' => 'preview', 'middleware' => 'use_preview'], function () use ($router) {
-        });
+Add your middleware:
 
-
-Add your middleware :
-
+```php
     'use_preview' => Distilleries\Contentful\Http\Middleware\UsePreview::class,
+```

@@ -17,6 +17,7 @@ class EntryHandler
     /**
      * EntryHandler constructor.
      *
+     * @return void
      */
     public function __construct()
     {

@@ -2,7 +2,7 @@
 
 namespace Distilleries\Contentful\Commands\Generators\Definitions;
 
-class SymbolDefinition extends BaseDefinition
+class RichTextDefinition extends SymbolDefinition
 {
     /**
      * {@inheritdoc}

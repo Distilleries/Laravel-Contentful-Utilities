@@ -27,7 +27,7 @@ class CreateAssetsTable extends Migration
             $table->integer('height')->unsigned()->default(0);
             $table->timestamps();
 
-            $table->primary(['contentful_id', 'locale','country']);
+            $table->primary(['contentful_id', 'country', 'locale']);
         });
     }
 

@@ -20,6 +20,7 @@ abstract class AbstractImporter
      * Importer constructor.
      *
      * @param  \Distilleries\Contentful\Api\ManagementApi  $api
+     * @return void
      */
     public function __construct(ManagementApi $api)
     {

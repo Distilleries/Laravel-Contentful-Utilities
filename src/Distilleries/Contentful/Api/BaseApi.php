@@ -38,41 +38,43 @@ abstract class BaseApi
     /**
      * BaseApi constructor.
      *
-     * @param  \GuzzleHttp\ClientInterface $client
+     * @param  \GuzzleHttp\ClientInterface  $client
+     * @return void
      */
     public function __construct(ClientInterface $client)
     {
         $this->client = $client;
 
         $this->config = config('contentful', []);
-        $this->config = !is_array($this->config) ? (array)$this->config : $this->config;
+        $this->config = ! is_array($this->config) ? (array)$this->config : $this->config;
     }
 
     /**
      * Return endpoint URL.
      *
-     * @param  string $endpoint
+     * @param  string  $endpoint
      * @return string
      */
     protected function url($endpoint): string
     {
         $baseUrl = rtrim($this->baseUrl, '/');
 
-        //Mandatory to make sure we have the last version modified by the scripts
+        // Mandatory to make sure we have the last version modified by the scripts
         $this->config['use_preview'] = config('contentful.use_preview');
 
-        if ((isset($this->config['use_preview']) && $this->config['use_preview'] == true) && !empty($this->previewBaseUrl)) {
+        if ((isset($this->config['use_preview']) && $this->config['use_preview'] == true) && ! empty($this->previewBaseUrl)) {
             $baseUrl = rtrim($this->previewBaseUrl, '/');
         }
 
         $environment = (isset($this->config['use_environment']) && $this->config['use_environment'] == true) ? '/environments/' . $this->config['environment'] . '/' : '/';
+
         return $baseUrl . '/spaces/' . $this->config['space_id'] . $environment . trim($endpoint, '/');
     }
 
     /**
      * Decode given response.
      *
-     * @param  \Psr\Http\Message\ResponseInterface $response
+     * @param  \Psr\Http\Message\ResponseInterface  $response
      * @return array
      */
     protected function decodeResponse(ResponseInterface $response): array

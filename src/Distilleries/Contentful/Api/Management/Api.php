@@ -181,12 +181,11 @@ class Api extends BaseApi implements ManagementApi
      */
     public function processAsset(string $assetId, string $locale, int $version = 1)
     {
-        $this->client->request('PUT',
-            $this->url('environments/master/assets/' . $assetId . '/files/' . $locale . '/process'), [
-                RequestOptions::HEADERS => $this->headers([
-                    'X-Contentful-Version' => $version,
-                ]),
-            ]);
+        $this->client->request('PUT', $this->url('environments/master/assets/' . $assetId . '/files/' . $locale . '/process'), [
+            RequestOptions::HEADERS => $this->headers([
+                'X-Contentful-Version' => $version,
+            ]),
+        ]);
     }
 
     /**
@@ -234,7 +233,7 @@ class Api extends BaseApi implements ManagementApi
     /**
      * Return default headers + given headers.
      *
-     * @param  array $headers
+     * @param  array  $headers
      * @return array
      */
     private function headers(array $headers = []): array

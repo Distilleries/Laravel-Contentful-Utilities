@@ -12,8 +12,16 @@ class IntegerDefinition extends BaseDefinition
         $stubPath = __DIR__ . '/stubs/integer.stub';
 
         return self::getStub($stubPath, [
-            'field_camel' => studly_case($this->id()),
             'field' => $this->id(),
+            'field_studly' => $this->studlyId(),
         ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function modelProperty()
+    {
+        return ' * @property int $' . $this->snakeId();
     }
 }

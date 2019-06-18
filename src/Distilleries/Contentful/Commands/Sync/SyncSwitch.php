@@ -18,16 +18,28 @@ class SyncSwitch extends Command
      */
     protected $description = 'Dump and switch the database';
 
+    /**
+     * From sync to live?
+     *
+     * @return bool
+     */
     protected function isFromSyncToLive(): bool
     {
         $bool = $this->option('live');
-        return !empty($bool) ? true : false;
+
+        return ! empty($bool) ? true : false;
     }
 
+    /**
+     * Check if preview?
+     *
+     * @return bool
+     */
     protected function isPreview(): bool
     {
         $bool = $this->option('preview');
-        return !empty($bool) ? true : false;
+
+        return ! empty($bool) ? true : false;
     }
 
     /**
@@ -37,9 +49,7 @@ class SyncSwitch extends Command
      */
     public function handle()
     {
-
         $isPreview = $this->isPreview();
-
         if ($this->isPreview()) {
             use_contentful_preview();
         }
@@ -51,6 +61,5 @@ class SyncSwitch extends Command
             $this->putSync($this->dumpSync($isPreview), $isPreview, 'mysql_sync');
             $this->switchToSyncDb();
         }
-
     }
 }

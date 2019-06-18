@@ -4,7 +4,7 @@ namespace Distilleries\Contentful\Commands\Sync\Traits;
 
 trait SyncTrait
 {
-    abstract  public function warn($string, $verbosity = null);
+    abstract public function warn($string, $verbosity = null);
 
     /**
      * Switch to `sync` database.
@@ -23,7 +23,8 @@ trait SyncTrait
     /**
      * Dump `sync` database into a SQL file and return its path.
      *
-     * @param  boolean $isPreview
+     * @param  boolean  $isPreview
+     * @param  string  $connector
      * @return string
      */
     protected function dumpSync(bool $isPreview, string $connector = 'mysql'): string
@@ -32,7 +33,7 @@ trait SyncTrait
         $this->warn('Dump "' . basename($path) . '"...');
 
         $dirName = dirname($path);
-        if (!is_dir($dirName)) {
+        if (! is_dir($dirName)) {
             mkdir($dirName, 0777, true);
         }
 
@@ -44,8 +45,8 @@ trait SyncTrait
     /**
      * Dump SQL database in given file path.
      *
-     * @param  string $path
-     * @param  string $connector
+     * @param  string  $path
+     * @param  string  $connector
      * @return void
      */
     protected function dumpSql(string $path, string $connector)
@@ -67,20 +68,20 @@ trait SyncTrait
     protected function getConnector(bool $isPreview, string $connector = 'mysql'): string
     {
         $compiledConnector = $connector . ($isPreview ? '_preview' : '');
+
         if (empty(config('database.connections.' . $compiledConnector . '.username'))) {
             $compiledConnector = $connector;
         }
 
         return $compiledConnector;
-
     }
 
 
     /**
      * Put previous dump in live-preview database.
      *
-     * @param  string $path
-     * @param  boolean $isPreview
+     * @param  string  $path
+     * @param  boolean  $isPreview
      * @return void
      */
     protected function putSync(string $path, bool $isPreview, string $connector = 'mysql')
@@ -98,8 +99,8 @@ trait SyncTrait
     /**
      * Put SQL file into given database.
      *
-     * @param  string $path
-     * @param  string $connector
+     * @param  string  $path
+     * @param  string  $connector
      * @return void
      */
     protected function putSql(string $path, string $connector)

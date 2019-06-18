@@ -30,7 +30,8 @@ class SyncLocales extends Command
     /**
      * SyncLocales constructor.
      *
-     * @param  \Distilleries\Contentful\Api\ManagementApi $api
+     * @param  \Distilleries\Contentful\Api\ManagementApi  $api
+     * @return void
      */
     public function __construct(ManagementApi $api)
     {
