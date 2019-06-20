@@ -27,6 +27,7 @@ class ServiceProvider extends BaseServiceProvider
             'command.contentful.sync-locales',
             'command.contentful.import-clean',
             'command.contentful.import-publish',
+            'contentful.rich-text.parser'
         ];
     }
 
@@ -57,6 +58,8 @@ class ServiceProvider extends BaseServiceProvider
         $this->app->bind(Api\ManagementApi::class, Api\Management\Api::class);
         $this->app->bind(Api\SyncApi::class, Api\Sync\Api::class);
         $this->app->bind(Api\UploadApi::class, Api\Upload\Api::class);
+
+        $this->registerContentfulRelated();
 
         if ($this->app->runningInConsole()) {
             $this->registerCommands();
@@ -107,5 +110,29 @@ class ServiceProvider extends BaseServiceProvider
         $this->commands('command.contentful.sync-locales');
         $this->commands('command.contentful.import-clean');
         $this->commands('command.contentful.import-publish');
+    }
+
+    /**
+     * Bind utilities in IoC.
+     *
+     * @return void
+     */
+    private function registerContentfulRelated()
+    {
+        $this->app->singleton('contentful.rich-text.parser', function () {
+            $spaceId = config('contentful.space_id');
+            $environment = config('contentful.environment');
+
+            $client = new \Contentful\Delivery\Client(config('contentful.tokens.delivery.live'), $spaceId, $environment);
+            $linkResolver = new \Contentful\Delivery\LinkResolver(
+                $client,
+                new \Contentful\Delivery\ResourcePool\Extended(
+                    $client,
+                    new \Cache\Adapter\Void\VoidCachePool
+                )
+            );
+
+            return new \Contentful\RichText\Parser($linkResolver);
+        });
     }
 }

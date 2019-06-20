@@ -4,6 +4,7 @@ namespace Distilleries\Contentful\Helpers;
 
 use Exception;
 use Illuminate\Support\Carbon;
+use Contentful\RichText\Renderer;
 use Illuminate\Support\Collection;
 use Distilleries\Contentful\Models\Location;
 
@@ -76,6 +77,28 @@ class Caster
         }
 
         return $data;
+    }
+
+    /**
+     * Return rendered HTML rich-text data.
+     *
+     * @param  mixed  $object
+     * @return string|null
+     */
+    public static function richText($object): ?string
+    {
+        $html = '';
+
+        if (! empty($object)) {
+            try {
+                $node = app('contentful.rich-text.parser')->parse($object);
+                $html = (new Renderer)->render($node);
+            } catch (Exception $e) {
+                dd($e->getMessage());
+            }
+        }
+
+        return $html;
     }
 
     /**
