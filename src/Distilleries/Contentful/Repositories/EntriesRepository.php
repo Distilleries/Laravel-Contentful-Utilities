@@ -236,6 +236,7 @@ class EntriesRepository
 
         return $this->instanceQueryBuilder($model, $data)->first();
     }
+    
     /**
      * Override Eloquent entry with all fillable data.
      *
