@@ -236,7 +236,7 @@ class EntriesRepository
 
         return $this->instanceQueryBuilder($model, $data)->first();
     }
-
+    
     /**
      * Override Eloquent entry with all fillable data.
      *
@@ -247,18 +247,34 @@ class EntriesRepository
     private function overridePayloadAndExtraFillables(ContentfulModel $model, array $data)
     {
         $fillables = $model->getFillable();
+        $casts = $model->getCasts();
 
         // In this way we can delegate extra field update to
         // the Model itself (eg. adding slug or publishing date).
         $update = [];
         foreach ($data as $key => $value) {
             if (in_array($key, $fillables)) {
-                $update[$key] = $value;
+                $update[$key] = $this->isCastedAsArray($casts, $key) ? json_encode($value) : $value;
             }
         }
-        $update['payload'] = json_encode($data['payload']);
 
         $this->instanceQueryBuilder($model, $data)->update($update);
+    }
+
+    /**
+     * Return if key is casted as array in model attributes casts.
+     *
+     * @param  array  $casts
+     * @param  string  $key
+     * @return bool
+     */
+    private function isCastedAsArray(array $casts, string $key): bool
+    {
+        if (isset($casts[$key]) && (Str::lower($casts[$key]) === 'array')) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
