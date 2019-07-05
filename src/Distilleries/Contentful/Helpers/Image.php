@@ -75,7 +75,7 @@ class Image
      */
     protected static function detectFormat(?string $format = ''): ?string
     {
-        $httpAccept = request()->server('http_accept');
+        $httpAccept = mb_strtolower(request()->server('http_accept'));
         if (strpos($httpAccept, 'image/webp') !== false) {
             return 'webp';
         }
@@ -103,7 +103,7 @@ class Image
     /**
      * Detect if progressive image can be used.
      *
-     * @param  null|string  $format
+     * @param  string|null  $format
      * @param  bool|null  $useProgressive
      * @return bool
      */
