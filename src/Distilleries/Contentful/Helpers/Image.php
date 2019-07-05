@@ -47,7 +47,7 @@ class Image
     /**
      * Replace assets hosts by configured ones.
      *
-     * @param null|string  $url
+     * @param string|null  $url
      * @param string  $imageUrl
      * @return string
      */
@@ -70,28 +70,23 @@ class Image
     /**
      * Auto-detect image format to serve (based on browser capability).
      *
-     * @param  string  $format
+     * @param  string|null  $format
      * @return string|null
      */
-    protected static function detectFormat(string $format = ''): ?string
+    protected static function detectFormat(?string $format = ''): ?string
     {
-        /** @var \Jenssegers\Agent\Agent $agent */
-        $agent = app('agent');
-
-        if (empty($format)) {
-            $browser = Str::lower($agent->browser());
-            if (($browser === 'chrome') && !$agent->isMobile()) {
-                $format = config('contentful.image.use_webp') ? 'webp' : null;
-            }
+        $httpAccept = request()->server('http_accept');
+        if (strpos($httpAccept, 'image/webp') !== false) {
+            return 'webp';
         }
 
-        return $format;
+        return ! empty($format) ? $format : null;
     }
 
     /**
      * Detect if fit can be used.
      *
-     * @param string|null  $fit
+     * @param  string|null  $fit
      * @return string|null
      */
     protected static function detectFit(?string $fit = null): ?string
@@ -108,8 +103,8 @@ class Image
     /**
      * Detect if progressive image can be used.
      *
-     * @param null|string  $format
-     * @param bool|null  $useProgressive
+     * @param  null|string  $format
+     * @param  bool|null  $useProgressive
      * @return bool
      */
     protected static function detectProgressive(?string $format = '', ?bool $useProgressive = null): bool
