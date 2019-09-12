@@ -32,7 +32,6 @@ class CreateEntryRelationshipsTable extends Migration
             $table->index(['country', 'locale', 'related_contentful_id'], 'c_l_rid_idx');
             // @TODO... Specified key was too long
             // $table->index(['country', 'locale', 'related_contentful_id', 'source_contentful_id', 'source_contentful_type'], 'c_l_rid_sid_sty_idx');
-
         });
     }
 

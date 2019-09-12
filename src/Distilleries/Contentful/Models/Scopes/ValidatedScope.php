@@ -22,7 +22,7 @@ class ValidatedScope implements Scope
             ->where(function ($query) use ($model) {
                 $query
                     ->whereNull($model->getTable() . '.validated_at')
-                    ->orWhere($model->getTable() . '.validated_at','>=',Carbon::now()->format('Y-m-d H:i:s'));
+                    ->orWhere($model->getTable() . '.validated_at', '>=', Carbon::now()->format('Y-m-d H:i:s'));
             });
 
         $this->extend($builder);

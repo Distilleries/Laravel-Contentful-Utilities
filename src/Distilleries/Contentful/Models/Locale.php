@@ -177,7 +177,7 @@ class Locale extends Model
             $tab = explode('_', $code);
 
             return Str::lower($tab[0]);
-        } else if (Str::contains($code, '-')) {
+        } elseif (Str::contains($code, '-')) {
             $tab = explode('-', $code);
 
             return Str::lower($tab[0]);
@@ -198,7 +198,7 @@ class Locale extends Model
             $tab = explode('_', $code);
 
             return Str::lower($tab[1]);
-        } else if (Str::contains($code, '-')) {
+        } elseif (Str::contains($code, '-')) {
             $tab = explode('-', $code);
 
             return Str::lower($tab[1]);

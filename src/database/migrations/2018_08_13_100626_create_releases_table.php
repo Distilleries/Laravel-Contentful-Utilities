@@ -13,7 +13,7 @@ class CreateReleasesTable extends Migration
      */
     public function up()
     {
-        Schema::create('releases', function(Blueprint $table) {
+        Schema::create('releases', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('current')->unsigned()->default(0);
             $table->timestamps();
