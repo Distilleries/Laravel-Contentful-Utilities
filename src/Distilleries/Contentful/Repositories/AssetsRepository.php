@@ -167,7 +167,8 @@ class AssetsRepository
     {
         return ! empty($fields[$field][$locale]) ?
             $fields[$field][$locale] :
-            (! empty($fields[$field][$fallbackLocale]) ? $fields[$field][$fallbackLocale] :
+            (
+                ! empty($fields[$field][$fallbackLocale]) ? $fields[$field][$fallbackLocale] :
                 (! empty($secondFallback) && ! empty($fields[$field][$secondFallback]) ? $fields[$field][$secondFallback] : $default)
             );
     }

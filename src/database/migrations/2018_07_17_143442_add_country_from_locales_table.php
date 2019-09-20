@@ -28,6 +28,9 @@ class AddCountryFromLocalesTable extends Migration
     {
         Schema::table('locales', function (Blueprint $table) {
             $table->dropColumn('country');
+        });
+
+        Schema::table('locales', function (Blueprint $table) {
             $table->dropColumn('locale');
         });
     }

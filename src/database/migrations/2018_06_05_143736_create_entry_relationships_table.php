@@ -16,19 +16,19 @@ class CreateEntryRelationshipsTable extends Migration
         Schema::create('entry_relationships', function (Blueprint $table) {
             $table->string('locale', 16);
             $table->string('country', 16);
-            $table->string('source_contentful_id')->index();
-            $table->string('source_contentful_type')->index();
-            $table->string('related_contentful_id')->index();
-            $table->string('related_contentful_type')->index();
+            $table->string('source_contentful_id', 64)->index();
+            $table->string('source_contentful_type', 64)->index();
+            $table->string('related_contentful_id', 64)->index();
+            $table->string('related_contentful_type', 64)->index();
             $table->integer('order')->unsigned()->default(0);
 
-            $table->index(['locale', 'source_contentful_id'], 'locale_source_contentful_id_index');
-            $table->index(['country','locale', 'source_contentful_id'], 'cl_source_contentful_id_index');
-            $table->index(['locale', 'source_contentful_id', 'related_contentful_id', 'related_contentful_type'], 'locale_source_related_index');
-            $table->index(['country','locale', 'source_contentful_id', 'related_contentful_id', 'related_contentful_type'], 'cl_source_related_index');
-            $table->index(['locale', 'related_contentful_id'], 'locale_related_contentful_id_index');
-            $table->index(['country','locale', 'related_contentful_id'], 'cl_related_contentful_id_index');
-            $table->index(['country','locale', 'related_contentful_id', 'source_contentful_id', 'source_contentful_type'], 'cl_related_source_index');
+            $table->index(['locale', 'source_contentful_id'], 'l_sid_idx');
+            $table->index(['country', 'locale', 'source_contentful_id'], 'c_l_sid_idx');
+            $table->index(['locale', 'source_contentful_id', 'related_contentful_id', 'related_contentful_type'], 'l_sid_rid_rty_idx');
+            $table->index(['country', 'locale', 'source_contentful_id', 'related_contentful_id', 'related_contentful_type'], 'c_l_sid_rid_rty_idx');
+            $table->index(['locale', 'related_contentful_id'], 'l_rid_idx');
+            $table->index(['country', 'locale', 'related_contentful_id'], 'c_l_rid_idx');
+            $table->index(['country', 'locale', 'related_contentful_id', 'source_contentful_id', 'source_contentful_type'], 'c_l_rid_sid_sty_idx');
         });
     }
 

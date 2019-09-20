@@ -137,7 +137,7 @@ abstract class ContentfulMapper
             if (is_array($value)) {
                 if ($this->isLink($value)) {
                     try {
-                        $relationships[] = $this->relationshipSignature($value,$field);
+                        $relationships[] = $this->relationshipSignature($value, $field);
                     } catch (Exception $e) {
                         //
                     }
@@ -145,7 +145,7 @@ abstract class ContentfulMapper
                     foreach ($value as $entry) {
                         if ($this->isLink($entry)) {
                             try {
-                                $relationships[] = $this->relationshipSignature($entry,$field);
+                                $relationships[] = $this->relationshipSignature($entry, $field);
                             } catch (Exception $e) {
                                 //
                             }

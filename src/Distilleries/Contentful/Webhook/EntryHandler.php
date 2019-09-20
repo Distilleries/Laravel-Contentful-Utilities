@@ -159,7 +159,7 @@ class EntryHandler
     {
         $locales = Locale::all();
         $locales = is_array($locales) ? collect($locales) : $locales;
-        $this->entries->toContentfulModel($payload,$locales);
+        $this->entries->toContentfulModel($payload, $locales);
     }
 
     /**

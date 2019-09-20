@@ -60,7 +60,7 @@ class EntriesRepository
 
             if (! empty($model)) {
                 if (isset($localeEntry['relationships'])) {
-                    $this->handleRelationships($localeEntry['locale'],$localeEntry['country'], $localeEntry['contentful_id'], $this->entryContentType($entry), $localeEntry['relationships']);
+                    $this->handleRelationships($localeEntry['locale'], $localeEntry['country'], $localeEntry['contentful_id'], $this->entryContentType($entry), $localeEntry['relationships']);
                     unset($localeEntry['relationships']);
                 }
             } else {

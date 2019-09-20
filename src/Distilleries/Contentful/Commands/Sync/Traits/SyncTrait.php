@@ -53,7 +53,8 @@ trait SyncTrait
     {
         $exec = 'export MYSQL_PWD=\'%s\'; mysqldump --add-drop-table --default-character-set=%s %s -u %s -h %s --port %s > %s';
 
-        $command = sprintf($exec,
+        $command = sprintf(
+            $exec,
             addcslashes(config('database.connections.' . $connector . '.password'), "'"),
             config('database.connections.' . $connector . '.charset'),
             config('database.connections.' . $connector . '.database'),
@@ -107,7 +108,8 @@ trait SyncTrait
     {
         $exec = 'export MYSQL_PWD=\'%s\'; mysql -u %s -h %s --port %s %s < %s';
 
-        $command = sprintf($exec,
+        $command = sprintf(
+            $exec,
             addcslashes(config('database.connections.' . $connector . '.password'), "'"),
             config('database.connections.' . $connector . '.username'),
             config('database.connections.' . $connector . '.host'),
